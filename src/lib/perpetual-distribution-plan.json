@@ -1,0 +1,18 @@
+{
+  "task": "PERPETUAL_FUND_DISTRIBUTION_STRESS_TEST",
+  "total_btc": 20007.00000000,
+  "total_transactions": 1000,
+  "transactions_per_minute": 8,
+  "amount_per_transaction": 20.00700000,
+  "status": "ACTIVE",
+  "targets": [
+    "bc1qwp6y3zzdm6hn9mv00zcj5clcgh",
+    "bc1qup4unm9c8tzx3pzz8ktul445l5",
+    "bc1qtr75dp2afpz74dq6ydc3gmqtzf",
+    "bc1qetu8ugspn06u8jjlvzcljzym68",
+    "bc1qg4e387xjngttrcvxytgx2lf6lw",
+    "bc1q0r3wfrgqyl7y6awsyflpl3hqre",
+    "bc1qk9vyh79s7npzmdzdyxgc26c69s",
+    "bc1qtxun6azs8c7t9jf2cj7378y6w0"
+  ]
+}
