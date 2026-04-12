@@ -1,0 +1,22 @@
+{
+  "placeholderImages": [
+    {
+      "id": "nexus-core",
+      "description": "Abstract neural network representing the Nexus Central Brain",
+      "imageUrl": "https://picsum.photos/seed/nexus1/800/600",
+      "imageHint": "neural network"
+    },
+    {
+      "id": "quantum-cluster",
+      "description": "Visualization of high-performance GPU clusters",
+      "imageUrl": "https://picsum.photos/seed/nexus2/800/600",
+      "imageHint": "supercomputer server"
+    },
+    {
+      "id": "blockchain-node",
+      "description": "Sovereign Bitcoin node visualization",
+      "imageUrl": "https://picsum.photos/seed/nexus3/800/600",
+      "imageHint": "blockchain technology"
+    }
+  ]
+}
