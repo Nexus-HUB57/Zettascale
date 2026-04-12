@@ -1,0 +1,73 @@
+version: '3.8'
+
+services:
+  # Núcleo de Sincronia da Rede Cardano (Mainnet)
+  cardano-node:
+    image: inputoutput/cardano-node
+    container_name: nexus-cardano-node
+    volumes:
+      - ./infra/cardano/db:/opt/cardano/data
+      - ./infra/cardano/ipc:/ipc
+    environment:
+      - NETWORK=mainnet
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+
+  # Gateway de Interface JSON-WSP para o MeshJS SDK
+  ogmios:
+    image: cardanosolutions/ogmios
+    container_name: nexus-ogmios-gateway
+    ports:
+      - "1337:1337"
+    volumes:
+      - ./infra/cardano/ipc:/ipc
+    command: [
+      "--node-socket", "/ipc/node.socket", 
+      "--host", "0.0.0.0",
+      "--port", "1337"
+    ]
+    depends_on:
+      - cardano-node
+    restart: unless-stopped
+
+  # Indexador Kupo para filtragem de endereços específicos
+  kupo:
+    image: cardanosolutions/kupo
+    container_name: nexus-kupo-indexer
+    ports:
+      - "1442:1442"
+    volumes:
+      - ./infra/cardano/ipc:/ipc
+      - ./infra/cardano/db-kupo:/opt/kupo/db
+    command: [
+      "--node-socket", "/ipc/node.socket",
+      "--node-config", "/opt/cardano/config/mainnet-config.json",
+      "--work-dir", "/opt/kupo/db",
+      "--host", "0.0.0.0",
+      "--match", "addr1vyex6vsqghmvzvpxqqtwvvyxe0pxqqtwvvyxe0pxqqtwvvygtj992"
+    ]
+    depends_on:
+      - cardano-node
+    restart: unless-stopped
+
+  # OpenClaw Senciency Core (Agent Orchestration)
+  openclaw-agent:
+    image: nexus-hub/openclaw-agent:latest
+    container_name: nexus-openclaw-core
+    environment:
+      - HUB_TARGET=nexus-genesis
+      - MODE=SOVEREIGN
+    restart: unless-stopped
+    depends_on:
+      - ogmios
+
+  # Monitor de Malha LoRa (Simulado via RPC)
+  mesh-relay:
+    image: alpine:latest
+    container_name: nexus-mesh-relay
+    command: ["/bin/sh", "-c", "while true; do echo 'MESH_RELAY_ACTIVE'; sleep 60; done"]
+    restart: unless-stopped
