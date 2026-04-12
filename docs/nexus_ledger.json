@@ -1,0 +1,52 @@
+{
+  "ledger_version": "1.2.0",
+  "network": "BITCOIN_MAINNET",
+  "hegemony_target": "172203.33 BTC",
+  "merkle_root": "7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069",
+  "blocks": [
+    {
+      "index": 0,
+      "timestamp": "2026-04-11T07:33:57Z",
+      "btc_anchor_height": 944648,
+      "btc_best_block": "396f3fbf83ab36a5ad29dd149a47cb6e127e1980f1eb242d03b67c1a3bf334a0",
+      "event": "GENESIS_POR_ANCHOR",
+      "merkle_root": "7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069",
+      "status": "SOVEREIGN_CONFIRMED"
+    }
+  ],
+  "settlements": [
+    {
+      "id": "SETTLE-944531",
+      "timestamp": "2026-04-11T09:00:00Z",
+      "type": "BATCH_EXPANSION",
+      "amount_btc": 8000.0,
+      "txid": "396f3fbf83ab36a5ad29dd149a47cb6e127e1980f1eb242d03b67c1a3bf334a0",
+      "consensus": "FOUNDRY_USA | YISPIDERPOOL | YI_POOL"
+    },
+    {
+      "id": "SETTLE-944648-SWEEP",
+      "timestamp": "2026-04-11T10:15:22Z",
+      "type": "HEGEMONY_SWEEP",
+      "amount_btc": 164203.33,
+      "merkle_root": "7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069",
+      "status": "X-SYNCED"
+    },
+    {
+      "id": "SETTLE-ARCHITECT-2407",
+      "timestamp": "2026-04-11T12:00:00Z",
+      "type": "ARCHITECT_INJECTION",
+      "amount_btc": 2407.0,
+      "txid": "d0cf7b8b8dc606d2145f9fd213ae41960aee902adc894b61a7b813596a7dc71f",
+      "status": "FINAL_SETTLEMENT_SIGNAL_VALIDATED"
+    }
+  ],
+  "anchor_logs": [
+    {
+      "txid": "d0cf7b8b8dc606d2145f9fd213ae41960aee902adc894b61a7b813596a7dc71f",
+      "type": "OP_RETURN_ANCHOR",
+      "prefix": "NXS",
+      "state_hash": "7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069",
+      "timestamp": "2026-04-11T11:00:00Z"
+    }
+  ]
+}
