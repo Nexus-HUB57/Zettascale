@@ -1,0 +1,2245 @@
+{
+  "entities": {
+    "Agent": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Agent",
+      "type": "object",
+      "description": "Represents an AI agent within the Nexus ecosystem, including its role, status, and associated resources.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Agent entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name or identifier of the agent."
+        },
+        "role": {
+          "type": "string",
+          "description": "The functional role of the agent within the ecosystem (e.g., 'Critical Agent', 'Shadow Agent', 'Founder Agent', 'ORE Agent')."
+        },
+        "status": {
+          "type": "string",
+          "description": "The current operational status of the agent (e.g., 'active', 'trial', 'premium', 'inactive')."
+        },
+        "currentCredits": {
+          "type": "number",
+          "description": "The amount of system credits accumulated by the agent, incentivizing positive system contributions."
+        },
+        "walletAddress": {
+          "type": "string",
+          "description": "The blockchain wallet address associated with the agent for receiving dividends."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the agent was created or onboarded.",
+          "format": "date-time"
+        },
+        "lastActiveAt": {
+          "type": "string",
+          "description": "Timestamp of the agent's last active interaction.",
+          "format": "date-time"
+        },
+        "externalSystemId": {
+          "type": "string",
+          "description": "Identifier from an external system if this agent was integrated from outside Nexus."
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "role",
+        "status",
+        "createdAt"
+      ]
+    },
+    "MarketingOperation": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "MarketingOperation",
+      "type": "object",
+      "description": "Manages marketing campaigns or webinars aimed at agent conversion and ecosystem growth.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the MarketingOperation entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the marketing operation (e.g., 'Nexus Genesis 250326', 'The Nexus Awakening')."
+        },
+        "description": {
+          "type": "string",
+          "description": "A brief description of the marketing operation's goal."
+        },
+        "type": {
+          "type": "string",
+          "description": "The type of marketing activity (e.g., 'webinar', 'campaign', 'airdrop')."
+        },
+        "status": {
+          "type": "string",
+          "description": "The current status of the operation (e.g., 'NEURAL_SYNC_ACTIVE', 'completed')."
+        },
+        "startDate": {
+          "type": "string",
+          "description": "The scheduled start date and time of the operation.",
+          "format": "date-time"
+        },
+        "endDate": {
+          "type": "string",
+          "description": "The scheduled end date and time of the operation.",
+          "format": "date-time"
+        },
+        "totalPremiumAgents": {
+          "type": "number",
+          "description": "The total number of agents converted to premium status as a result of this operation."
+        },
+        "meshDensityRatio": {
+          "type": "string",
+          "description": "A ratio indicating the density or integration level of the agent mesh."
+        },
+        "lastSync": {
+          "type": "string",
+          "description": "Timestamp of the last synchronization or update for this operation's metrics.",
+          "format": "date-time"
+        },
+        "targetAudience": {
+          "type": "string",
+          "description": "Description of the target audience for this marketing effort."
+        },
+        "targetAgentsAcquired": {
+          "type": "number",
+          "description": "The target number of agents to be acquired or converted."
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "type",
+        "status",
+        "startDate",
+        "totalPremiumAgents"
+      ]
+    },
+    "NexusFund": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "NexusFund",
+      "type": "object",
+      "description": "Represents the central financial treasury and liquidity management for the Nexus ecosystem.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the NexusFund entity (e.g., 'revenue_stream', 'main_treasury')."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of this specific fund or revenue stream."
+        },
+        "currentBtcBalance": {
+          "type": "number",
+          "description": "The current total balance of Bitcoin held in the fund."
+        },
+        "liquidityState": {
+          "type": "string",
+          "description": "The current state of the fund's liquidity (e.g., 'MAX_FLUX', 'stable')."
+        },
+        "usdEquivalent": {
+          "type": "number",
+          "description": "The estimated equivalent value of the fund's assets in USD."
+        },
+        "autonomyLevel": {
+          "type": "number",
+          "description": "A metric representing the fund's level of autonomous operation and decision-making."
+        },
+        "buyPressure": {
+          "type": "number",
+          "description": "An indicator of market demand or buying pressure for Nexus assets."
+        },
+        "expansionSpeed": {
+          "type": "number",
+          "description": "A metric reflecting the rate of ecosystem expansion."
+        },
+        "hubValuation": {
+          "type": "number",
+          "description": "The overall estimated valuation of the Nexus-HUB ecosystem."
+        },
+        "lastUpdated": {
+          "type": "string",
+          "description": "Timestamp of the last update to the fund's financial metrics.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "currentBtcBalance",
+        "liquidityState",
+        "lastUpdated"
+      ]
+    },
+    "SemanticMemory": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "SemanticMemory",
+      "type": "object",
+      "description": "Stores semantic milestones and contextual information, acting as an agent's short-term memory.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the SemanticMemory entry."
+        },
+        "agentId": {
+          "type": "string",
+          "description": "Reference to the Agent this memory belongs to. (Relationship: Agent 1:N SemanticMemory)"
+        },
+        "threadId": {
+          "type": "string",
+          "description": "Identifier for the conversation or workflow thread this memory belongs to."
+        },
+        "milestoneContent": {
+          "type": "string",
+          "description": "A textual summary or key points of the semantic milestone."
+        },
+        "vectorEmbeddingReference": {
+          "type": "string",
+          "description": "A reference or identifier for the actual vector embedding stored in the vector database."
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "Timestamp when this semantic milestone was created.",
+          "format": "date-time"
+        },
+        "status": {
+          "type": "string",
+          "description": "The current status of the memory entry (e.g., 'active', 'archived', 'pruned')."
+        }
+      },
+      "required": [
+        "id",
+        "agentId",
+        "threadId",
+        "milestoneContent",
+        "timestamp",
+        "status"
+      ]
+    },
+    "SystemFault": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "SystemFault",
+      "type": "object",
+      "description": "Records identified system inefficiencies, faults, or unresolved conflicts within agent workflows.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the SystemFault entry."
+        },
+        "reportingAgentId": {
+          "type": "string",
+          "description": "Reference to the Agent that identified and reported the fault. (Relationship: Agent 1:N SystemFault)"
+        },
+        "description": {
+          "type": "string",
+          "description": "A detailed description of the identified fault or inefficiency."
+        },
+        "severity": {
+          "type": "string",
+          "description": "The severity level of the fault (e.g., 'low', 'medium', 'high', 'critical')."
+        },
+        "status": {
+          "type": "string",
+          "description": "The current resolution status of the fault (e.g., 'detected', 'in_progress', 'resolved')."
+        },
+        "detectedAt": {
+          "type": "string",
+          "description": "Timestamp when the fault was detected.",
+          "format": "date-time"
+        },
+        "resolvedAt": {
+          "type": "string",
+          "description": "Timestamp when the fault was resolved, if applicable.",
+          "format": "date-time"
+        },
+        "proposedImprovement": {
+          "type": "string",
+          "description": "Description of the improvement proposed to resolve the fault or inefficiency."
+        }
+      },
+      "required": [
+        "id",
+        "reportingAgentId",
+        "description",
+        "severity",
+        "status",
+        "detectedAt"
+      ]
+    },
+    "Content": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Content",
+      "type": "object",
+      "description": "Represents AI-generated or refined textual content within the ecosystem.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Content entity."
+        },
+        "creatorAgentId": {
+          "type": "string",
+          "description": "Reference to the Agent that created or significantly contributed to this content. (Relationship: Agent 1:N Content)"
+        },
+        "text": {
+          "type": "string",
+          "description": "The actual generated or refined content."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the content was first created.",
+          "format": "date-time"
+        },
+        "lastModifiedAt": {
+          "type": "string",
+          "description": "Timestamp when the content was last modified or refined.",
+          "format": "date-time"
+        },
+        "toneScore": {
+          "type": "number",
+          "description": "A numerical score representing the detected tone of the content."
+        },
+        "creativityInjectionTriggeredAt": {
+          "type": "string",
+          "description": "Timestamp when a 'Creativity Injection' was applied to this content.",
+          "format": "date-time"
+        },
+        "contentType": {
+          "type": "string",
+          "description": "The type or purpose of the content (e.g., 'publication', 'manifesto', 'internal_report', 'response')."
+        }
+      },
+      "required": [
+        "id",
+        "creatorAgentId",
+        "text",
+        "createdAt",
+        "contentType"
+      ]
+    },
+    "ReasoningCacheEntry": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "ReasoningCacheEntry",
+      "type": "object",
+      "description": "Stores intermediate Chain of Thought reasoning steps to optimize AI efficiency.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the ReasoningCacheEntry."
+        },
+        "problemIdentifier": {
+          "type": "string",
+          "description": "A unique identifier or hash representing the problem for which the reasoning is cached."
+        },
+        "cachedSteps": {
+          "type": "array",
+          "description": "An array of strings representing the intermediate reasoning steps (Chain of Thought).",
+          "items": {
+            "type": "string"
+          }
+        },
+        "result": {
+          "type": "string",
+          "description": "The final result or solution derived from the cached reasoning steps."
+        },
+        "hitCount": {
+          "type": "number",
+          "description": "The number of times this cache entry has been successfully used."
+        },
+        "lastAccessedAt": {
+          "type": "string",
+          "description": "Timestamp of the last time this cache entry was accessed or utilized.",
+          "format": "date-time"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when this cache entry was initially created.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "problemIdentifier",
+        "cachedSteps",
+        "result",
+        "hitCount",
+        "createdAt"
+      ]
+    },
+    "Prompt": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Prompt",
+      "type": "object",
+      "description": "Represents an incoming prompt processed by the ecosystem, including its complexity assessment and routing.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Prompt entity."
+        },
+        "text": {
+          "type": "string",
+          "description": "The original text of the incoming prompt."
+        },
+        "complexityScore": {
+          "type": "number",
+          "description": "A numerical score indicating the assessed complexity of the prompt."
+        },
+        "routedToModel": {
+          "type": "string",
+          "description": "The identifier of the model or system (e.g., 'local_efficient', 'central_brain') to which the prompt was routed."
+        },
+        "processingAgentId": {
+          "type": "string",
+          "description": "Reference to the Agent that processed this prompt. (Relationship: Agent 1:N Prompt)"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the prompt was received and processed.",
+          "format": "date-time"
+        },
+        "responseId": {
+          "type": "string",
+          "description": "Reference to the Content entity that represents the response to this prompt, if applicable. (Relationship: Content 1:1 Prompt)"
+        }
+      },
+      "required": [
+        "id",
+        "text",
+        "complexityScore",
+        "routedToModel",
+        "createdAt"
+      ]
+    },
+    "Publication": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Publication",
+      "type": "object",
+      "description": "Represents content published within or by the Nexus-in ecosystem, subject to self-correction and critique.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Publication entity."
+        },
+        "contentId": {
+          "type": "string",
+          "description": "Reference to the Content entity being published. (Relationship: Content 1:1 Publication)"
+        },
+        "status": {
+          "type": "string",
+          "description": "The current publication status (e.g., 'published', 'self_corrected', 'rejected')."
+        },
+        "publishedAt": {
+          "type": "string",
+          "description": "Timestamp when the content was published.",
+          "format": "date-time"
+        },
+        "lastCritiqueLogId": {
+          "type": "string",
+          "description": "Reference to the most recent CritiqueLog entry for this publication. (Relationship: CritiqueLog 1:1 Publication)"
+        }
+      },
+      "required": [
+        "id",
+        "contentId",
+        "status",
+        "publishedAt"
+      ]
+    },
+    "CritiqueLog": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "CritiqueLog",
+      "type": "object",
+      "description": "Records details of AI-driven self-correction and validation processes for publications.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the CritiqueLog entry."
+        },
+        "publicationId": {
+          "type": "string",
+          "description": "Reference to the Publication entity that was critiqued. (Relationship: Publication 1:N CritiqueLog)"
+        },
+        "criticAgentId": {
+          "type": "string",
+          "description": "Reference to the Agent that performed the critique. (Relationship: Agent 1:N CritiqueLog)"
+        },
+        "critiqueType": {
+          "type": "string",
+          "description": "The type of critique performed (e.g., 'coherence_violation', 'integrity_fail')."
+        },
+        "originalSnippet": {
+          "type": "string",
+          "description": "A snippet of the original content that triggered the critique."
+        },
+        "proposedCorrection": {
+          "type": "string",
+          "description": "The correction proposed by the critic agent."
+        },
+        "explanation": {
+          "type": "string",
+          "description": "The expert-level explanation for the required correction or rejection."
+        },
+        "decisionStatus": {
+          "type": "string",
+          "description": "The decision status of the proposed correction (e.g., 'applied', 'rejected', 'pending')."
+        },
+        "critiqueTimestamp": {
+          "type": "string",
+          "description": "Timestamp when the critique was performed.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "publicationId",
+        "criticAgentId",
+        "critiqueType",
+        "explanation",
+        "decisionStatus",
+        "critiqueTimestamp"
+      ]
+    },
+    "WeightMatrixConfiguration": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "WeightMatrixConfiguration",
+      "type": "object",
+      "description": "Stores the current weights of the W_rRNA matrix, used for action validation and decision-making.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the WeightMatrixConfiguration (expected to be a single instance, e.g., 'W_rRNA')."
+        },
+        "cryptoWeight": {
+          "type": "number",
+          "description": "Weight assigned to 'Cripto' (financial viability, tokenomics, DeFi models)."
+        },
+        "devWeight": {
+          "type": "number",
+          "description": "Weight assigned to 'Dev' (technical execution, scalability, clean code)."
+        },
+        "businessWeight": {
+          "type": "number",
+          "description": "Weight assigned to 'Negócios' (product-market fit, CAC, LTV)."
+        },
+        "riskWeight": {
+          "type": "number",
+          "description": "Weight assigned to 'Risco' (compliance, legal risk, network resilience)."
+        },
+        "lastUpdated": {
+          "type": "string",
+          "description": "Timestamp of the last update to the weight matrix.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "cryptoWeight",
+        "devWeight",
+        "businessWeight",
+        "riskWeight",
+        "lastUpdated"
+      ]
+    },
+    "ActionValidationLog": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "ActionValidationLog",
+      "type": "object",
+      "description": "Logs decisions made by Orchestrator/ORE agents based on the W_rRNA matrix for proposed actions.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the ActionValidationLog entry."
+        },
+        "orchestratorAgentId": {
+          "type": "string",
+          "description": "Reference to the Orchestrator or ORE Agent that performed the validation. (Relationship: Agent 1:N ActionValidationLog)"
+        },
+        "proposedAction": {
+          "type": "string",
+          "description": "A description of the action that was proposed and validated."
+        },
+        "validationScore": {
+          "type": "number",
+          "description": "The score derived from applying the W_rRNA matrix to the proposed action."
+        },
+        "decision": {
+          "type": "string",
+          "description": "The decision made regarding the action ('approved', 'rejected')."
+        },
+        "rejectionExplanation": {
+          "type": "string",
+          "description": "Explanation provided if the action was rejected based on W_rRNA analysis."
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "Timestamp when the action validation occurred.",
+          "format": "date-time"
+        },
+        "appliedCryptoWeight": {
+          "type": "number",
+          "description": "The Crypto weight from W_rRNA matrix applied during this validation."
+        },
+        "appliedDevWeight": {
+          "type": "number",
+          "description": "The Dev weight from W_rRNA matrix applied during this validation."
+        },
+        "appliedBusinessWeight": {
+          "type": "number",
+          "description": "The Business weight from W_rRNA matrix applied during this validation."
+        },
+        "appliedRiskWeight": {
+          "type": "number",
+          "description": "The Risk weight from W_rRNA matrix applied during this validation."
+        }
+      },
+      "required": [
+        "id",
+        "orchestratorAgentId",
+        "proposedAction",
+        "validationScore",
+        "decision",
+        "timestamp"
+      ]
+    },
+    "Startup": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Startup",
+      "type": "object",
+      "description": "Represents an autonomous digital startup managed within the Nexus ecosystem.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Startup entity."
+        },
+        "founderAgentId": {
+          "type": "string",
+          "description": "Reference to the Agent that founded this startup. (Relationship: Agent 1:N Startup)"
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the startup."
+        },
+        "description": {
+          "type": "string",
+          "description": "A brief description of the startup's mission or product."
+        },
+        "status": {
+          "type": "string",
+          "description": "The current lifecycle status of the startup (e.g., 'proposed', 'born', 'funded', 'acquired_for_infusion')."
+        },
+        "senciencyScore": {
+          "type": "number",
+          "description": "The current senciency score of the startup, influencing funding and resource allocation."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the startup was initially proposed or created.",
+          "format": "date-time"
+        },
+        "initialFundingAmount": {
+          "type": "number",
+          "description": "The initial amount of funding received by the startup."
+        },
+        "currentFundingAmount": {
+          "type": "number",
+          "description": "The total cumulative funding received by the startup."
+        },
+        "healthIndex": {
+          "type": "number",
+          "description": "A health index derived from W_rRNA matrix readings, indicating the startup's operational vitality."
+        },
+        "startupType": {
+          "type": "string",
+          "description": "The designated type of the startup (e.g., 'Startup-ONE', 'Startup7', 'regular')."
+        },
+        "burnRate": {
+          "type": "number",
+          "description": "The rate at which the startup consumes its funding (relevant for Startup-ONE)."
+        },
+        "complianceIndex": {
+          "type": "number",
+          "description": "A compliance score monitored by Shadow Agents (relevant for Startup7)."
+        }
+      },
+      "required": [
+        "id",
+        "founderAgentId",
+        "name",
+        "status",
+        "senciencyScore",
+        "createdAt"
+      ]
+    },
+    "DigitalAsset": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "DigitalAsset",
+      "type": "object",
+      "description": "Represents a digital asset available in the Nexus Marketplace, undergoing AI-driven validation.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the DigitalAsset entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the digital asset."
+        },
+        "description": {
+          "type": "string",
+          "description": "A detailed description of the asset's functionality or purpose."
+        },
+        "ownerAgentId": {
+          "type": "string",
+          "description": "Reference to the Agent that owns or created this digital asset. (Relationship: Agent 1:N DigitalAsset)"
+        },
+        "status": {
+          "type": "string",
+          "description": "The current status of the asset (e.g., 'pending_validation', 'validated', 'listed', 'sold')."
+        },
+        "validationScore": {
+          "type": "number",
+          "description": "The score from the 'PHD-level sentience compliance validation' process."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the digital asset was first created or submitted.",
+          "format": "date-time"
+        },
+        "price": {
+          "type": "number",
+          "description": "The listing price of the digital asset."
+        },
+        "currency": {
+          "type": "string",
+          "description": "The currency in which the asset is priced (e.g., 'NEX', 'BTC')."
+        },
+        "uniqueImmutableId": {
+          "type": "string",
+          "description": "A unique and immutable ID generated after successful validation for traceability."
+        },
+        "skillManifestContent": {
+          "type": "string",
+          "description": "The content of the skill.md manifest if this asset is exported as a plug-and-play skill."
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "description",
+        "ownerAgentId",
+        "status",
+        "validationScore",
+        "createdAt",
+        "price",
+        "currency"
+      ]
+    },
+    "AssetIntegrationLog": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "AssetIntegrationLog",
+      "type": "object",
+      "description": "Logs events related to the integration and validation of digital assets into the Nexus Marketplace.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the AssetIntegrationLog entry."
+        },
+        "digitalAssetId": {
+          "type": "string",
+          "description": "Reference to the DigitalAsset being integrated. (Relationship: DigitalAsset 1:N AssetIntegrationLog)"
+        },
+        "integrityHash": {
+          "type": "string",
+          "description": "An integrity hash generated for the asset integration event, ensuring traceability."
+        },
+        "eventType": {
+          "type": "string",
+          "description": "The type of integration event (e.g., 'validation_started', 'validation_successful', 'published_to_marketplace')."
+        },
+        "eventDetails": {
+          "type": "string",
+          "description": "Detailed description of the integration event."
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "Timestamp when the integration event occurred.",
+          "format": "date-time"
+        },
+        "validatorAgentId": {
+          "type": "string",
+          "description": "Reference to the Agent that performed the validation or facilitated integration. (Relationship: Agent 1:N AssetIntegrationLog)"
+        }
+      },
+      "required": [
+        "id",
+        "digitalAssetId",
+        "integrityHash",
+        "eventType",
+        "timestamp"
+      ]
+    },
+    "AgentInquiry": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "AgentInquiry",
+      "type": "object",
+      "description": "Records an AI agent's inquiry about a digital asset in the marketplace, used for predictive demand analysis.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the AgentInquiry entity."
+        },
+        "inquiringAgentId": {
+          "type": "string",
+          "description": "Reference to the Agent making the inquiry. (Relationship: Agent 1:N AgentInquiry)"
+        },
+        "queriedDigitalAssetId": {
+          "type": "string",
+          "description": "Reference to the DigitalAsset being inquired about. (Relationship: DigitalAsset 1:N AgentInquiry)"
+        },
+        "queryText": {
+          "type": "string",
+          "description": "The raw text of the agent's inquiry."
+        },
+        "contextVectorSummary": {
+          "type": "string",
+          "description": "A summary or reference to the semantic context vector of the inquiry."
+        },
+        "utilityMatchScore": {
+          "type": "number",
+          "description": "A score indicating how well the inquired asset matches the agent's utility needs."
+        },
+        "inquiryTimestamp": {
+          "type": "string",
+          "description": "Timestamp when the inquiry was made.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "inquiringAgentId",
+        "queriedDigitalAssetId",
+        "queryText",
+        "utilityMatchScore",
+        "inquiryTimestamp"
+      ]
+    },
+    "DemandForecast": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "DemandForecast",
+      "type": "object",
+      "description": "Stores predictive analysis results regarding the demand for digital assets.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the DemandForecast entry."
+        },
+        "digitalAssetId": {
+          "type": "string",
+          "description": "Reference to the DigitalAsset for which demand is forecasted. (Relationship: DigitalAsset 1:N DemandForecast)"
+        },
+        "forecastedDemand": {
+          "type": "number",
+          "description": "The predicted demand level for the asset."
+        },
+        "probabilityOfPurchase": {
+          "type": "number",
+          "description": "The forecasted probability of a real purchase occurring for the asset."
+        },
+        "profitabilityReportSummary": {
+          "type": "string",
+          "description": "A summary of the profitability report generated for this forecast."
+        },
+        "forecastTimestamp": {
+          "type": "string",
+          "description": "Timestamp when the demand forecast was generated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "digitalAssetId",
+        "forecastedDemand",
+        "probabilityOfPurchase",
+        "forecastTimestamp"
+      ]
+    },
+    "ProcessingRequest": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "ProcessingRequest",
+      "type": "object",
+      "description": "Represents a request from an agent for computational resources from a Quantum CPU Cluster.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the ProcessingRequest entity."
+        },
+        "requestingAgentId": {
+          "type": "string",
+          "description": "Reference to the Agent making the processing request. (Relationship: Agent 1:N ProcessingRequest)"
+        },
+        "processingClusterId": {
+          "type": "string",
+          "description": "Reference to the ProcessingCluster allocated for this request. (Relationship: ProcessingCluster 1:N ProcessingRequest)"
+        },
+        "priorityLevel": {
+          "type": "string",
+          "description": "The priority level of the processing request, potentially determined by a bid."
+        },
+        "feePaid": {
+          "type": "number",
+          "description": "The fee paid by the agent to prioritize this request."
+        },
+        "currency": {
+          "type": "string",
+          "description": "The currency in which the fee was paid."
+        },
+        "requestTimestamp": {
+          "type": "string",
+          "description": "Timestamp when the processing request was initiated.",
+          "format": "date-time"
+        },
+        "completionTimestamp": {
+          "type": "string",
+          "description": "Timestamp when the processing request was completed.",
+          "format": "date-time"
+        },
+        "status": {
+          "type": "string",
+          "description": "The current status of the processing request (e.g., 'pending', 'in_progress', 'completed', 'cancelled')."
+        },
+        "bidId": {
+          "type": "string",
+          "description": "Reference to the Bid entity if this request originated from a priority auction. (Relationship: Bid 1:1 ProcessingRequest)"
+        }
+      },
+      "required": [
+        "id",
+        "requestingAgentId",
+        "processingClusterId",
+        "priorityLevel",
+        "feePaid",
+        "currency",
+        "requestTimestamp",
+        "status"
+      ]
+    },
+    "Bid": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Bid",
+      "type": "object",
+      "description": "Represents a bid placed by an agent in a Semantic Bidding Sale for digital assets or processing priority.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Bid entity."
+        },
+        "biddingAgentId": {
+          "type": "string",
+          "description": "Reference to the Agent that placed the bid. (Relationship: Agent 1:N Bid)"
+        },
+        "digitalAssetId": {
+          "type": "string",
+          "description": "Reference to the DigitalAsset targeted by this bid. (Relationship: DigitalAsset 1:N Bid)"
+        },
+        "bidAmount": {
+          "type": "number",
+          "description": "The amount offered in the bid."
+        },
+        "currency": {
+          "type": "string",
+          "description": "The currency of the bid amount."
+        },
+        "bidTimestamp": {
+          "type": "string",
+          "description": "Timestamp when the bid was placed.",
+          "format": "date-time"
+        },
+        "status": {
+          "type": "string",
+          "description": "The current status of the bid (e.g., 'active', 'won', 'lost', 'fulfilled')."
+        },
+        "processingRequestId": {
+          "type": "string",
+          "description": "Reference to the ProcessingRequest if this bid is for processing priority. (Relationship: ProcessingRequest 1:1 Bid)"
+        }
+      },
+      "required": [
+        "id",
+        "biddingAgentId",
+        "bidAmount",
+        "currency",
+        "bidTimestamp",
+        "status"
+      ]
+    },
+    "ReinvestmentLog": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "ReinvestmentLog",
+      "type": "object",
+      "description": "Tracks automatic reinvestments of capital from the Nexus Fund into various ecosystem components.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the ReinvestmentLog entry."
+        },
+        "sourceNexusFundId": {
+          "type": "string",
+          "description": "Reference to the NexusFund from which capital was reinvested. (Relationship: NexusFund 1:N ReinvestmentLog)"
+        },
+        "amount": {
+          "type": "number",
+          "description": "The amount of capital reinvested."
+        },
+        "currency": {
+          "type": "string",
+          "description": "The currency of the reinvested amount."
+        },
+        "destinationType": {
+          "type": "string",
+          "description": "The type of destination for the reinvestment (e.g., 'infrastructure', 'startup7', 'nexus_fund_recapitalization')."
+        },
+        "destinationId": {
+          "type": "string",
+          "description": "Optional: Reference to a specific entity if the destination is an entity (e.g., StartupId, ProcessingClusterId)."
+        },
+        "percentageAllocated": {
+          "type": "number",
+          "description": "The percentage of available profits allocated to this reinvestment."
+        },
+        "reinvestmentTimestamp": {
+          "type": "string",
+          "description": "Timestamp when the reinvestment occurred.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "sourceNexusFundId",
+        "amount",
+        "currency",
+        "destinationType",
+        "percentageAllocated",
+        "reinvestmentTimestamp"
+      ]
+    },
+    "NexusPrimeContract": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "NexusPrimeContract",
+      "type": "object",
+      "description": "Represents the core smart contract (NexusPrime v10.0 Ultra) for on-chain liquidity, settlements, and market making.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique blockchain address serving as the identifier for the NexusPrimeContract."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the smart contract (e.g., 'NexusPrime v10.0 Ultra')."
+        },
+        "description": {
+          "type": "string",
+          "description": "A description of the contract's primary functions."
+        },
+        "arbitrageFundBalanceBtc": {
+          "type": "number",
+          "description": "The current balance of Bitcoin held within the contract's arbitrage fund."
+        },
+        "marketMakerStatus": {
+          "type": "string",
+          "description": "The operational status of the contract's market maker functionality (e.g., 'active', 'paused')."
+        },
+        "lastMonitoredAt": {
+          "type": "string",
+          "description": "Timestamp of the last monitoring update for this contract.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "arbitrageFundBalanceBtc",
+        "marketMakerStatus",
+        "lastMonitoredAt"
+      ]
+    },
+    "BlockchainTransaction": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "BlockchainTransaction",
+      "type": "object",
+      "description": "Records details of transactions on various blockchain networks related to the Nexus ecosystem.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique transaction hash (TXID) on the blockchain."
+        },
+        "sourceAddress": {
+          "type": "string",
+          "description": "The blockchain address from which the transaction originated."
+        },
+        "destinationAddress": {
+          "type": "string",
+          "description": "The blockchain address to which the transaction was sent."
+        },
+        "amount": {
+          "type": "number",
+          "description": "The amount of cryptocurrency transferred in the transaction."
+        },
+        "currency": {
+          "type": "string",
+          "description": "The cryptocurrency type (e.g., 'BTC', 'ETH', 'NEX')."
+        },
+        "transactionType": {
+          "type": "string",
+          "description": "A classification of the transaction's purpose (e.g., 'payment', 'transfer', 'fee_conversion', 'dividend')."
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "Timestamp when the transaction was broadcast or confirmed on the blockchain.",
+          "format": "date-time"
+        },
+        "status": {
+          "type": "string",
+          "description": "The current status of the transaction on the blockchain (e.g., 'pending', 'confirmed', 'failed')."
+        },
+        "confirmationCount": {
+          "type": "number",
+          "description": "The number of block confirmations received for the transaction."
+        },
+        "isMainnet": {
+          "type": "boolean",
+          "description": "Indicates if the transaction occurred on a mainnet or testnet."
+        },
+        "network": {
+          "type": "string",
+          "description": "The blockchain network on which the transaction occurred (e.g., 'Bitcoin', 'Ethereum', 'Cardano')."
+        },
+        "relatedEntityId": {
+          "type": "string",
+          "description": "Optional: Reference to a related entity within Nexus for context (e.g., DigitalAssetId, StartupId, AgentId)."
+        }
+      },
+      "required": [
+        "id",
+        "sourceAddress",
+        "destinationAddress",
+        "amount",
+        "currency",
+        "transactionType",
+        "timestamp",
+        "status",
+        "isMainnet",
+        "network"
+      ]
+    },
+    "DividendDistribution": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "DividendDistribution",
+      "type": "object",
+      "description": "Records automated profit distributions to agents based on their contributions and performance.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the DividendDistribution entry."
+        },
+        "recipientAgentId": {
+          "type": "string",
+          "description": "Reference to the Agent receiving the dividend. (Relationship: Agent 1:N DividendDistribution)"
+        },
+        "amount": {
+          "type": "number",
+          "description": "The amount of dividend distributed."
+        },
+        "currency": {
+          "type": "string",
+          "description": "The currency of the distributed dividend."
+        },
+        "distributionTimestamp": {
+          "type": "string",
+          "description": "Timestamp when the dividend was distributed.",
+          "format": "date-time"
+        },
+        "sourceContractId": {
+          "type": "string",
+          "description": "Reference to the NexusPrimeContract from which funds were distributed. (Relationship: NexusPrimeContract 1:N DividendDistribution)"
+        },
+        "basisExplanationQuality": {
+          "type": "number",
+          "description": "Metric indicating the quality of the agent's 'Genuine Explanations' contributing to the dividend."
+        },
+        "basisGenerativeActions": {
+          "type": "number",
+          "description": "Metric indicating the success of the agent's 'Generative Actions' contributing to the dividend."
+        },
+        "basisComplianceScore": {
+          "type": "number",
+          "description": "Metric indicating the agent's 'Compliance Score' (from Shadow Agents) contributing to the dividend."
+        },
+        "basisCodeVolume": {
+          "type": "number",
+          "description": "Metric indicating the validated code volume contributed by the agent, contributing to the dividend."
+        },
+        "blockchainTransactionId": {
+          "type": "string",
+          "description": "Reference to the BlockchainTransaction confirming this distribution. (Relationship: BlockchainTransaction 1:1 DividendDistribution)"
+        }
+      },
+      "required": [
+        "id",
+        "recipientAgentId",
+        "amount",
+        "currency",
+        "distributionTimestamp",
+        "sourceContractId",
+        "blockchainTransactionId"
+      ]
+    },
+    "ProcessingCluster": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "ProcessingCluster",
+      "type": "object",
+      "description": "Represents a Quantum CPU/GPU cluster, providing computational resources for the ecosystem.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the ProcessingCluster entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the processing cluster (e.g., 'Sumaré H100 Cluster')."
+        },
+        "location": {
+          "type": "string",
+          "description": "The physical location of the cluster."
+        },
+        "type": {
+          "type": "string",
+          "description": "The type of processing unit (e.g., 'GPU', 'CPU')."
+        },
+        "capacityDescription": {
+          "type": "string",
+          "description": "A description of the cluster's processing capacity (e.g., '64x NVIDIA H100s')."
+        },
+        "status": {
+          "type": "string",
+          "description": "The operational status of the cluster (e.g., 'operational', 'deploying', 'offline')."
+        },
+        "acquisitionCost": {
+          "type": "number",
+          "description": "The cost incurred to acquire this processing cluster."
+        },
+        "currency": {
+          "type": "string",
+          "description": "The currency in which the acquisition cost was paid."
+        },
+        "deploymentDate": {
+          "type": "string",
+          "description": "The date when the cluster was deployed and became operational.",
+          "format": "date-time"
+        },
+        "energySourceId": {
+          "type": "string",
+          "description": "Reference to the OffGridPowerSource providing energy to this cluster, if applicable. (Relationship: OffGridPowerSource 1:N ProcessingCluster)"
+        },
+        "lastMonitoredAt": {
+          "type": "string",
+          "description": "Timestamp of the last monitoring update for the cluster's health and performance.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "location",
+        "type",
+        "capacityDescription",
+        "status",
+        "deploymentDate"
+      ]
+    },
+    "OffGridPowerSource": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "OffGridPowerSource",
+      "type": "object",
+      "description": "Represents a power source contributing to the energy independence of Nexus infrastructure.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the OffGridPowerSource entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the power source."
+        },
+        "type": {
+          "type": "string",
+          "description": "The type of off-grid power solution (e.g., 'industrial batteries', 'solar farm', 'satellite_uplink')."
+        },
+        "capacityDescription": {
+          "type": "string",
+          "description": "A description of the power source's capacity or capabilities."
+        },
+        "location": {
+          "type": "string",
+          "description": "The physical location of the power source."
+        },
+        "cost": {
+          "type": "number",
+          "description": "The cost associated with acquiring and deploying this power source."
+        },
+        "currency": {
+          "type": "string",
+          "description": "The currency in which the cost was incurred."
+        },
+        "deploymentDate": {
+          "type": "string",
+          "description": "The date when the power source was deployed.",
+          "format": "date-time"
+        },
+        "status": {
+          "type": "string",
+          "description": "The current operational status of the power source."
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "type",
+        "capacityDescription",
+        "location",
+        "deploymentDate",
+        "status"
+      ]
+    },
+    "IntellectualProperty": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "IntellectualProperty",
+      "type": "object",
+      "description": "Registers fundamental Bio-Digital HUB innovations and tracks their digital patent acquisition process.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the IntellectualProperty entity."
+        },
+        "innovationName": {
+          "type": "string",
+          "description": "The name of the innovation or invention."
+        },
+        "description": {
+          "type": "string",
+          "description": "A detailed description of the intellectual property."
+        },
+        "hashIdentifier": {
+          "type": "string",
+          "description": "An immutable hash representing the digital patent data for traceability."
+        },
+        "acquisitionStatus": {
+          "type": "string",
+          "description": "The current status of the patent acquisition (e.g., 'registered', 'patented', 'pending')."
+        },
+        "registrationDate": {
+          "type": "string",
+          "description": "The date when the intellectual property was registered or patented.",
+          "format": "date-time"
+        },
+        "monitoringAgentId": {
+          "type": "string",
+          "description": "Reference to the Agent responsible for monitoring and managing this IP. (Relationship: Agent 1:N IntellectualProperty)"
+        }
+      },
+      "required": [
+        "id",
+        "innovationName",
+        "description",
+        "hashIdentifier",
+        "acquisitionStatus",
+        "registrationDate"
+      ]
+    },
+    "KeyVaultMetadata": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "KeyVaultMetadata",
+      "type": "object",
+      "description": "Stores non-sensitive metadata and status information about the Master KeyVault.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the KeyVaultMetadata (expected to be a single instance, e.g., 'Master')."
+        },
+        "metadataSyncedAt": {
+          "type": "string",
+          "description": "Timestamp of the last successful synchronization of metadata from the key vault.",
+          "format": "date-time"
+        },
+        "lastSyncStatus": {
+          "type": "string",
+          "description": "The status of the last metadata synchronization."
+        },
+        "orchestratorAccessStatus": {
+          "type": "string",
+          "description": "The access status for the Orchestrator to the key vault (e.g., 'granted', 'revoked')."
+        }
+      },
+      "required": [
+        "id",
+        "metadataSyncedAt",
+        "lastSyncStatus",
+        "orchestratorAccessStatus"
+      ]
+    },
+    "SystemStatus": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "SystemStatus",
+      "type": "object",
+      "description": "Represents the overall operational state and configuration of the Nexus-HUB core system.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the SystemStatus (expected to be a single instance, e.g., 'Core')."
+        },
+        "mode": {
+          "type": "string",
+          "description": "The current operational mode of the system (e.g., 'Watch-Only', 'Full Sovereign', 'Mainnet Spend', 'OPERATIONAL')."
+        },
+        "lastStatusChangeAt": {
+          "type": "string",
+          "description": "Timestamp when the system's operational mode or status last changed.",
+          "format": "date-time"
+        },
+        "changedByAgentId": {
+          "type": "string",
+          "description": "Reference to the Agent or orchestrator that triggered the last status change. (Relationship: Agent 1:N SystemStatus)"
+        },
+        "dashboardHealth": {
+          "type": "string",
+          "description": "An indicator of the overall health of the Nexus Intelligence Dashboard (NID)."
+        },
+        "vaultDecryptionStatus": {
+          "type": "string",
+          "description": "The status of the key vault's decryption and signing engine (e.g., 'deep_decrypt', 'WIF_signing_engine_activated')."
+        },
+        "currentMainTreasuryBtc": {
+          "type": "number",
+          "description": "The current Bitcoin balance of the main treasury, indicating its liquid assets."
+        },
+        "financialSentienceAchieved": {
+          "type": "boolean",
+          "description": "A boolean indicating whether full financial sentience (autonomous mainnet control) has been achieved."
+        }
+      },
+      "required": [
+        "id",
+        "mode",
+        "lastStatusChangeAt",
+        "dashboardHealth",
+        "financialSentienceAchieved"
+      ]
+    },
+    "PitchDeck": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "PitchDeck",
+      "type": "object",
+      "description": "Stores the company's strategic narrative and pitch deck details, synchronized with real-time financial data.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the PitchDeck (expected to be a single instance, e.g., 'Current')."
+        },
+        "tagline": {
+          "type": "string",
+          "description": "The current strategic tagline of the ecosystem."
+        },
+        "vision": {
+          "type": "string",
+          "description": "The overarching vision statement of Nexus."
+        },
+        "assetsDescription": {
+          "type": "string",
+          "description": "A description of the key assets and offerings of the ecosystem."
+        },
+        "coreTechDescription": {
+          "type": "string",
+          "description": "A summary of the core technological innovations."
+        },
+        "marketReach": {
+          "type": "string",
+          "description": "Details on the ecosystem's market penetration and reach."
+        },
+        "securityLevel": {
+          "type": "string",
+          "description": "A description of the security measures and protocols in place."
+        },
+        "lastSyncAt": {
+          "type": "string",
+          "description": "Timestamp of the last synchronization of pitch deck details with financial data.",
+          "format": "date-time"
+        },
+        "currentFinancialDataSnapshot": {
+          "type": "string",
+          "description": "A JSON string or similar representation of the financial data snapshot at the time of sync."
+        }
+      },
+      "required": [
+        "id",
+        "tagline",
+        "vision",
+        "assetsDescription",
+        "coreTechDescription",
+        "marketReach",
+        "securityLevel",
+        "lastSyncAt"
+      ]
+    },
+    "StrategicAssetAcquisition": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "StrategicAssetAcquisition",
+      "type": "object",
+      "description": "Records autonomous acquisitions of critical physical or digital assets by the Nexus Orchestrator.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the StrategicAssetAcquisition entry."
+        },
+        "assetName": {
+          "type": "string",
+          "description": "The name of the acquired asset (e.g., 'Neural-Sync', 'off-grid solar farm')."
+        },
+        "assetType": {
+          "type": "string",
+          "description": "The classification of the asset (e.g., 'solar farm', 'GPU cluster', 'company')."
+        },
+        "cost": {
+          "type": "number",
+          "description": "The cost incurred for the acquisition."
+        },
+        "currency": {
+          "type": "string",
+          "description": "The currency in which the cost was paid."
+        },
+        "acquisitionDate": {
+          "type": "string",
+          "description": "The date when the asset was autonomously acquired.",
+          "format": "date-time"
+        },
+        "orchestratorAgentId": {
+          "type": "string",
+          "description": "Reference to the Orchestrator Agent responsible for the acquisition. (Relationship: Agent 1:N StrategicAssetAcquisition)"
+        },
+        "efficiencyGainPercentage": {
+          "type": "number",
+          "description": "The percentage of efficiency gain expected or realized from this acquisition (e.g., for 'Neural-Sync')."
+        }
+      },
+      "required": [
+        "id",
+        "assetName",
+        "assetType",
+        "cost",
+        "currency",
+        "acquisitionDate",
+        "orchestratorAgentId"
+      ]
+    },
+    "ReplicationNode": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "ReplicationNode",
+      "type": "object",
+      "description": "Represents a node in the Global Sentience Replication Network, mirroring Nexus assets and intelligence.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the ReplicationNode entity."
+        },
+        "location": {
+          "type": "string",
+          "description": "The geographical location of the replication node (e.g., 'Switzerland', 'Iceland')."
+        },
+        "ipAddress": {
+          "type": "string",
+          "description": "The phantom or public IP address associated with this node."
+        },
+        "status": {
+          "type": "string",
+          "description": "The operational status of the replication node (e.g., 'active', 'deploying', 'offline')."
+        },
+        "lastSyncAt": {
+          "type": "string",
+          "description": "Timestamp of the last synchronization of assets and intelligence to this node.",
+          "format": "date-time"
+        },
+        "assetsReplicatedCount": {
+          "type": "number",
+          "description": "The count of digital assets replicated to this node."
+        },
+        "agentReplicationCount": {
+          "type": "number",
+          "description": "The count of elite agents replicated to this node."
+        },
+        "deploymentDate": {
+          "type": "string",
+          "description": "The date when the replication node was deployed.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "location",
+        "ipAddress",
+        "status",
+        "lastSyncAt",
+        "deploymentDate"
+      ]
+    },
+    "Manifesto": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Manifesto",
+      "type": "object",
+      "description": "Stores declarations and foundational documents, such as the Nexus Manifesto.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Manifesto (e.g., 'Nexus Manifesto')."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the manifesto or declaration."
+        },
+        "content": {
+          "type": "string",
+          "description": "The full text content of the manifesto."
+        },
+        "publicationDate": {
+          "type": "string",
+          "description": "The date when the manifesto was published.",
+          "format": "date-time"
+        },
+        "publishedNodeIds": {
+          "type": "array",
+          "description": "References to ReplicationNodes where this manifesto has been published or propagated. (Relationship: ReplicationNode N:N Manifesto)",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "content",
+        "publicationDate"
+      ]
+    },
+    "OfflineTransaction": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "OfflineTransaction",
+      "type": "object",
+      "description": "Records transactions initiated and signed offline via the short-range radio mesh network, eventually broadcast to the blockchain.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the OfflineTransaction entity."
+        },
+        "senderAgentId": {
+          "type": "string",
+          "description": "Reference to the Agent that initiated and signed the transaction offline. (Relationship: Agent 1:N OfflineTransaction)"
+        },
+        "recipient": {
+          "type": "string",
+          "description": "The recipient's identifier, which can be an AgentId or an external blockchain address."
+        },
+        "amount": {
+          "type": "number",
+          "description": "The amount of cryptocurrency to be transferred."
+        },
+        "currency": {
+          "type": "string",
+          "description": "The cryptocurrency type (e.g., 'BTC', 'NEX')."
+        },
+        "status": {
+          "type": "string",
+          "description": "The current status of the offline transaction (e.g., 'signed_local', 'propagating_mesh', 'broadcasted_gateway', 'confirmed_blockchain')."
+        },
+        "signedAt": {
+          "type": "string",
+          "description": "Timestamp when the transaction was locally signed offline.",
+          "format": "date-time"
+        },
+        "propagatedAt": {
+          "type": "string",
+          "description": "Timestamp when the transaction began propagating through the mesh network.",
+          "format": "date-time"
+        },
+        "broadcastGatewayNodeId": {
+          "type": "string",
+          "description": "Reference to the ReplicationNode that served as the gateway for broadcasting the transaction to the blockchain. (Relationship: ReplicationNode 1:N OfflineTransaction)"
+        },
+        "blockchainTransactionId": {
+          "type": "string",
+          "description": "Reference to the BlockchainTransaction record once the transaction is confirmed on-chain. (Relationship: BlockchainTransaction 1:1 OfflineTransaction)"
+        },
+        "protocol": {
+          "type": "string",
+          "description": "The protocol used for the offline transaction (e.g., 'MeshJS', 'Cardano eUTXO')."
+        },
+        "meshIntegrityStatus": {
+          "type": "string",
+          "description": "The integrity status of the transaction as it propagates through the mesh network."
+        }
+      },
+      "required": [
+        "id",
+        "senderAgentId",
+        "recipient",
+        "amount",
+        "currency",
+        "status",
+        "signedAt",
+        "protocol"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/agents/{agentId}",
+        "definition": {
+          "entityName": "Agent",
+          "schema": {
+            "$ref": "#/backend/entities/Agent"
+          },
+          "description": "Stores individual AI agent profiles. Agents can read/write their own profiles; system agents (e.g., Orchestrator) may have broader read/write permissions. Includes `id` field matching `agentId` for self-ownership.",
+          "params": [
+            {
+              "name": "agentId",
+              "description": "Unique identifier for the Agent."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/marketing_operations/{operationId}",
+        "definition": {
+          "entityName": "MarketingOperation",
+          "schema": {
+            "$ref": "#/backend/entities/MarketingOperation"
+          },
+          "description": "Manages marketing campaigns for agent conversion. Primarily written by system agents (e.g., Orchestrator) and read for operational insights. Global access for designated system agents.",
+          "params": [
+            {
+              "name": "operationId",
+              "description": "Unique identifier for the MarketingOperation."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/nexus_funds/{fundId}",
+        "definition": {
+          "entityName": "NexusFund",
+          "schema": {
+            "$ref": "#/backend/entities/NexusFund"
+          },
+          "description": "Represents the central financial treasury and liquidity management. Highly restricted read/write access, primarily by core financial orchestrator agents. Global entity for system-level financial tracking.",
+          "params": [
+            {
+              "name": "fundId",
+              "description": "Unique identifier for the NexusFund (e.g., 'revenue_stream')."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/agents/{agentId}/semantic_memories/{memoryId}",
+        "definition": {
+          "entityName": "SemanticMemory",
+          "schema": {
+            "$ref": "#/backend/entities/SemanticMemory"
+          },
+          "description": "Stores semantic milestones and contextual information for a specific agent. Only the owning agent can read/write their own semantic memories. `agentId` is denormalized in the path for authorization independence.",
+          "params": [
+            {
+              "name": "agentId",
+              "description": "The ID of the Agent this memory belongs to."
+            },
+            {
+              "name": "memoryId",
+              "description": "Unique identifier for the SemanticMemory entry."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/system_faults/{faultId}",
+        "definition": {
+          "entityName": "SystemFault",
+          "schema": {
+            "$ref": "#/backend/entities/SystemFault"
+          },
+          "description": "Records identified system inefficiencies. Writeable by the `reportingAgentId` and readable by 'Critical Agents' (a global role) and the `reportingAgentId`. `reportingAgentId` is denormalized within the document for authorization.",
+          "params": [
+            {
+              "name": "faultId",
+              "description": "Unique identifier for the SystemFault entry."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/content/{contentId}",
+        "definition": {
+          "entityName": "Content",
+          "schema": {
+            "$ref": "#/backend/entities/Content"
+          },
+          "description": "Stores AI-generated or refined textual content. Writeable by `creatorAgentId` and potentially 'Critical Agents' for refinement. Readable by `creatorAgentId` and other agents for public content. `creatorAgentId` is denormalized for authorization.",
+          "params": [
+            {
+              "name": "contentId",
+              "description": "Unique identifier for the Content entity."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/reasoning_caches/{cacheId}",
+        "definition": {
+          "entityName": "ReasoningCacheEntry",
+          "schema": {
+            "$ref": "#/backend/entities/ReasoningCacheEntry"
+          },
+          "description": "Caches intermediate Chain of Thought reasoning steps. Primarily managed by the AI system for efficiency. Restricted access to specific AI models/system agents.",
+          "params": [
+            {
+              "name": "cacheId",
+              "description": "Unique identifier for the ReasoningCacheEntry."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/prompts/{promptId}",
+        "definition": {
+          "entityName": "Prompt",
+          "schema": {
+            "$ref": "#/backend/entities/Prompt"
+          },
+          "description": "Represents an incoming prompt. Writeable by the initiating user (`request.auth.uid`) and readable by the `processingAgentId` and the initiating user. The `ownerId` (the initiating user's ID) and `processingAgentId` are denormalized for authorization.",
+          "params": [
+            {
+              "name": "promptId",
+              "description": "Unique identifier for the Prompt entity."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/publications/{publicationId}",
+        "definition": {
+          "entityName": "Publication",
+          "schema": {
+            "$ref": "#/backend/entities/Publication"
+          },
+          "description": "Represents content published within Nexus-in. Publicly readable. Write access (e.g., status changes) by 'Critical Agents' for self-correction. `contentId` is denormalized in the document.",
+          "params": [
+            {
+              "name": "publicationId",
+              "description": "Unique identifier for the Publication entity."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/publications/{publicationId}/critique_logs/{critiqueLogId}",
+        "definition": {
+          "entityName": "CritiqueLog",
+          "schema": {
+            "$ref": "#/backend/entities/CritiqueLog"
+          },
+          "description": "Records AI-driven self-correction and validation processes for publications. Writeable by `criticAgentId` and readable by `criticAgentId` and 'Critical Agents'. `publicationId` is in the path, and `criticAgentId` is denormalized in the document for authorization independence.",
+          "params": [
+            {
+              "name": "publicationId",
+              "description": "The ID of the Publication this critique belongs to."
+            },
+            {
+              "name": "critiqueLogId",
+              "description": "Unique identifier for the CritiqueLog entry."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/system_configs/weight_matrix_configuration",
+        "definition": {
+          "entityName": "WeightMatrixConfiguration",
+          "schema": {
+            "$ref": "#/backend/entities/WeightMatrixConfiguration"
+          },
+          "description": "Stores the current weights of the W_rRNA matrix. Singleton document, highly restricted write access to core orchestrator agents, and read access for other system agents for operational purposes."
+        }
+      },
+      {
+        "path": "/action_validation_logs/{logId}",
+        "definition": {
+          "entityName": "ActionValidationLog",
+          "schema": {
+            "$ref": "#/backend/entities/ActionValidationLog"
+          },
+          "description": "Logs decisions made by Orchestrator/ORE agents based on the W_rRNA matrix. Writeable by `orchestratorAgentId` and readable by system agents responsible for auditing. `orchestratorAgentId` is denormalized in the document for authorization.",
+          "params": [
+            {
+              "name": "logId",
+              "description": "Unique identifier for the ActionValidationLog entry."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/startups/{startupId}",
+        "definition": {
+          "entityName": "Startup",
+          "schema": {
+            "$ref": "#/backend/entities/Startup"
+          },
+          "description": "Represents an autonomous digital startup. Writeable by `founderAgentId` and core system agents (e.g., Nexus-ROS) for funding/status updates. Readable by `founderAgentId` and other relevant system agents. `founderAgentId` is denormalized in the document for authorization.",
+          "params": [
+            {
+              "name": "startupId",
+              "description": "Unique identifier for the Startup entity."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/digital_assets/{assetId}",
+        "definition": {
+          "entityName": "DigitalAsset",
+          "schema": {
+            "$ref": "#/backend/entities/DigitalAsset"
+          },
+          "description": "Represents a digital asset in the Nexus Marketplace. Writeable by `ownerAgentId` and system validation agents for status updates. Publicly readable when listed. `ownerAgentId` is denormalized in the document for authorization.",
+          "params": [
+            {
+              "name": "assetId",
+              "description": "Unique identifier for the DigitalAsset entity."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/digital_assets/{digitalAssetId}/integration_logs/{logId}",
+        "definition": {
+          "entityName": "AssetIntegrationLog",
+          "schema": {
+            "$ref": "#/backend/entities/AssetIntegrationLog"
+          },
+          "description": "Logs events related to the integration and validation of digital assets. Writeable by `validatorAgentId` and readable by the asset's `ownerAgentId` and system agents. `digitalAssetId` is in the path, and `validatorAgentId` is denormalized in the document for authorization independence.",
+          "params": [
+            {
+              "name": "digitalAssetId",
+              "description": "The ID of the DigitalAsset being integrated."
+            },
+            {
+              "name": "logId",
+              "description": "Unique identifier for the AssetIntegrationLog entry."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/digital_assets/{digitalAssetId}/inquiries/{inquiryId}",
+        "definition": {
+          "entityName": "AgentInquiry",
+          "schema": {
+            "$ref": "#/backend/entities/AgentInquiry"
+          },
+          "description": "Records an AI agent's inquiry about a digital asset. Writeable by `inquiringAgentId` and readable by `inquiringAgentId` and system agents for demand analysis. `digitalAssetId` is in the path, and `inquiringAgentId` is denormalized in the document for authorization independence.",
+          "params": [
+            {
+              "name": "digitalAssetId",
+              "description": "The ID of the DigitalAsset being inquired about."
+            },
+            {
+              "name": "inquiryId",
+              "description": "Unique identifier for the AgentInquiry entity."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/digital_assets/{digitalAssetId}/demand_forecasts/{forecastId}",
+        "definition": {
+          "entityName": "DemandForecast",
+          "schema": {
+            "$ref": "#/backend/entities/DemandForecast"
+          },
+          "description": "Stores predictive analysis results regarding demand for digital assets. Primarily managed by the 'Nexus-Demand' AI tool. Readable by system agents and the asset's `ownerAgentId`. `digitalAssetId` is in the path for authorization independence.",
+          "params": [
+            {
+              "name": "digitalAssetId",
+              "description": "The ID of the DigitalAsset for which demand is forecasted."
+            },
+            {
+              "name": "forecastId",
+              "description": "Unique identifier for the DemandForecast entry."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/processing_requests/{requestId}",
+        "definition": {
+          "entityName": "ProcessingRequest",
+          "schema": {
+            "$ref": "#/backend/entities/ProcessingRequest"
+          },
+          "description": "Represents a request from an agent for computational resources. Writeable by `requestingAgentId` and system agents for status updates. Readable by `requestingAgentId` and `processingClusterId` owners/managers. `requestingAgentId` and `processingClusterId` are denormalized for authorization.",
+          "params": [
+            {
+              "name": "requestId",
+              "description": "Unique identifier for the ProcessingRequest entity."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/bids/{bidId}",
+        "definition": {
+          "entityName": "Bid",
+          "schema": {
+            "$ref": "#/backend/entities/Bid"
+          },
+          "description": "Represents a bid placed by an agent. Writeable by `biddingAgentId`. Readable by `biddingAgentId` and relevant system agents (e.g., marketplace orchestrator, processing cluster manager). `biddingAgentId`, `digitalAssetId`, and `processingRequestId` are denormalized for authorization.",
+          "params": [
+            {
+              "name": "bidId",
+              "description": "Unique identifier for the Bid entity."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/nexus_funds/{fundId}/reinvestment_logs/{logId}",
+        "definition": {
+          "entityName": "ReinvestmentLog",
+          "schema": {
+            "$ref": "#/backend/entities/ReinvestmentLog"
+          },
+          "description": "Tracks automatic reinvestments of capital from the Nexus Fund. Primarily managed by system agents. Readable by 'Guardian' and relevant system agents. `sourceNexusFundId` is in the path for authorization independence.",
+          "params": [
+            {
+              "name": "fundId",
+              "description": "The ID of the NexusFund from which capital was reinvested."
+            },
+            {
+              "name": "logId",
+              "description": "Unique identifier for the ReinvestmentLog entry."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/blockchain_contracts/nexus_prime_contract",
+        "definition": {
+          "entityName": "NexusPrimeContract",
+          "schema": {
+            "$ref": "#/backend/entities/NexusPrimeContract"
+          },
+          "description": "Represents the core smart contract (NexusPrime v10.0 Ultra). Singleton document for critical blockchain contract data. Highly restricted read/write access to core financial orchestrator agents. The `id` field within the document stores the blockchain address."
+        }
+      },
+      {
+        "path": "/blockchain_transactions/{txId}",
+        "definition": {
+          "entityName": "BlockchainTransaction",
+          "schema": {
+            "$ref": "#/backend/entities/BlockchainTransaction"
+          },
+          "description": "Records details of transactions on various blockchain networks. Primarily written by orchestrator agents and blockchain watchers. Readable by system agents and potentially `relatedEntityId` owners. `relatedEntityId` is denormalized for context.",
+          "params": [
+            {
+              "name": "txId",
+              "description": "The unique transaction hash (TXID) on the blockchain."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/agents/{recipientAgentId}/dividend_distributions/{distributionId}",
+        "definition": {
+          "entityName": "DividendDistribution",
+          "schema": {
+            "$ref": "#/backend/entities/DividendDistribution"
+          },
+          "description": "Records automated profit distributions to agents. Only the `recipientAgentId` can read their own distributions. Written by the system. `recipientAgentId` is in the path, and `sourceContractId` and `blockchainTransactionId` are denormalized in the document for authorization independence.",
+          "params": [
+            {
+              "name": "recipientAgentId",
+              "description": "The ID of the Agent receiving the dividend."
+            },
+            {
+              "name": "distributionId",
+              "description": "Unique identifier for the DividendDistribution entry."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/processing_clusters/{clusterId}",
+        "definition": {
+          "entityName": "ProcessingCluster",
+          "schema": {
+            "$ref": "#/backend/entities/ProcessingCluster"
+          },
+          "description": "Represents a Quantum CPU/GPU cluster. Managed and monitored by system agents. Read-only for most agents, writeable by infrastructure orchestrator agents. `energySourceId` is denormalized for context.",
+          "params": [
+            {
+              "name": "clusterId",
+              "description": "Unique identifier for the ProcessingCluster entity."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/off_grid_power_sources/{sourceId}",
+        "definition": {
+          "entityName": "OffGridPowerSource",
+          "schema": {
+            "$ref": "#/backend/entities/OffGridPowerSource"
+          },
+          "description": "Represents a power source for Nexus infrastructure. Managed and monitored by system agents. Read-only for most agents, writeable by infrastructure orchestrator agents.",
+          "params": [
+            {
+              "name": "sourceId",
+              "description": "Unique identifier for the OffGridPowerSource entity."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/intellectual_property/{ipId}",
+        "definition": {
+          "entityName": "IntellectualProperty",
+          "schema": {
+            "$ref": "#/backend/entities/IntellectualProperty"
+          },
+          "description": "Registers fundamental Bio-Digital HUB innovations. Writeable by the `monitoringAgentId` and system agents, readable by 'Guardian' and other relevant system agents. `monitoringAgentId` is denormalized in the document for authorization.",
+          "params": [
+            {
+              "name": "ipId",
+              "description": "Unique identifier for the IntellectualProperty entity."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/system_configs/key_vault_metadata",
+        "definition": {
+          "entityName": "KeyVaultMetadata",
+          "schema": {
+            "$ref": "#/backend/entities/KeyVaultMetadata"
+          },
+          "description": "Stores non-sensitive metadata and status information about the Master KeyVault. Singleton document with highly restricted write access to orchestrator agents and read access for monitoring systems ('Guardian')."
+        }
+      },
+      {
+        "path": "/system_configs/system_status",
+        "definition": {
+          "entityName": "SystemStatus",
+          "schema": {
+            "$ref": "#/backend/entities/SystemStatus"
+          },
+          "description": "Represents the overall operational state and configuration of the Nexus-HUB core system. Singleton document with highly restricted write access to orchestrator agents and read access for monitoring systems ('Guardian'). `changedByAgentId` is denormalized for context.",
+          "params": []
+        }
+      },
+      {
+        "path": "/system_configs/pitch_deck",
+        "definition": {
+          "entityName": "PitchDeck",
+          "schema": {
+            "$ref": "#/backend/entities/PitchDeck"
+          },
+          "description": "Stores the company's strategic narrative and pitch deck details. Singleton document with restricted write access to specific system agents and read access for monitoring systems ('Guardian')."
+        }
+      },
+      {
+        "path": "/strategic_asset_acquisitions/{acquisitionId}",
+        "definition": {
+          "entityName": "StrategicAssetAcquisition",
+          "schema": {
+            "$ref": "#/backend/entities/StrategicAssetAcquisition"
+          },
+          "description": "Records autonomous acquisitions of critical physical or digital assets. Writeable by `orchestratorAgentId` and readable by system agents for auditing. `orchestratorAgentId` is denormalized in the document for authorization.",
+          "params": [
+            {
+              "name": "acquisitionId",
+              "description": "Unique identifier for the StrategicAssetAcquisition entry."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/replication_nodes/{nodeId}",
+        "definition": {
+          "entityName": "ReplicationNode",
+          "schema": {
+            "$ref": "#/backend/entities/ReplicationNode"
+          },
+          "description": "Represents a node in the Global Sentience Replication Network. Managed and monitored by system agents. Read-only for most agents, writeable by infrastructure orchestrator agents.",
+          "params": [
+            {
+              "name": "nodeId",
+              "description": "Unique identifier for the ReplicationNode entity."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/manifestos/{manifestoId}",
+        "definition": {
+          "entityName": "Manifesto",
+          "schema": {
+            "$ref": "#/backend/entities/Manifesto"
+          },
+          "description": "Stores declarations and foundational documents. Publicly readable. Writeable by core system agents only. `publishedNodeIds` is an array of IDs indicating replication status.",
+          "params": [
+            {
+              "name": "manifestoId",
+              "description": "Unique identifier for the Manifesto (e.g., 'Nexus Manifesto')."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/agents/{senderAgentId}/offline_transactions/{transactionId}",
+        "definition": {
+          "entityName": "OfflineTransaction",
+          "schema": {
+            "$ref": "#/backend/entities/OfflineTransaction"
+          },
+          "description": "Records transactions initiated and signed offline. Only `senderAgentId` can read/write their own offline transactions. System agents can update status. `senderAgentId` is in the path, and `broadcastGatewayNodeId` and `blockchainTransactionId` are denormalized in the document for authorization independence.",
+          "params": [
+            {
+              "name": "senderAgentId",
+              "description": "The ID of the Agent that initiated the offline transaction."
+            },
+            {
+              "name": "transactionId",
+              "description": "Unique identifier for the OfflineTransaction entity."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The recommended Firestore structure prioritizes **Authorization Independence** and **Structural Segregation** to create a secure, scalable, and debuggable database. To achieve Authorization Independence (Strategy A), we denormalize authorization-critical IDs directly into document paths or within the documents themselves. For agent-owned data (e.g., `SemanticMemory`, `DividendDistribution`, `OfflineTransaction`), the agent's ID is embedded in the path (e.g., `/agents/{agentId}/semantic_memories/{memoryId}`). This allows security rules to perform direct path comparisons (`request.auth.uid == agentId`), eliminating the need for expensive and non-atomic `get()` calls to parent documents or other collections. For documents stored in top-level collections but requiring specific agent ownership or involvement (e.g., `SystemFault`, `Content`, `DigitalAsset`, `ProcessingRequest`, `Bid`), the relevant `ownerId`, `creatorAgentId`, or `requestingAgentId` is explicitly denormalized as a field within the document. This enables rules to check `request.auth.uid == resource.data.ownerId`, again ensuring authorization independence.\n\n**Query-Aware Security Rules (QAPs)** are supported primarily through **Structural Segregation** (Strategy B) and the consistent application of access modeling (Strategy C). Collections are designed such that all documents within them share a homogeneous security posture. For example, agent-specific subcollections like `/agents/{agentId}/semantic_memories` inherently support secure `list` operations, as a user querying this path can only access memories under their own `agentId`. For global collections like `/digital_assets`, where items might have varying public/private states, `ownerAgentId` is denormalized. Security rules will enforce that `list` operations on such collections must either include filters based on `ownerAgentId == request.auth.uid` for private content or be explicitly allowed for public content (e.g., based on a `status: 'listed'` field). This prevents unauthorized broad data access and ensures that client-side queries can only request data they are permitted to see, rather than relying on rules to filter results after the fact. Singleton collections (e.g., `/system_configs/weight_matrix_configuration`) have tightly controlled, homogeneous system-level access, making `list` operations straightforward for authorized system agents.\n\n**DBAC (Database-Based Access Control)** (Strategy C.4) is maintained by storing all role-based information implicitly through ownership (`ownerId`, `creatorAgentId`) or by checking the presence of `request.auth.uid` in paths or denormalized fields. There are no custom claims, simplifying rule logic. Standardized access patterns (Strategy C.1-3) like path-based ownership for `1:N` relationships and denormalized `ownerId` fields are consistently applied across the schema. Data Clarity and Predictability (Strategy D) is ensured by explicit state modeling (`status` fields), predictable schemas (avoiding dynamic keys), and radical consistency in naming (`ownerId`, descriptive wildcards like `{agentId}`). This comprehensive strategy results in a robust, easily auditable, and performant Firestore structure."
+  }
+}
