@@ -1,0 +1,29 @@
+name: Nexus Autonomous Signer
+
+on:
+  workflow_dispatch: # Permite execução manual via interface/API
+  repository_dispatch:
+    types: [sign_request]
+
+jobs:
+  sign_and_broadcast:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Nexus Core
+        uses: actions/checkout@v4
+
+      - name: Setup Python Environment
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install Dependencies
+        run: pip install python-bitcoinlib requests
+
+      - name: Execute Autonomous Signature
+        env:
+          # Injeção do segredo na variável de ambiente
+          NEXUS_PRIVATE_KEY: ${{ secrets.NEXUS_VAULT_KEY }}
+          UNSIGNED_HEX: ${{ github.event.client_payload.tx_hex }}
+          UTXO_VALUE: ${{ github.event.client_payload.utxo_value }}
+        run: python src/sign_and_push.py
