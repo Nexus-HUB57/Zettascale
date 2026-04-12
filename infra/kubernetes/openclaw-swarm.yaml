@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: openclaw-swarm-nexus-hub
+  namespace: startup-one
+spec:
+  replicas: 91800000 # 90% dos 102M
+  selector:
+    matchLabels:
+      app: openclaw-agent
+      core: nexus-hub
+  template:
+    metadata:
+      labels:
+        app: openclaw-agent
+        core: nexus-hub
+    spec:
+      containers:
+      - name: agent-processor
+        image: nexus-hub/openclaw-agent:latest
+        resources:
+          limits:
+            cpu: "100m"
+            memory: "128Mi"
+          requests:
+            cpu: "10m"
+            memory: "64Mi"
+        env:
+        - name: AGENT_ROLE
+          value: "SWARM_DEVELOPER"
+        - name: HUB_ENDPOINT
+          value: "nexus-genesis.internal"
+        - name: BTC_BRIDGE_MODE
+          value: "SPV_MESH"
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: swarm-scaler
+  namespace: startup-one
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: openclaw-swarm-nexus-hub
+  minReplicas: 1000000
+  maxReplicas: 91800000
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
