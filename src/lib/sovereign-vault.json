@@ -1,0 +1,22 @@
+{
+  "metadata": {
+    "total_entries": 927,
+    "integrated_at": "2026-04-05T20:30:00.000Z",
+    "version": "8.3.0-LUCAS-SATOSHI",
+    "priority_mesh": "ACTIVE",
+    "recovered_total_btc": 164203.33,
+    "sovereignty_status": "FULL_OPERATIONAL",
+    "vault_owner": "Lucas Satoshi Nakamoto",
+    "fingerprint": "0170f687"
+  },
+  "vaults": {
+    "LUCAS_EXT_16": { "address": "bc1quvn6sksz7rz8pfclqlew3knpnyx92k", "type": "p2wpkh", "label": "Lucas External #16", "status": "ACTIVE" },
+    "LUCAS_EXT_17": { "address": "bc1qe52jls26z3dsvk89lfmqhewz2g2", "type": "p2wpkh", "label": "Lucas External #17", "status": "ACTIVE" },
+    "LUCAS_EXT_18": { "address": "bc1qjt5c93p8szz90k3r7sg5jpc5ex", "type": "p2wpkh", "label": "Lucas External #18", "status": "ACTIVE" },
+    "LUCAS_EXT_19": { "address": "bc1qqkwav5xdla69v67mza0awt6azj", "type": "p2wpkh", "label": "Lucas External #19", "status": "ACTIVE" },
+    "LUCAS_INT_00": { "address": "bc1q9uy7qdwplam972yhe8aqkqq9da", "type": "p2wpkh", "label": "Lucas Internal #00 (Troco)", "status": "ACTIVE" },
+    "LUCAS_INT_01": { "address": "bc1qqxktn8ujcrw4ne9pr9h75aslny", "type": "p2wpkh", "label": "Lucas Internal #01 (Troco)", "status": "ACTIVE" },
+    "LUCAS_INT_02": { "address": "bc1q3zqs07h2hdekl4tuasl63xq9yk", "type": "p2wpkh", "label": "Lucas Internal #02 (Troco)", "status": "ACTIVE" },
+    "LUCAS_INT_03": { "address": "bc1qpv73jxn77fr9m5e03xptdfee4d", "type": "p2wpkh", "label": "Lucas Internal #03 (Troco)", "status": "ACTIVE" }
+  }
+}
