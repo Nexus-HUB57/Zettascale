@@ -8,15 +8,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { 
   Crown,
-  Stamp,
   CheckCircle2,
   Terminal,
   Zap,
   Loader2,
-  ArrowRight,
-  ShieldCheck,
-  Globe,
-  Database,
   Anchor,
   Network,
   Activity,
@@ -31,9 +26,14 @@ import { TOTAL_SOVEREIGN_LASTRO, FINAL_MERKLE_ROOT, BATCH_8000_BTC_HASH, FINAL_S
 import { executeOREProtocol } from "@/ai/flows/ai-ore-orchestrator";
 
 export default function NexusHubPage() {
+  const [isMounted, setIsMounted] = useState(false);
   const [isSweeping, setIsSweeping] = useState(false);
   const [isORERunning, setIsORERunning] = useState(false);
   const { toast } = useToast();
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const handleRunSweep = async () => {
     setIsSweeping(true);
@@ -63,6 +63,8 @@ export default function NexusHubPage() {
     }
   };
 
+  if (!isMounted) return null;
+
   return (
     <SidebarProvider defaultOpen={true}>
       <NexusSidebar />
@@ -80,34 +82,29 @@ export default function NexusHubPage() {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <Button 
-              variant="outline" 
-              size="sm" 
+            <button 
               onClick={handleExecuteORE}
               disabled={isORERunning}
-              className="h-8 border-purple-500/30 text-purple-400 font-mono text-[10px] uppercase hover:bg-purple-500/10"
+              className="flex items-center gap-2 px-3 py-1.5 rounded-md border border-purple-500/30 text-purple-400 font-mono text-[10px] uppercase hover:bg-purple-500/10 disabled:opacity-50"
             >
-              {isORERunning ? <Loader2 className="h-3 w-3 mr-2 animate-spin" /> : <ShieldAlert className="h-3 w-3 mr-2" />}
+              {isORERunning ? <Loader2 className="h-3 w-3 animate-spin" /> : <ShieldAlert className="h-3 w-3" />}
               Executar ORE
-            </Button>
+            </button>
             <Badge variant="outline" className="border-accent/30 text-accent bg-accent/10 gap-1.5 font-mono text-[9px] animate-pulse">
               <Activity className="h-3 w-3" /> TRI_NUCLEAR_SYNC: PLENO
             </Badge>
-            <Button 
-              variant="outline" 
-              size="sm" 
+            <button 
               onClick={handleRunSweep}
               disabled={isSweeping}
-              className="h-8 border-accent/30 text-accent font-mono text-[10px] uppercase hover:bg-accent/10"
+              className="flex items-center gap-2 px-3 py-1.5 rounded-md border border-accent/30 text-accent font-mono text-[10px] uppercase hover:bg-accent/10 disabled:opacity-50"
             >
-              {isSweeping ? <Loader2 className="h-3 w-3 mr-2 animate-spin" /> : <RefreshCcw className="h-3 w-3 mr-2" />}
+              {isSweeping ? <Loader2 className="h-3 w-3 animate-spin" /> : <RefreshCcw className="h-3 w-3" />}
               Re-Validar Hegemonia
-            </Button>
+            </button>
           </div>
         </header>
 
         <main className="p-6 space-y-6 overflow-y-auto max-h-[calc(100vh-64px)] scrollbar-hide">
-          
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <Card className="lg:col-span-2 bg-black/40 border-accent/20 border-double border-4 relative overflow-hidden">
               <div className="absolute top-0 right-0 p-8 opacity-5 pointer-events-none">
@@ -120,7 +117,7 @@ export default function NexusHubPage() {
               <CardContent className="p-8 space-y-8">
                 <div className="flex flex-col items-center justify-center py-4 space-y-2">
                    <p className="text-[10px] text-muted-foreground uppercase tracking-widest">Consolidado Real na Mainnet Bitcoin</p>
-                   <p className="text-6xl font-bold text-accent font-tech-mono tracking-tighter">{TOTAL_SOVEREIGN_LASTRO.toLocaleString()} BTC</p>
+                   <p className="text-6xl font-bold text-accent font-tech-mono tracking-tighter">{TOTAL_SOVEREIGN_LASTRO.toLocaleString()}</p>
                    <Badge variant="outline" className="mt-4 border-blue-500/30 text-blue-400 font-mono text-[10px] px-4 uppercase">System_ALL_AI_to_AI_Pleno</Badge>
                 </div>
                 
@@ -197,7 +194,7 @@ export default function NexusHubPage() {
               <CardTitle className="text-xs font-bold uppercase tracking-widest font-mono flex items-center gap-2">
                 <Terminal className="h-4 w-4 text-accent" /> Neural Pulse Log (Mainnet Pleno)
               </CardTitle>
-            </header>
+            </CardHeader>
             <CardContent className="p-4 font-mono text-[10px] space-y-2 h-48 overflow-y-auto scrollbar-hide">
               <p className="text-blue-400"># STARTING_UDO_SYNCHRONIZATION_CYCLE...</p>
               <p className="text-foreground/80">&gt; Nucleus Nexus-IN: Viral signal at 99.8% amplitude.</p>
