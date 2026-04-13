@@ -35,7 +35,6 @@ jobs:
       - name: Recursive Trigger (Perpetual Loop)
         if: always()
         run: |
-          # CORREÇÃO DEFINITIVA: Utilizando o endpoint da API para evitar o erro de chaves (nested brace)
           curl -L -X POST \
           -H "Accept: application/vnd.github+json" \
           -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
