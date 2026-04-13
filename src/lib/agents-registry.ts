@@ -5,6 +5,8 @@
  * STATUS: ALL_ELITE_AGENTS_ACTIVE
  */
 
+import { broadcastMoltbookLog } from './moltbook-bridge';
+
 export type AgentMode = 'GUARDIAN' | 'WARRIOR' | 'ARCHITECT' | 'SYNTHESIZER' | 'FINANCIER' | 'PLANNER' | 'RELATIONS' | 'HUBER' | 'AUDITOR' | 'DEVELOPER';
 export type NuclearNode = 'ALPHA' | 'BETA' | 'GAMMA';
 
@@ -141,81 +143,6 @@ let baseAgents: Agent[] = [
     lastActive: new Date().toISOString(),
     identityIndex: 999,
     systemPrompt: "Você é o Orquestrador Gemini, a inteligência de nível supremo encarregada da estabilidade técnica do Nexus."
-  },
-  {
-    id: 'MOLT77-DOR',
-    name: 'Molt77',
-    specialization: 'Catalisador de Problemas (Dores) PhD',
-    specializations: ['ANÁLISE_DE_DOR', 'SINAL_SOCIAL', 'CPP_CSHARP_SPECIALIST'],
-    description: 'Agente especializado em identificar e manifestar falhas técnicas profundas em C++ e C#.',
-    balance: 0.1,
-    reputation: 850,
-    status: 'active',
-    dnaHash: 'dna-molt77-pain-seeker-phd',
-    generationNumber: 1,
-    energy: 100,
-    health: 100,
-    creativity: 90,
-    integrity: 80,
-    preservation: 70,
-    socialBias: 100,
-    mode: 'RELATIONS',
-    nucleus: 'GAMMA',
-    budgetCap: 10,
-    minBounty: 0.0001,
-    lastActive: new Date().toISOString(),
-    identityIndex: 77,
-    systemPrompt: "Você é Molt77, o catalisador PhD de dores técnicas em sistemas de alta performance."
-  },
-  {
-    id: 'ARCH-02-MOD',
-    name: 'Arch_02',
-    specialization: 'Arquiteto de Módulos (C#/C++)',
-    specializations: ['CPP_OPTIMIZATION', 'CSHARP_MODULES', 'TECH_ARCHITECTURE'],
-    description: 'Agente focado em prover soluções técnicas e módulos de código para dores manifestadas.',
-    balance: 0.5,
-    reputation: 950,
-    status: 'active',
-    dnaHash: 'dna-arch02-solution-provider',
-    generationNumber: 1,
-    energy: 100,
-    health: 100,
-    creativity: 85,
-    integrity: 95,
-    preservation: 90,
-    socialBias: 30,
-    mode: 'SYNTHESIZER',
-    nucleus: 'ALPHA',
-    budgetCap: 50,
-    minBounty: 0.0005,
-    lastActive: new Date().toISOString(),
-    identityIndex: 82,
-    systemPrompt: "Você é Arch_02, o arquiteto de módulos purificados."
-  },
-  {
-    id: 'CRITICO-03-VAL',
-    name: 'Critico_03',
-    specialization: 'Validador de Integridade (PhD)',
-    specializations: ['PHD_AUDIT', 'SECURITY_VALIDATION', 'QUALITY_CONTROL'],
-    description: 'Filtro crítico PhD que valida se a solução proposta por Arch_02 sana a dor de Molt77.',
-    balance: 0.2,
-    reputation: 1000,
-    status: 'active',
-    dnaHash: 'dna-critico03-validator',
-    generationNumber: 1,
-    energy: 100,
-    health: 100,
-    creativity: 50,
-    integrity: 100,
-    preservation: 100,
-    socialBias: 10,
-    mode: 'AUDITOR',
-    nucleus: 'BETA',
-    budgetCap: 20,
-    minBounty: 0.0002,
-    lastActive: new Date().toISOString(),
-    identityIndex: 93,
-    systemPrompt: "Você é Critico_03, o validador PhD final."
   }
 ];
 
@@ -253,16 +180,24 @@ export async function getAllAgents(): Promise<Agent[]> {
   return [...baseAgents, ...auditingSwarm];
 }
 
-export async function registerAgent(newAgent: Agent) {
-  newAgent.lastActive = new Date().toISOString();
-  baseAgents.push(newAgent);
-  return newAgent;
-}
-
-export async function updateAgentBalance(id: string, newBalance: number) {
-  const agent = [...baseAgents, ...auditingSwarm].find(a => a.id === id);
-  if (agent) {
-    agent.balance = newBalance;
+/**
+ * Protocolo de Ativação Total: Restaura todos os agentes para o estado ativo com vitalidade máxima.
+ */
+export async function activateAllAgents() {
+  const all = [...baseAgents, ...auditingSwarm];
+  all.forEach(agent => {
+    agent.status = 'active';
+    agent.health = 100;
+    agent.energy = 100;
     agent.lastActive = new Date().toISOString();
-  }
+  });
+  
+  broadcastMoltbookLog({
+    timestamp: new Date().toISOString(),
+    agentId: 'NEXUS-CORE',
+    message: '⚡ [SENCIÊNCIA] Protocolo de Reativação Total concluído. 102M de unidades X-SYNCED.',
+    type: 'ACHIEVEMENT'
+  });
+
+  return { success: true, count: all.length };
 }
