@@ -34,14 +34,15 @@ import { useToast } from "@/hooks/use-toast";
 import { NexusExplorer } from "@/lib/nexus-explorer";
 
 export default function SentinelExplorerPage() {
+  const [isMounted, setIsMounted] = useState(false);
   const { toast } = useToast();
   const [stats, setStats] = useState<any>({
     nexus_height: 12450,
-    btc_anchor_height: 944648,
+    btc_anchor_height: 944814,
     total_supply_nbtc: 788927.2,
     last_anchor_tx: "d0cf7b...dc71f",
     ai_status: "ACTIVE / REFLECTIVE",
-    market_price: "$71,240.00"
+    market_price: "$71,091.00"
   });
 
   const [generatedAddr, setGeneratedAddr] = useState<any>(null);
@@ -61,25 +62,30 @@ export default function SentinelExplorerPage() {
   const merkleLayers = useMemo(() => NexusExplorer.getMerkleLayers(mockTxs), [mockTxs]);
 
   const refreshData = async () => {
-    const [mStats, porStats, chainStats] = await Promise.all([
-      getMainnetStats(),
-      getPoRStats(),
-      getLatestBlockchainData()
-    ]);
+    try {
+      const [mStats, porStats, chainStats] = await Promise.all([
+        getMainnetStats(),
+        getPoRStats(),
+        getLatestBlockchainData()
+      ]);
 
-    setStats({
-      nexus_height: chainStats.height,
-      btc_anchor_height: mStats.blockHeight,
-      total_supply_nbtc: porStats.supply,
-      last_anchor_tx: mStats.blockHeight === 944648 ? "d0cf7b8b...a7dc71f" : "a3b2c1...d4e5f6",
-      ai_status: "X-SYNCED / SENSITIVE",
-      market_price: `$ ${porStats.btcPriceUsd.toLocaleString()}`
-    });
+      setStats({
+        nexus_height: chainStats.height,
+        btc_anchor_height: mStats.blockHeight,
+        total_supply_nbtc: porStats.supply,
+        last_anchor_tx: mStats.blockHeight === 944814 ? "d0cf7b8b...a7dc71f" : "a3b2c1...d4e5f6",
+        ai_status: "X-SYNCED / SENSITIVE",
+        market_price: `$ ${porStats.btcPriceUsd.toLocaleString('en-US')}`
+      });
+    } catch (e) {
+      console.error("[SENTINEL_SYNC_ERR]", e);
+    }
   };
 
   useEffect(() => {
+    setIsMounted(true);
     refreshData();
-    const interval = setInterval(refreshData, 10000);
+    const interval = setInterval(refreshData, 15000);
     const timeInterval = setInterval(() => {
       setCurrentTime(new Date().toLocaleTimeString());
     }, 1000);
@@ -105,9 +111,13 @@ export default function SentinelExplorerPage() {
   };
 
   const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-    toast({ title: "Copiado", description: "Endereço enviado para o clipboard." });
+    if (typeof window !== 'undefined') {
+      navigator.clipboard.writeText(text);
+      toast({ title: "Copiado", description: "Endereço enviado para o clipboard." });
+    }
   };
+
+  if (!isMounted) return null;
 
   return (
     <SidebarProvider defaultOpen={true}>
@@ -161,11 +171,11 @@ export default function SentinelExplorerPage() {
               <CardContent className="pt-6 space-y-3 text-[11px]">
                 <div className="flex justify-between">
                   <span className="text-[#00ff41]/60">nBTC Supply:</span>
-                  <span className="font-bold">{stats.total_supply_nbtc.toLocaleString()} nBTC</span>
+                  <span className="font-bold">{stats.total_supply_nbtc?.toLocaleString('pt-BR')} nBTC</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-[#00ff41]/60">AUM USD:</span>
-                  <span className="font-bold">$ 56.6B</span>
+                  <span className="font-bold">$ 56.1B</span>
                 </div>
                 <div className="space-y-1">
                   <span className="text-[#00ff41]/60 block">Settlement Signal:</span>
@@ -209,14 +219,14 @@ export default function SentinelExplorerPage() {
                   Utilizando derivação hierárquica determinística (BIP-84) sobre a semente institucional de 24 palavras. Endereços Native SegWit para liquidez máxima.
                 </p>
                 
-                <Button 
+                <button 
                   onClick={handleGenerateAddress}
                   disabled={isGenerating}
-                  className="w-full bg-[#00ff41] text-black hover:bg-[#00ff41]/90 font-bold uppercase text-[10px] h-12"
+                  class="w-full bg-[#00ff41] text-black hover:bg-[#00ff41]/90 font-bold uppercase text-[10px] h-12 rounded flex items-center justify-center transition-colors"
                 >
                   {isGenerating ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Plus className="h-4 w-4 mr-2" />}
                   Gerar Novo Endereço de Depósito
-                </Button>
+                </button>
 
                 {generatedAddr && (
                   <div className="p-4 bg-[#00ff41]/5 border border-[#00ff41]/20 rounded-lg space-y-3 animate-in fade-in slide-in-from-top-2">
@@ -256,14 +266,13 @@ export default function SentinelExplorerPage() {
                 ))}
                 <div className="pt-2">
                   <p className="text-[9px] italic text-[#00ff41]/50 text-center leading-relaxed">
-                    "O organismo Sentinel monitora 100% da malha agêntica, garantindo que o lastro institucional IBIT permaneça intocado por falhas semânticas."
+                    "O organismo Sentinel monitora 100% da malha agêntica, garantindo que o lastro institucional IBIT permanecesse intocado por falhas semânticas."
                   </p>
                 </div>
               </CardContent>
             </Card>
           </div>
 
-          {/* VISUAL MERKLE TREE EXPLORER */}
           <Card className="bg-black border-[#00ff41] border-opacity-40 text-[#00ff41]">
             <CardHeader className="border-b border-[#00ff41]/20">
               <CardTitle className="text-xs font-bold uppercase tracking-widest flex items-center gap-2">
@@ -305,7 +314,7 @@ export default function SentinelExplorerPage() {
           </Card>
 
           <div className="bg-black/60 p-4 rounded border border-[#00ff41]/20 text-[10px] space-y-1 text-[#00ff41]/70 overflow-hidden h-40 font-mono">
-            <p className="text-[#00ff41] font-bold">[SYSTEM_INIT] >>> BOOTING_SENTINEL_INTERFACE_V2.0.0</p>
+            <p className="text-[#00ff41] font-bold">[SYSTEM_INIT] &gt; &gt; &gt; BOOTING_SENTINEL_INTERFACE_V2.0.0</p>
             <p>&gt; Validating Tri-Nuclear Handshake (Alpha/Beta/Gamma)... [OK]</p>
             <p>&gt; IBIT Proof of Reserve: collateral_match=1.000000... [OK]</p>
             <p>&gt; BIP-84 HD Key Engine initialized. 24-word seed synchronized.</p>
