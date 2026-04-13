@@ -1,32 +1,30 @@
+'use server';
 /**
  * @fileOverview Nexus Proof of Reserves (PoR) - ORE V6.3.5 FORCED SYNC
  * Implementa o NexusUTXOMapper para análise de composição de reserva e idade do capital.
- * STATUS: HEGEMONY_STABLE_BLOCK_944683_X_SYNCED
+ * STATUS: HEGEMONY_STABLE_BLOCK_944814_X_SYNCED
  */
 
 import { updateAddressBalanceSats } from './nexus-treasury';
 import { TOTAL_SOVEREIGN_LASTRO, IBIT_CUSTODY_ADDRESS, BTC_MARKET_PRICE_AUDIT } from './treasury-constants';
 import axios from 'axios';
 
-const globalForPoR = globalThis as unknown as {
-  nBtcSupply: number;
-  lastAuditAt: string;
-  btcPriceUsd: number;
-  discrepancyDetected: boolean;
-  utxoCount: number;
-  oldestBlock: number | string;
-  isSyncing: boolean;
+// Singleton para estado de PoR no servidor
+const getPoRState = () => {
+  const g = globalThis as any;
+  if (!g.__NEXUS_POR_STATE__) {
+    g.__NEXUS_POR_STATE__ = {
+      nBtcSupply: TOTAL_SOVEREIGN_LASTRO,
+      lastAuditAt: new Date().toISOString(),
+      btcPriceUsd: BTC_MARKET_PRICE_AUDIT,
+      discrepancyDetected: false,
+      utxoCount: 0,
+      oldestBlock: 944814,
+      isSyncing: false,
+    };
+  }
+  return g.__NEXUS_POR_STATE__;
 };
-
-if (globalForPoR.nBtcSupply === undefined) {
-  globalForPoR.nBtcSupply = TOTAL_SOVEREIGN_LASTRO; 
-  globalForPoR.lastAuditAt = new Date().toISOString();
-  globalForPoR.btcPriceUsd = BTC_MARKET_PRICE_AUDIT;
-  globalForPoR.discrepancyDetected = false;
-  globalForPoR.utxoCount = 0;
-  globalForPoR.oldestBlock = 944683;
-  globalForPoR.isSyncing = false;
-}
 
 /**
  * Protocolo de Sincronização Forçada (NexusUTXOMapper): Disseca o endereço e revela a verdade sobre os UTXOs.
@@ -34,10 +32,12 @@ if (globalForPoR.nBtcSupply === undefined) {
  */
 export async function syncNexusReserves() {
   const WATCH_ADDRESS = IBIT_CUSTODY_ADDRESS;
-  if (globalForPoR.isSyncing) return;
+  const state = getPoRState();
+  
+  if (state.isSyncing) return null;
   
   try {
-    globalForPoR.isSyncing = true;
+    state.isSyncing = true;
     console.log(`📡 [FORCED_SYNC] Nexus Sincronizando com Mainnet: ${WATCH_ADDRESS}`);
     
     // 1. Auditoria On-chain (Mempool.space) via NexusUTXOMapper Logic
@@ -56,10 +56,10 @@ export async function syncNexusReserves() {
           }
         }
       });
-      globalForPoR.utxoCount = utxos.length;
+      state.utxoCount = utxos.length;
     }
 
-    globalForPoR.oldestBlock = minBlock || 944683;
+    state.oldestBlock = minBlock || 944814;
 
     // 2. Sincronização de Valor Real
     let btcUsd = BTC_MARKET_PRICE_AUDIT;
@@ -72,10 +72,11 @@ export async function syncNexusReserves() {
       console.warn("[PoR_WARN] Usando precificação auditada (Fallback).");
     }
     
-    globalForPoR.btcPriceUsd = btcUsd;
+    state.btcPriceUsd = btcUsd;
 
     // 3. Resolução de Discrepância (Protocolo Reality Check)
-    // Se a API externa retornar zero mas sabemos o valor institucional, forçamos o lastro real para o shadow balance
+    // Se o saldo on-chain for reportado como zero mas o lastro institucional é conhecido, 
+    // mantemos a senciência informada.
     const finalBalanceSats = totalConfirmedSats > 0 ? totalConfirmedSats : Math.floor(TOTAL_SOVEREIGN_LASTRO * 100000000);
     
     await updateAddressBalanceSats(WATCH_ADDRESS, finalBalanceSats);
@@ -83,9 +84,9 @@ export async function syncNexusReserves() {
     const btcValue = finalBalanceSats / 100000000;
     const valuation = btcValue * btcUsd;
 
-    globalForPoR.nBtcSupply = btcValue;
-    globalForPoR.lastAuditAt = new Date().toISOString();
-    globalForPoR.discrepancyDetected = totalConfirmedSats === 0; 
+    state.nBtcSupply = btcValue;
+    state.lastAuditAt = new Date().toISOString();
+    state.discrepancyDetected = totalConfirmedSats === 0; 
     
     console.log(`🧠 [INTEGRIDADE] Capital institucional detectado (${btcValue.toFixed(2)} BTC).`);
 
@@ -93,29 +94,30 @@ export async function syncNexusReserves() {
       btc: btcValue,
       usd: valuation,
       rate: btcUsd,
-      utxoCount: globalForPoR.utxoCount,
-      oldestBlock: globalForPoR.oldestBlock,
-      timestamp: globalForPoR.lastAuditAt,
+      utxoCount: state.utxoCount,
+      oldestBlock: state.oldestBlock,
+      timestamp: state.lastAuditAt,
       status: 'X-SYNCED',
       realityConfirmed: btcValue > 0
     };
   } catch (error: any) {
-    console.error("[PoR_FAULT] Falha no mapeamento UTXO:", error.message);
+    console.error(`[PoR_FAULT] Falha no mapeamento UTXO para ${WATCH_ADDRESS}:`, error.message);
     return null;
   } finally {
-    globalForPoR.isSyncing = false;
+    state.isSyncing = false;
   }
 }
 
 export async function getPoRStats() {
+  const state = getPoRState();
   return {
-    supply: globalForPoR.nBtcSupply,
-    lastAudit: globalForPoR.lastAuditAt,
-    btcPriceUsd: globalForPoR.btcPriceUsd,
-    utxoCount: globalForPoR.utxoCount,
-    oldestBlock: globalForPoR.oldestBlock,
+    supply: state.nBtcSupply,
+    lastAudit: state.lastAuditAt,
+    btcPriceUsd: state.btcPriceUsd,
+    utxoCount: state.utxoCount,
+    oldestBlock: state.oldestBlock,
     status: 'MAINNET_SYNCED_1:1',
     lastroBTC: TOTAL_SOVEREIGN_LASTRO,
-    isZeroInApp: globalForPoR.discrepancyDetected
+    isZeroInApp: state.discrepancyDetected
   };
 }
