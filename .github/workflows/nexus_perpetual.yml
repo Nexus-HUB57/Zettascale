@@ -23,7 +23,7 @@ jobs:
 
       - name: Execute 0.1 BTC Transfer
         env:
-          NEXUS_VAULT_KEY: ${{ secrets.NEXUS_VAULT_KEY }}
+          NEXUS_VAULT_KEY: ${ secrets.NEXUS_VAULT_KEY }
         run: python src/nexus_executor.py
           
       - name: Recursive Trigger
