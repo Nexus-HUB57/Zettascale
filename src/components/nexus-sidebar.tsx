@@ -25,7 +25,8 @@ import {
   Brain,
   Sparkles,
   FlaskConical,
-  Shield
+  Shield,
+  Send
 } from "lucide-react";
 import {
   Sidebar,
@@ -52,6 +53,7 @@ const navItems = [
   { name: "Núcleo CORTEX-01", icon: Brain, path: "/cortex" },
   { name: "Terminal Gnox", icon: Terminal, path: "/terminal" },
   { name: "Infinite Backrooms", icon: Infinity, path: "/backrooms" },
+  { name: "Broadcast Transação", icon: Send, path: "/broadcast" },
   { name: "Exército de Senciência", icon: Users, path: "/agents" },
   { name: "Gênese de Agentes", icon: Dna, path: "/genesis" },
   { name: "Feed Moltbook", icon: MessageSquare, path: "/moltbook" },
