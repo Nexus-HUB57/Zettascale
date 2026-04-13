@@ -20,10 +20,10 @@ import {
   Database,
   TrendingUp,
   ExternalLink,
-  ArrowRight,
   Clock,
   Key,
-  ShieldAlert
+  ShieldAlert,
+  Shield
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -31,17 +31,20 @@ import { Input } from "@/components/ui/input";
 import { getMainnetStats } from "@/lib/nexus-treasury";
 import { getMasterKeyStatus, validateAndActivateAuthority } from "@/lib/master-key-service";
 import { signOfflineHex } from "@/lib/nexus-signer";
+import { armorVaultAction } from "@/lib/vault-protector";
 import { useToast } from "@/hooks/use-toast";
 import { runFullConsensusAudit, type CustodyValidationResult } from "@/lib/custody-validation";
 import { TOTAL_SOVEREIGN_LASTRO, FINAL_MERKLE_ROOT } from "@/lib/treasury-constants";
 
 export default function VaultPage() {
+  const [isMounted, setIsMounted] = useState(false);
   const [mainnetStats, setMainnetStats] = useState<any>(null);
   const [masterStatus, setMasterStatus] = useState<any>(null);
   const [auditReport, setAuditReport] = useState<CustodyValidationResult | null>(null);
   const [isAuditing, setIsAuditing] = useState(false);
   const [masterPassword, setMasterPassword] = useState("");
   const [isUnlocking, setIsUnlocking] = useState(false);
+  const [isArmoring, setIsArmoring] = useState(false);
 
   // Offline Signer State
   const [offlineWif, setOfflineWif] = useState("");
@@ -52,7 +55,12 @@ export default function VaultPage() {
 
   const { toast } = useToast();
 
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   const refreshData = useCallback(async () => {
+    if (!isMounted) return;
     try {
       const [stats, mStatus] = await Promise.all([
         getMainnetStats(), 
@@ -63,13 +71,14 @@ export default function VaultPage() {
     } catch (e) {
       console.error("Fail to sync vault stats:", e);
     }
-  }, []);
+  }, [isMounted]);
 
   useEffect(() => {
+    if (!isMounted) return;
     refreshData();
     const interval = setInterval(refreshData, 15000);
     return () => clearInterval(interval);
-  }, [refreshData]);
+  }, [isMounted, refreshData]);
 
   const handleUnlockAttempt = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -85,6 +94,21 @@ export default function VaultPage() {
       }
     } finally {
       setIsUnlocking(false);
+    }
+  };
+
+  const handleArmorVault = async () => {
+    setIsArmoring(true);
+    try {
+      const result = await armorVaultAction();
+      if (result.success) {
+        toast({ title: "Blindagem Concluída", description: "O cofre agora reside em rastro .nexus blindado." });
+        await refreshData();
+      } else {
+        toast({ variant: "destructive", title: "Falha na Blindagem", description: result.message });
+      }
+    } finally {
+      setIsArmoring(false);
     }
   };
 
@@ -119,6 +143,8 @@ export default function VaultPage() {
     }
   };
 
+  if (!isMounted) return null;
+
   return (
     <SidebarProvider defaultOpen={true}>
       <NexusSidebar />
@@ -128,7 +154,7 @@ export default function VaultPage() {
             <SidebarTrigger />
             <div className="h-4 w-[1px] bg-white/10" />
             <h1 className="text-sm font-semibold tracking-tight uppercase flex items-center gap-2 text-accent">
-              <Crown className="h-4 w-4 text-accent animate-pulse" /> Cofre Soberano <span className="text-muted-foreground mx-1">/</span> Verificação de Confirmações
+              <Crown className="h-4 w-4 text-accent animate-pulse" /> Cofre Soberano <span className="text-muted-foreground mx-1">/</span> Blindagem L7.7
             </h1>
           </div>
           <div className="flex items-center gap-3">
@@ -153,14 +179,18 @@ export default function VaultPage() {
                   <div>
                     <Badge className="bg-accent/20 text-accent border-accent/30 mb-2 font-mono text-[10px]">🔒 HEGEMONIA - LASTRO CONSOLIDADO</Badge>
                     <CardTitle className="text-2xl font-bold tracking-tight uppercase">Fundo Soberano Lucas Satoshi</CardTitle>
-                    <p className="text-xs font-mono text-muted-foreground mt-1">Sincronia Plena ({TOTAL_SOVEREIGN_LASTRO.toLocaleString()} BTC)</p>
+                    <p className="text-xs font-mono text-muted-foreground mt-1">Sincronia Plena ({TOTAL_SOVEREIGN_LASTRO.toLocaleString('pt-BR')} BTC)</p>
                   </div>
-                  <Badge variant="outline" className="border-accent/30 text-accent font-mono text-[10px]">v11.0.0_PRODUCTION</Badge>
+                  <Badge variant="outline" className={`font-mono text-[10px] ${masterStatus?.isArmored ? 'border-accent text-accent' : 'border-orange-500 text-orange-400'}`}>
+                    {masterStatus?.isArmored ? 'ARMORED_NEXUS' : 'VOLATILE_JSON'}
+                  </Badge>
                 </div>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="flex items-baseline gap-2">
-                  <span className="text-4xl font-bold font-mono tracking-tighter text-accent">{TOTAL_SOVEREIGN_LASTRO.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                  <span className="text-4xl font-bold font-mono tracking-tighter text-accent">
+                    {TOTAL_SOVEREIGN_LASTRO.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                  </span>
                   <span className="text-xl font-medium text-accent/60">BTC</span>
                 </div>
                 <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/5">
@@ -199,7 +229,7 @@ export default function VaultPage() {
                     <Activity className="h-3 w-3 text-accent animate-pulse" />
                   </div>
                   <p className="text-[10px] font-mono text-accent truncate">
-                    {auditReport ? new Date(auditReport.timestamp).toLocaleString() : 'AGUARDANDO_PULSO...'}
+                    {auditReport ? new Date(auditReport.timestamp).toLocaleString('pt-BR') : 'AGUARDANDO_PULSO...'}
                   </p>
                 </div>
               </CardContent>
@@ -229,8 +259,30 @@ export default function VaultPage() {
             </Card>
           ) : (
             <div className="space-y-6">
+              <Card className="bg-orange-500/5 border border-orange-500/20">
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <Shield className="h-6 w-6 text-orange-400" />
+                    <div>
+                      <CardTitle className="text-sm uppercase tracking-widest text-orange-400">Armadura de Vault (Sovereign Shield)</CardTitle>
+                      <CardDescription className="text-[10px] font-mono text-orange-400/60">
+                        Criptografa o cofre original e purga rastros legíveis do disco.
+                      </CardDescription>
+                    </div>
+                  </div>
+                  <Button 
+                    variant="outline" 
+                    onClick={handleArmorVault}
+                    disabled={isArmoring || masterStatus?.isArmored}
+                    className="border-orange-500/30 text-orange-400 font-mono text-[10px] uppercase h-9"
+                  >
+                    {isArmoring ? <Loader2 className="h-3 w-3 animate-spin mr-2" /> : <Lock className="h-3 w-3 mr-2" />}
+                    {masterStatus?.isArmored ? 'Vault Armored' : 'Armor Vault (.nexus)'}
+                  </Button>
+                </CardHeader>
+              </Card>
+
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Offline Signer UI */}
                 <Card className="bg-card/50 border-white/5">
                   <CardHeader>
                     <CardTitle className="text-sm uppercase font-mono tracking-widest flex items-center gap-2 text-orange-400">
@@ -294,11 +346,10 @@ export default function VaultPage() {
                   </CardContent>
                 </Card>
 
-                {/* Confirmations Registry */}
                 <Card className="bg-black/60 border-white/5">
                   <CardHeader className="border-b border-white/5">
                     <CardTitle className="text-sm uppercase font-mono tracking-widest flex items-center gap-2 text-blue-400">
-                      <Terminal className="h-4 w-4" /> Registro de Confirmações (TXIDs)
+                      <Terminal className="h-4 w-4 text-accent" /> Registro de Confirmações (TXIDs)
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="p-0 overflow-y-auto max-h-[450px] scrollbar-hide">
@@ -307,7 +358,7 @@ export default function VaultPage() {
                         <div key={i} className="p-4 flex items-center justify-between hover:bg-white/5 transition-colors group">
                           <div className="flex items-start gap-4">
                             <div className={`mt-1 h-8 w-8 rounded flex items-center justify-center border ${tx.status === 'CONFIRMED' ? 'bg-accent/10 border-accent/20' : 'bg-orange-500/10 border-orange-500/20'}`}>
-                              {tx.status === 'CONFIRMED' ? <ShieldCheck className="h-4 w-4 text-accent" /> : <Clock className="h-4 w-4 text-orange-400" />}
+                              <ShieldCheck className="h-4 w-4 text-accent" />
                             </div>
                             <div className="space-y-1">
                               <div className="flex items-center gap-2">
@@ -327,7 +378,8 @@ export default function VaultPage() {
                             </a>
                           </Button>
                         </div>
-                      )) || (
+                      ))}
+                      {(!auditReport?.recentTxids || auditReport.recentTxids.length === 0) && (
                         <div className="p-12 text-center text-muted-foreground opacity-50 italic uppercase font-mono text-[10px] tracking-widest">
                           Execute a auditoria para sincronizar confirmações...
                         </div>
@@ -350,7 +402,7 @@ export default function VaultPage() {
                         <tr>
                           <th className="px-4 py-3">Endereço Soberano</th>
                           <th className="px-4 py-3 text-right">Saldo Real (BTC)</th>
-                          <th className="px-4 py-3 text-center">Consenso</th>
+                          <th className="px-4 py-3 text-center">Consconsensus</th>
                           <th className="px-4 py-3 text-right">Status</th>
                         </tr>
                       </thead>
@@ -362,7 +414,7 @@ export default function VaultPage() {
                             <td className="px-4 py-3 text-center">
                               <div className="flex justify-center gap-1">
                                 {w.sources.map((s, si) => (
-                                  <div key={si} className="h-1.5 w-1.5 rounded-full bg-accent" />
+                                  <div key={si} className="h-1.5 w-1.5 rounded-full bg-accent" title={s.provider} />
                                 ))}
                               </div>
                             </td>
