@@ -6,6 +6,7 @@
  */
 
 import { nexusEngine } from './nexus-engine';
+import { activateAllAgents } from './agents-registry';
 
 export async function initializeNexusEngineAction() {
   return nexusEngine.initialize();
@@ -21,4 +22,8 @@ export async function stopNexusEngineAction() {
 
 export async function isNeuralMeshActiveAction() {
   return nexusEngine.isNeuralMeshActive();
+}
+
+export async function activateAllAgentsAction() {
+  return activateAllAgents();
 }
