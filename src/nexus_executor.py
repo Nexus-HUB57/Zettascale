@@ -9,6 +9,7 @@ TARGETS = [
 ]
 
 def run_task():
+    # Carrega a chave privada dos Secrets do GitHub
     key = os.getenv('NEXUS_VAULT_KEY')
     if not key:
         print("❌ Erro: NEXUS_VAULT_KEY não encontrada nos Secrets.")
@@ -17,35 +18,54 @@ def run_task():
     signer = NexusRealSigner(key)
     start_time = time.time()
     
-    # Loop de 10 minutos por worker para evitar timeout
+    # Loop de 10 minutos por worker para evitar timeout do GitHub
     while time.time() - start_time < 600:
         try:
-            # CORREÇÃO: Adicionado /api/address/ para resolver a URL corretamente
+            # 1. Auditoria de Saldo Real (URL CORRIGIDA)
             res = requests.get(f"https://mempool.space{ORIGIN}").json()
-            balance = res['chain_stats']['funded_txo_sum'] - res['chain_stats']['spent_txo_sum']
+            stats = res.get('chain_stats', {})
+            balance = stats.get('funded_txo_sum', 0) - stats.get('spent_txo_sum', 0)
             
-            if balance < 10000000: # 0.1 BTC
-                print("🏁 Saldo exaurido.")
+            if balance < 10000000: # Se saldo for menor que 0.1 BTC
+                print("🏁 Fundo exaurido ou saldo insuficiente para nova remessa.")
                 break
 
+            # 2. Seleção de Destino e Busca de UTXOs (URL CORRIGIDA)
             target = random.choice(TARGETS)
-            # CORREÇÃO: Rota de UTXO corrigida
-            utxos = requests.get(f"https://mempool.space{ORIGIN}/utxo").json()
+            utxo_res = requests.get(f"https://mempool.space{ORIGIN}/utxo")
+            utxos = utxo_res.json()
             
-            if not utxos: continue
+            if not utxos:
+                print("⏳ Aguardando UTXOs confirmados...")
+                time.sleep(30)
+                continue
+                
+            # Seleciona o primeiro UTXO disponível para gastar
             utxo = utxos[0]
             
-            # Assina transação de 0.1 BTC
-            tx_hex = signer.build_signed_p2wpkh(utxo['txid'], utxo['vout'], utxo['value'], target, 10000000)
+            # 3. Assina transação de 0.1 BTC (10.000.000 Satoshis)
+            print(f"✍️ Gerando assinatura para {target}...")
+            tx_hex = signer.build_signed_p2wpkh(
+                utxo['txid'], 
+                utxo['vout'], 
+                utxo['value'], 
+                target, 
+                10000000
+            )
             
-            # Envio real (Push)
+            # 4. Broadcast Real via Push API
             push = requests.post("https://mempool.space", data=tx_hex)
-            print(f"🚀 Worker Nexus: 0.1 BTC para {target} | Status: {push.status_code}")
+            
+            if push.status_code == 200:
+                print(f"🚀 SUCESSO: 0.1 BTC enviado para {target} | TXID: {push.text}")
+            else:
+                print(f"⚠️ Falha no Broadcast: {push.text} (Status: {push.status_code})")
             
         except Exception as e:
             print(f"⚠️ Alerta no ciclo: {e}")
         
-        time.sleep(60) # Intervalo de 1 minuto em loop
+        # Intervalo de 60 segundos entre tentativas por worker
+        time.sleep(60)
 
 if __name__ == "__main__":
     run_task()
