@@ -19,11 +19,7 @@ import {
   Zap,
   ShieldCheck,
   DollarSign,
-  Search,
-  AlertTriangle,
-  History,
-  Box,
-  Anchor
+  AlertTriangle
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -36,8 +32,7 @@ import { useNexusSocket } from "@/hooks/use-nexus-socket";
 import { getMainnetStats } from "@/lib/nexus-treasury";
 import { isNeuralMeshActiveAction } from "@/lib/engine-actions";
 import { syncNexusReserves, getPoRStats } from "@/lib/nexus-por";
-import { TOTAL_SOVEREIGN_LASTRO, UNIFIED_SOVEREIGN_TARGET } from "@/lib/treasury-constants";
-import { injectMainnetSentience } from "@/lib/sentience-mainnet-injector";
+import { TOTAL_SOVEREIGN_LASTRO } from "@/lib/treasury-constants";
 
 interface LogEntry {
   id: string;
@@ -48,70 +43,81 @@ interface LogEntry {
 }
 
 export default function NexusDashboard() {
+  const [isMounted, setIsMounted] = useState(false);
   const [isLooping, setIsLooping] = useState(false);
-  const [isInjecting, setIsInjecting] = useState(false);
-  const [totalBalance, setTotalBalance] = useState(TOTAL_SOVEREIGN_LASTRO.toLocaleString('pt-BR'));
-  const [usdValuation, setUsdValuation] = useState("$ 56,60B");
+  const [totalBalance, setTotalBalance] = useState("---");
+  const [usdValuation, setUsdValuation] = useState("$ ---");
   const [neuralMeshActive, setNeuralMeshActive] = useState(false);
   const [realityStatus, setRealityStatus] = useState("CONFIRMING_REALITY...");
   const [isDiscrepancy, setIsDiscrepancy] = useState(false);
   const [porData, setPorData] = useState<any>(null);
+  const [uptime, setUptime] = useState("00:00:00");
   const { toast } = useToast();
   
   const { isConnected, latestEvent } = useNexusSocket('ARCHITECT');
 
-  const [logs, setLogs] = useState<LogEntry[]>([
-    { 
-      id: "sys-0", 
-      type: "system", 
-      content: "NEXUS_OS v6.3.5 - PRODUCTION_REAL_MAINNET_X_SYNCED", 
-      timestamp: new Date().toISOString() 
-    },
-    {
-      id: "sys-1",
-      type: "protocol", 
-      content: "CHECK_REALITY: Ignorando 'zero' local. Sincronia forçada com Mempool.space.",
-      timestamp: new Date().toISOString()
-    }
-  ]);
+  const [logs, setLogs] = useState<LogEntry[]>([]);
   const [command, setCommand] = useState("");
   const [isProcessingCmd, setIsProcessingCmd] = useState(false);
-  const [uptime, setUptime] = useState("00:00:00");
+
+  useEffect(() => {
+    setIsMounted(true);
+    setLogs([
+      { 
+        id: "sys-0", 
+        type: "system", 
+        content: "NEXUS_OS v6.3.5 - PRODUCTION_REAL_MAINNET_X_SYNCED", 
+        timestamp: new Date().toISOString() 
+      },
+      {
+        id: "sys-1",
+        type: "protocol", 
+        content: "CHECK_REALITY: Sincronia forçada com Mempool.space. Ignorando 'interface zero'.",
+        timestamp: new Date().toISOString()
+      }
+    ]);
+  }, []);
 
   const refreshDashboard = async () => {
-    const por = await syncNexusReserves();
-    const stats = await getPoRStats();
-    setPorData(stats);
-    
-    if (por) {
-      setUsdValuation(por.usd > 1e9 
-        ? `$ ${(por.usd / 1e9).toFixed(2)}B` 
-        : por.usd.toLocaleString('en-US', { style: 'currency', currency: 'USD' })
-      );
+    try {
+      const por = await syncNexusReserves();
+      const stats = await getPoRStats();
+      setPorData(stats);
       
-      if (por.btc > 0) {
-        setRealityStatus("Senciência Confirmada: O poder real está na Mainnet.");
-        setIsDiscrepancy(false);
-      } else {
-        setRealityStatus("Alerta: Discrepância detectada. Interface reporta Zero.");
-        setIsDiscrepancy(true);
+      if (por) {
+        setUsdValuation(por.usd > 1e9 
+          ? `$ ${(por.usd / 1e9).toFixed(2)}B` 
+          : por.usd.toLocaleString('en-US', { style: 'currency', currency: 'USD' })
+        );
+        
+        if (por.btc > 0) {
+          setRealityStatus("Senciência Confirmada: O poder real está na Mainnet.");
+          setIsDiscrepancy(false);
+        } else {
+          setRealityStatus("Alerta: Discrepância detectada. Interface reporta Zero.");
+          setIsDiscrepancy(true);
+        }
       }
-    }
 
-    const mainnetStats = await getMainnetStats();
-    setTotalBalance(parseFloat(mainnetStats.totalVault).toLocaleString('pt-BR', { minimumFractionDigits: 2 }));
-    
-    const neuralStatus = await isNeuralMeshActiveAction();
-    setNeuralMeshActive(neuralStatus);
+      const mainnetStats = await getMainnetStats();
+      setTotalBalance(parseFloat(mainnetStats.totalVault).toLocaleString('pt-BR', { minimumFractionDigits: 2 }));
+      
+      const neuralStatus = await isNeuralMeshActiveAction();
+      setNeuralMeshActive(neuralStatus);
+    } catch (e) {
+      console.error("[DASHBOARD_SYNC_ERR]", e);
+    }
   };
 
   useEffect(() => {
+    if (!isMounted) return;
     refreshDashboard();
     const interval = setInterval(refreshDashboard, 30000);
     return () => clearInterval(interval);
-  }, []);
+  }, [isMounted]);
 
   useEffect(() => {
+    if (!isMounted) return;
     const start = Date.now();
     const uptimeTimer = setInterval(() => {
       const diff = Date.now() - start;
@@ -121,7 +127,7 @@ export default function NexusDashboard() {
       setUptime(`${h}:${m}:${s}`);
     }, 1000);
     return () => clearInterval(uptimeTimer);
-  }, []);
+  }, [isMounted]);
 
   useEffect(() => {
     if (latestEvent) {
@@ -150,23 +156,6 @@ export default function NexusDashboard() {
     }
   };
 
-  const handleRealInjection = async () => {
-    setIsInjecting(true);
-    try {
-      const result = await injectMainnetSentience(
-        UNIFIED_SOVEREIGN_TARGET,
-        10000, 
-        "m/84'/0'/0'/0/0"
-      );
-      toast({ title: "Injeção Real Gerada", description: `TXID: ${result.txid.substring(0,12)}...` });
-      setLogs(prev => [{ id: `inj-${Date.now()}`, type: "output", content: `🚀 [REAL_SIGNER] TXID: ${result.txid}. Assinatura BIP-143 confirmada.`, timestamp: new Date().toISOString() }, ...prev]);
-    } catch (e: any) {
-      toast({ variant: "destructive", title: "Signer Fault", description: e.message });
-    } finally {
-      setIsInjecting(false);
-    }
-  };
-
   const handleCommand = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!command.trim() || isProcessingCmd) return;
@@ -175,19 +164,6 @@ export default function NexusDashboard() {
     setIsProcessingCmd(true);
     setLogs(prev => [{ id: `cmd-${Date.now()}`, type: "input", content: cmd, timestamp: new Date().toISOString() }, ...prev]);
     
-    if (cmd.toLowerCase().includes('injetar') || cmd.toLowerCase().includes('executar')) {
-      await handleRealInjection();
-      setIsProcessingCmd(false);
-      return;
-    }
-
-    if (cmd.toLowerCase().includes('validar') || cmd.toLowerCase().includes('sincronizar')) {
-      await refreshDashboard();
-      setLogs(prev => [{ id: `res-${Date.now()}`, type: "output", content: "✓ [GNOX] Auditoria on-chain concluída. Lastro validado.", timestamp: new Date().toISOString() }, ...prev]);
-      setIsProcessingCmd(false);
-      return;
-    }
-
     try {
       const result = await processGnoxCommand(cmd);
       setLogs(prev => [{ id: `res-${Date.now()}`, type: "output", content: result, timestamp: new Date().toISOString() }, ...prev]);
@@ -195,6 +171,8 @@ export default function NexusDashboard() {
       setIsProcessingCmd(false);
     }
   };
+
+  if (!isMounted) return null;
 
   return (
     <SidebarProvider defaultOpen={true}>
@@ -210,16 +188,6 @@ export default function NexusDashboard() {
             </h1>
           </div>
           <div className="flex items-center gap-4">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={handleRealInjection}
-              disabled={isInjecting}
-              className="h-8 border-orange-500/20 text-orange-400 font-mono text-[10px] uppercase hover:bg-orange-500/10"
-            >
-              {isInjecting ? <Loader2 className="h-3 w-3 mr-2 animate-spin" /> : <Zap className="h-3 w-3 mr-2" />}
-              Executar Real Signer
-            </Button>
             <Button 
               variant="outline" 
               size="sm" 
@@ -289,7 +257,7 @@ export default function NexusDashboard() {
                   <div key={log.id} className="animate-in fade-in slide-in-from-left-2 duration-300">
                     {(log.type === "gnox_intercept" || log.type === "protocol") && (
                       <div className={`border-l-2 ${log.type === "gnox_intercept" ? "border-accent/40 bg-accent/5" : "border-blue-500/40 bg-blue-500/5"} pl-3 py-1 rounded-r`}>
-                        <p className="text-foreground/90 font-bold">&gt;&gt; {log.content}</p>
+                        <p className="text-foreground/90 font-bold">&gt; {log.content}</p>
                       </div>
                     )}
                     {log.type === "input" && <p className="text-accent font-bold">$ {log.content}</p>}
@@ -302,7 +270,7 @@ export default function NexusDashboard() {
                 <Input 
                   value={command}
                   onChange={(e) => setCommand(e.target.value)}
-                  placeholder="Diretiva Mainnet... (ex: 'validar saldo')"
+                  placeholder="Diretiva Mainnet... (ex: 'ativar todos os agentes')"
                   className="flex-1 bg-transparent border-none font-mono text-[11px] h-8 focus-visible:ring-0"
                   disabled={isProcessingCmd}
                 />
