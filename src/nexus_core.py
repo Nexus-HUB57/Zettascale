@@ -10,7 +10,6 @@ class NexusRealSigner:
     def __init__(self, wif_key):
         self.secret = CBitcoinSecret(wif_key)
         self.pubkey = self.secret.pub
-        # CORREÇÃO: Instanciação de endereço SegWit via ScriptPubKey
         hash160 = hashlib.new('ripemd160', hashlib.sha256(self.pubkey).digest()).digest()
         self.address = P2WPKHBitcoinAddress.from_scriptPubKey(CScript([OP_0, hash160]))
 
@@ -22,13 +21,10 @@ class NexusRealSigner:
         txout_change = CTxOut(change_sats, self.address.to_scriptPubKey())
         tx = CMutableTransaction([txin], [txout_dest, tx_change])
         
-        # Gerando Assinatura BIP-143
         hash160 = hashlib.new('ripemd160', hashlib.sha256(self.pubkey).digest()).digest()
         script_code = CScript([OP_0, hash160])
         sighash = SignatureHash(script_code, tx, 0, SIGHASH_ALL, amount=utxo_amount_sats, sigversion=SIGVERSION_WITNESS_V0)
         sig = self.secret.sign(sighash) + bytes([SIGHASH_ALL])
-        
-        # Injetando Witness Stack
         tx.wit = CTxWitness([CTxInWitness([sig, self.pubkey])])
         return b2x(tx.serialize())
 
