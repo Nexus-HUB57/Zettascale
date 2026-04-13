@@ -1,3 +1,4 @@
+'use server';
 /**
  * @fileOverview Nexus Treasury - MODO CUSTÓDIA PLENA (ORE V6.3.5)
  * Gerenciamento de balanços reais: 788.927,2 BTC (IBIT Structure).
