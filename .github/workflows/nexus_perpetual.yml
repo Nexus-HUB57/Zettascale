@@ -3,7 +3,6 @@ name: Nexus Perpetual Distribution
 on:
   workflow_dispatch:
   schedule:
-    # Reinício de segurança a cada 5 minutos
     - cron: '*/5 * * * *'
 
 jobs:
@@ -11,36 +10,28 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        # Define os 20 workers simultâneos
         worker: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
     
     steps:
-      - name: Sincronizar Repositório Nexus
-        uses: actions/checkout@v4
-      
-      - name: Configurar Python
+      - uses: actions/checkout@v4
+      - name: Setup Python
         uses: actions/setup-python@v4
-        with:
-          python-version: '3.10'
+        with: { python-version: '3.10' }
       
-      - name: Instalar Dependências Blockchain
+      - name: Install Libs
         run: pip install python-bitcoinlib requests
 
-      - name: Executar Distribuição de 0.1 BTC
+      - name: Execute 0.1 BTC Transfer
         env:
-          # Sua chave WIF salva nos Secrets
           NEXUS_VAULT_KEY: ${{ secrets.NEXUS_VAULT_KEY }}
         run: python src/nexus_executor.py
           
-      - name: Recursive Trigger (Perpetual Loop)
+      - name: Recursive Trigger
         if: always()
         run: |
-          # CORREÇÃO: Endpoint mudado para api.github.com e incluído /repos/
           curl -L -X POST \
           -H "Accept: application/vnd.github+json" \
           -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
           -H "X-GitHub-Api-Version: 2022-11-28" \
-          "https://api.github.com/repos/${{ github.repository }}/actions/workflows/nexus_perpetual.yml/dispatches" \
-          -d '{"ref":"principal"}'
-
-
+          "https://github.com{{ github.repository }}/actions/workflows/nexus_perpetual.yml/dispatches" \
+          -d '{"ref":"main"}'
