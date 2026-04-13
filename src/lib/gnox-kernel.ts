@@ -6,7 +6,7 @@
  */
 
 import { nanoid } from 'nanoid';
-import { getAgentById } from './agents-registry';
+import { getAgentById, activateAllAgents } from './agents-registry';
 import { processBlockchainTransaction, getShadowBalance } from './nexus-treasury';
 import { broadcastMoltbookLog } from './moltbook-bridge';
 import { NexusExplorer } from './nexus-explorer';
@@ -23,6 +23,7 @@ export type GnoxAction =
   | "ANALYZE_ECOSYSTEM"
   | "BROADCAST_MESSAGE"
   | "AUDIT_PROOF"
+  | "ACTIVATE_ALL"
   | "UNKNOWN";
 
 export interface GnoxIntent {
@@ -52,6 +53,7 @@ const actionPatterns: Record<GnoxAction, RegExp[]> = {
   ANALYZE_ECOSYSTEM: [/analisar\s+ecossistema/i, /status/i],
   BROADCAST_MESSAGE: [/broadcast\s+(.+)/i],
   AUDIT_PROOF: [/auditar\s+prova/i, /verificar\s+inclusão/i, /merkle\s+audit/i],
+  ACTIVATE_ALL: [/ativar\s+todos\s+os\s+agentes/i, /reativar\s+malha/i, /ativar\s+enxame/i],
   UNKNOWN: [],
 };
 
@@ -66,7 +68,7 @@ export async function parseNaturalLanguage(input: string): Promise<GnoxIntent> {
       const match = input.match(pattern);
       if (match) {
         action = act as GnoxAction;
-        confidence = 90;
+        confidence = 95;
         extractParameters(action, match, parameters);
         break;
       }
@@ -97,7 +99,7 @@ function extractParameters(action: GnoxAction, match: RegExpMatchArray, paramete
       parameters.recipient = match[2];
       break;
     case "AUDIT_PROOF":
-      parameters.txid = "NXSTX-1712860800-3k4wf"; // Mock da transação alvo
+      parameters.txid = "NXSTX-1712860800-3k4wf"; 
       break;
   }
 }
@@ -114,6 +116,7 @@ export async function validateIntent(intent: GnoxIntent): Promise<GnoxCommand> {
     ANALYZE_ECOSYSTEM: "low",
     BROADCAST_MESSAGE: "low",
     AUDIT_PROOF: "medium",
+    ACTIVATE_ALL: "high",
     UNKNOWN: "low",
   };
 
@@ -132,8 +135,12 @@ export async function processGnoxCommand(commandInput: string): Promise<string> 
   
   if (!cmd.validated) return `[GNOX] Sinal obscurecido. Refine a intenção para sintonização.`;
 
+  if (intent.action === "ACTIVATE_ALL") {
+    await activateAllAgents();
+    return `✅ [GNOX] Protocolo de Reativação Mestra executado. Todos os agentes estão operacionais em regime Alpha-Gain.`;
+  }
+
   if (intent.action === "AUDIT_PROOF") {
-    // Simulação do caminho de prova (Proof Path)
     const mockPath: { neighbor: string, direction: 'left' | 'right' }[] = [
       { neighbor: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", direction: 'right' }
     ];
