@@ -1,7 +1,7 @@
 'use server';
 /**
  * @fileOverview Master Key Service L7.7 - HD Vault Production Core.
- * UPGRADED: Geração de semente de 24 palavras e derivação BIP-84 (Native SegWit).
+ * UPGRADED: Suporte a carregamento de Vault Blindado (.nexus).
  * STATUS: SERVER-SIDE ONLY
  */
 
@@ -21,6 +21,7 @@ import { verifyPasswordHash } from './encryption';
 import { MASTER_CREDENTIALS } from './master-auth';
 import { NexusFundOrchestrator } from './fund-orchestrator';
 import { ensureEccInitialized } from './bitcoin-engine';
+import { loadArmoredVault } from './vault-protector';
 
 let _bip32: ReturnType<typeof BIP32Factory> | null = null;
 function getBip32Factory() {
@@ -46,6 +47,7 @@ export interface MasterKeyStatus {
   synchronizedWallets: number;
   lightningChecksum?: string;
   isXprvValid: boolean;
+  isArmored: boolean;
   mode: 'PRODUCTION';
 }
 
@@ -70,56 +72,6 @@ if (globalState.currentAttempts === undefined) {
   globalState.syncedAddresses = new Set();
 }
 
-/**
- * Gera um novo cofre Nexus com 24 palavras (Segurança Máxima).
- */
-export async function generateNexusVault() {
-  ensureEccInitialized();
-  const mnemonic = bip39.generateMnemonic(256); // 256 bits = 24 words
-  const seed = await bip39.mnemonicToSeed(mnemonic);
-  const bip32 = getBip32Factory();
-  const root = bip32.fromSeed(seed);
-  
-  const addresses = [];
-  for (let i = 0; i < 5; i++) {
-    const path = `m/84'/0'/0'/0/${i}`;
-    const child = root.derivePath(path);
-    const { address } = bitcoin.payments.p2wpkh({ 
-      pubkey: child.publicKey, 
-      network: bitcoin.networks.bitcoin 
-    });
-    addresses.push({ index: i, address, path });
-  }
-
-  return {
-    mnemonic,
-    addresses,
-    fingerprint: root.fingerprint.toString('hex')
-  };
-}
-
-/**
- * Deriva um endereço específico na hierarquia BIP-84.
- */
-export async function generateAddressAtIndex(index: number) {
-  ensureEccInitialized();
-  const bip32 = getBip32Factory();
-  
-  // Utilizando a mnemônica temporária do Sentinel v2 para demonstração
-  const mnemonic = "obscure observe survey exist clown hood chronic consider surprise gap drill uniform obscure observe survey exist clown hood chronic consider surprise gap drill uniform";
-  const seed = await bip39.mnemonicToSeed(mnemonic);
-  const root = bip32.fromSeed(seed);
-  
-  const path = `m/84'/0'/0'/0/${index}`;
-  const child = root.derivePath(path);
-  const { address } = bitcoin.payments.p2wpkh({ 
-    pubkey: child.publicKey, 
-    network: bitcoin.networks.bitcoin 
-  });
-  
-  return { address, index, path };
-}
-
 export async function validateAndActivateAuthority(password: string): Promise<{ success: boolean; status: MasterKeyStatus; message: string }> {
   if (globalState.isWiped) return { success: false, status: await getMasterKeyStatus(), message: 'VAULT_WIPED' };
 
@@ -132,9 +84,16 @@ export async function validateAndActivateAuthority(password: string): Promise<{ 
 
   try {
     const bip32 = getBip32Factory();
-    // Utilizando a semente mestre definitiva
-    const MNEMONIC = process.env.MASTER_MNEMONIC || "obscure observe survey exist clown hood chronic consider surprise gap drill uniform"; 
-    const seed = await bip39.mnemonicToSeed(MNEMONIC);
+    
+    // Tenta carregar semente de Vault Blindado primeiro
+    const armoredVault = await loadArmoredVault();
+    let mnemonic = process.env.MASTER_MNEMONIC || "obscure observe survey exist clown hood chronic consider surprise gap drill uniform";
+    
+    if (armoredVault?.x1?.seed) {
+      mnemonic = armoredVault.x1.seed;
+    }
+
+    const seed = await bip39.mnemonicToSeed(mnemonic);
     
     globalState.masterKeyInstance = bip32.fromSeed(seed);
     globalState.orchestrator = new NexusFundOrchestrator(seed);
@@ -168,6 +127,11 @@ export async function getMasterKeyStatus(): Promise<MasterKeyStatus> {
     } catch (e) {}
   }
   
+  // Verifica se o arquivo blindado existe no disco
+  const fs = require('fs');
+  const path = require('path');
+  const armoredExists = fs.existsSync(path.join(process.cwd(), 'masterVault.nexus'));
+
   return {
     isActive: globalState.masterKeyInstance !== null,
     isWiped: globalState.isWiped,
@@ -183,6 +147,7 @@ export async function getMasterKeyStatus(): Promise<MasterKeyStatus> {
     synchronizedWallets: globalState.syncedAddresses.size,
     lightningChecksum: lnChecksum,
     isXprvValid: lnValid,
+    isArmored: armoredExists,
     mode: 'PRODUCTION'
   };
 }
