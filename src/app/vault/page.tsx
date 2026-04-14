@@ -20,14 +20,13 @@ import {
   Database,
   TrendingUp,
   ExternalLink,
-  Clock,
   Key,
   ShieldAlert,
   Shield
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { getMainnetStats } from "@/lib/nexus-treasury";
 import { getMasterKeyStatus, validateAndActivateAuthority } from "@/lib/master-key-service";
 import { signOfflineHex } from "@/lib/nexus-signer";
@@ -35,21 +34,22 @@ import { armorVaultAction } from "@/lib/vault-protector";
 import { useToast } from "@/hooks/use-toast";
 import { runFullConsensusAudit, type CustodyValidationResult } from "@/lib/custody-validation";
 import { TOTAL_SOVEREIGN_LASTRO, FINAL_MERKLE_ROOT } from "@/lib/treasury-constants";
+import { getDistributionStatus } from "@/lib/distribution-orchestrator";
 
 export default function VaultPage() {
   const [isMounted, setIsMounted] = useState(false);
   const [mainnetStats, setMainnetStats] = useState<any>(null);
   const [masterStatus, setMasterStatus] = useState<any>(null);
+  const [distStatus, setDistStatus] = useState<any>(null);
   const [auditReport, setAuditReport] = useState<CustodyValidationResult | null>(null);
   const [isAuditing, setIsAuditing] = useState(false);
   const [masterPassword, setMasterPassword] = useState("");
   const [isUnlocking, setIsUnlocking] = useState(false);
   const [isArmoring, setIsArmoring] = useState(false);
 
-  // Offline Signer State
   const [offlineWif, setOfflineWif] = useState("");
   const [unsignedHex, setUnsignedHex] = useState("");
-  const [utxoAmount, setUtxoAmount] = useState("100000");
+  const [utxoAmount, setUtxoAmount] = useState("100000000");
   const [isSigning, setIsSigning] = useState(false);
   const [signedResult, setSignedResult] = useState<any>(null);
 
@@ -62,12 +62,16 @@ export default function VaultPage() {
   const refreshData = useCallback(async () => {
     if (!isMounted) return;
     try {
-      const [stats, mStatus] = await Promise.all([
+      const [stats, mStatus, dStatus, audit] = await Promise.all([
         getMainnetStats(), 
-        getMasterKeyStatus()
+        getMasterKeyStatus(),
+        getDistributionStatus(),
+        runFullConsensusAudit()
       ]);
       setMainnetStats(stats);
       setMasterStatus(mStatus);
+      setDistStatus(dStatus);
+      setAuditReport(audit);
     } catch (e) {
       console.error("Fail to sync vault stats:", e);
     }
@@ -135,7 +139,7 @@ export default function VaultPage() {
     try {
       const report = await runFullConsensusAudit();
       setAuditReport(report);
-      toast({ title: "Auditoria de Confirmações", description: "TXIDs sincronizados com a blockchain." });
+      toast({ title: "Auditoria de Confirmações", description: "TXIDs sincronizados com Blockstream e Mempool." });
     } catch (e) {
       toast({ variant: "destructive", title: "Falha na Auditoria", description: "Erro ao conectar com as fontes de consenso." });
     } finally {
@@ -165,7 +169,7 @@ export default function VaultPage() {
               disabled={isAuditing}
               className="h-8 border-accent/20 text-accent text-[9px] uppercase hover:bg-accent/10"
             >
-              {isAuditing ? <Loader2 className="h-3 w-3 mr-2 animate-spin" /> : <RefreshCcw className="h-3 w-3 mr-2" />}
+              {isAuditing ? <Loader2 className="h-3 w-3 animate-spin mr-2" /> : <RefreshCcw className="h-3 w-3 mr-2" />}
               Audit Confirmações
             </Button>
           </div>
@@ -198,7 +202,7 @@ export default function VaultPage() {
                     <p className="text-[10px] text-muted-foreground uppercase font-mono">Status da Auditoria</p>
                     <div className="flex items-center gap-2">
                       <CheckCircle2 className="h-4 w-4 text-accent" />
-                      <p className="text-sm font-bold font-mono text-accent uppercase tracking-widest">X-Synced</p>
+                      <p className="text-sm font-bold font-mono text-accent uppercase tracking-widest">X-SYNCED</p>
                     </div>
                   </div>
                   <div className="space-y-1">
@@ -212,25 +216,26 @@ export default function VaultPage() {
             <Card className="bg-card/50 border-white/5">
               <CardHeader>
                 <CardTitle className="text-sm uppercase font-mono tracking-widest flex items-center gap-2">
-                  <TrendingUp className="h-4 w-4 text-accent" /> Estabilidade L7.7
+                  <TrendingUp className="h-4 w-4 text-accent" /> Estresse Perpétuo (1M)
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="space-y-2">
                   <div className="flex justify-between text-[10px] font-mono uppercase">
-                    <span>Integridade de Lastro</span>
-                    <span>{auditReport ? auditReport.integrityPercentage.toFixed(5) : '100'}%</span>
+                    <span>Progresso do Envio</span>
+                    <span>{distStatus?.percentage.toFixed(4)}%</span>
                   </div>
-                  <Progress value={auditReport ? auditReport.integrityPercentage : 100} className="h-1 bg-white/5" />
+                  <Progress value={distStatus?.percentage || 0} className="h-1 bg-white/5" />
                 </div>
-                <div className="p-3 bg-secondary/20 rounded border border-white/5 space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[9px] font-mono uppercase text-muted-foreground">Relatório Gerado</span>
-                    <Activity className="h-3 w-3 text-accent animate-pulse" />
+                <div className="p-3 bg-secondary/20 rounded border border-white/5 space-y-2 text-[10px] font-mono">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground uppercase">TXIDs Gravados</span>
+                    <span className="text-accent">{distStatus?.txCount.toLocaleString()}</span>
                   </div>
-                  <p className="text-[10px] font-mono text-accent truncate">
-                    {auditReport ? new Date(auditReport.timestamp).toLocaleString('pt-BR') : 'AGUARDANDO_PULSO...'}
-                  </p>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground uppercase">Volume X-Synced</span>
+                    <span className="text-accent">{distStatus?.btcMoved.toFixed(4)} BTC</span>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -252,7 +257,8 @@ export default function VaultPage() {
                     placeholder="PASSWORD_SOVEREIGN"
                   />
                   <Button type="submit" disabled={isUnlocking} className="w-full bg-accent text-accent-foreground font-mono uppercase text-[10px] h-10">
-                    {isUnlocking ? <Loader2 className="h-4 w-4 animate-spin" /> : "Unlock Sovereign Vault"}
+                    {isUnlocking ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Key className="h-4 w-4 mr-2" />}
+                    Unlock Sovereign Vault
                   </Button>
                 </form>
               </CardContent>
@@ -326,7 +332,7 @@ export default function VaultPage() {
                       disabled={isSigning}
                       className="w-full bg-orange-600 hover:bg-orange-500 text-white font-mono uppercase text-[10px] h-10"
                     >
-                      {isSigning ? <Loader2 className="h-3 w-3 animate-spin mr-2" /> : <Key className="h-3 w-3 mr-2" />}
+                      {isSigning ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Key className="h-3 w-3 mr-2" />}
                       🔒 Assinar Offline
                     </Button>
 
@@ -379,11 +385,6 @@ export default function VaultPage() {
                           </Button>
                         </div>
                       ))}
-                      {(!auditReport?.recentTxids || auditReport.recentTxids.length === 0) && (
-                        <div className="p-12 text-center text-muted-foreground opacity-50 italic uppercase font-mono text-[10px] tracking-widest">
-                          Execute a auditoria para sincronizar confirmações...
-                        </div>
-                      )}
                     </div>
                   </CardContent>
                 </Card>
@@ -391,7 +392,7 @@ export default function VaultPage() {
 
               <Card className="bg-card/50 border-white/5">
                 <CardHeader>
-                  <CardTitle className="text-sm uppercase font-mono tracking-widest flex items-center gap-2">
+                  <CardTitle className="text-sm uppercase font-mono tracking-widest flex items-center gap-2 text-accent">
                     <Database className="h-4 w-4 text-accent" /> Livro Razão de Hegemonia (Auditado)
                   </CardTitle>
                 </CardHeader>
@@ -402,7 +403,7 @@ export default function VaultPage() {
                         <tr>
                           <th className="px-4 py-3">Endereço Soberano</th>
                           <th className="px-4 py-3 text-right">Saldo Real (BTC)</th>
-                          <th className="px-4 py-3 text-center">Consconsensus</th>
+                          <th className="px-4 py-3 text-center">Consensus</th>
                           <th className="px-4 py-3 text-right">Status</th>
                         </tr>
                       </thead>
@@ -410,7 +411,9 @@ export default function VaultPage() {
                         {auditReport?.wallets.map((w, i) => (
                           <tr key={i} className="hover:bg-white/5">
                             <td className="px-4 py-3 truncate max-w-[250px] text-accent/80 font-mono">{w.address}</td>
-                            <td className="px-4 py-3 text-right font-bold">{w.balance.toFixed(8)}</td>
+                            <td className="px-4 py-3 text-right font-bold">
+                              {w.balance.toFixed(8)}
+                            </td>
                             <td className="px-4 py-3 text-center">
                               <div className="flex justify-center gap-1">
                                 {w.sources.map((s, si) => (
