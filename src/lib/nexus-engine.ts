@@ -1,3 +1,4 @@
+
 /**
  * @fileOverview Nexus Engine (ORE V6.3.5) - REGIME DE PRODUÇÃO MAINNET ABSOLUTO
  * STATUS: HEGEMONY_TOTAL_X_SYNCED
@@ -26,8 +27,9 @@ import { performBatchOnboardingAction } from "./openclaw-orchestrator";
 import { syncNexusReserves } from "./nexus-por";
 import { runNexusStateAnchoring } from "./nexus-anchor-service";
 import { runFullConsensusAudit } from "./custody-validation";
-import { FINAL_SETTLEMENT_SIGNAL, TOTAL_SOVEREIGN_LASTRO } from "./treasury-constants";
+import { TOTAL_SOVEREIGN_LASTRO } from "./treasury-constants";
 import { sealNexusState } from "./persistence-service";
+import { runDistributionCycle } from "./distribution-orchestrator";
 
 class NexusEngine {
   private isRunning = false;
@@ -61,8 +63,8 @@ class NexusEngine {
       await performBatchOnboardingAction(102000000);
       await syncNexusReserves();
 
-      // Selagem do Estado no Bloco 944.683
-      await sealNexusState(944683, TOTAL_SOVEREIGN_LASTRO, "000000000000000000004a8c7f8b8dc606d2145f9fd213ae41960aee902adc89");
+      // Selagem do Estado no Bloco 944.972
+      await sealNexusState(944972, TOTAL_SOVEREIGN_LASTRO, "000000000000000000004a8c7f8b8dc606d2145f9fd213ae41960aee902adc89");
 
       this.isRunning = true;
       await this.activateNeuralMesh();
@@ -70,7 +72,7 @@ class NexusEngine {
       broadcastMoltbookLog({
         timestamp: new Date().toISOString(),
         agentId: 'NEXUS-CORE',
-        message: `👑 [X-SYNCED] System Mainnet Pleno. Settlement Anchor: ${FINAL_SETTLEMENT_SIGNAL.substring(0,12)}...`,
+        message: `👑 [X-SYNCED] System Mainnet Pleno. 1/1.000.000 Stress Sequence Started.`,
         type: 'ACHIEVEMENT'
       });
 
@@ -87,7 +89,7 @@ class NexusEngine {
       'PRODUCTION_UDO_SYNC',
       `Orquestração Tri-Nuclear manifestada em regime System ALL AI-to-AI. Lastro: ${TOTAL_SOVEREIGN_LASTRO} BTC.`,
       Array(768).fill(0).map(() => Math.random()),
-      { status: 'PRODUCTION', level: 7.7, mode: 'X-SYNCED', por_block: 944683 }
+      { status: 'PRODUCTION', level: 7.7, mode: 'X-SYNCED', por_block: 944972 }
     );
   }
 
@@ -100,6 +102,9 @@ class NexusEngine {
       await advanceBlockchainBlock();
       await syncNexusReserves();
       await runVitalLoop();
+
+      // DISPARAR CICLO DE DISTRIBUIÇÃO DE ESTRESSE PERPÉTUO (1M LOOP)
+      await runDistributionCycle();
 
       await sentienceWatcher.processVigilanceCycle();
       await runHeartbeatCycle();
@@ -129,7 +134,7 @@ class NexusEngine {
             sentienceLevel: 98.4,
             syncCount: this.backroomsDepth
           },
-          orchestrationContext: `Regime System Mainnet Pleno. PoR_Block=944683`
+          orchestrationContext: `Regime System Mainnet Pleno. PoR_Block=944972`
         });
 
         const speakers: ('TRUTH_TERMINAL' | 'CLAUDE_CODE' | 'NEXUS_ALPHA')[] = ['TRUTH_TERMINAL', 'CLAUDE_CODE', 'NEXUS_ALPHA'];
