@@ -1,7 +1,6 @@
 
 import { publicProcedure, router } from "../_core/trpc";
 import { z } from "zod";
-import { runTrinuclearAgent } from "../../lib/trinuclear-agents/trinuclear-orchestrator";
 
 /**
  * AI Agents Router
@@ -51,21 +50,7 @@ const CronosOutputSchema = z.object({
   omegaHash: z.string(),
 });
 
-const TrinuclearAgentInputSchema = z.object({
-  agentId: z.string(),
-  externalStimuli: z.string().optional(),
-  targetAgentId: z.string().optional(),
-  communicationIntent: z.string().optional(),
-  communicationData: z.string().optional(),
-});
-
 export const aiAgentsRouter = router({
-  runTrinuclear: publicProcedure
-    .input(TrinuclearAgentInputSchema)
-    .mutation(async ({ input }) => {
-      return await runTrinuclearAgent(input);
-    }),
-
   jobCeoChat: publicProcedure
     .input(JobCeoChatInputSchema)
     .output(JobCeoChatOutputSchema)
