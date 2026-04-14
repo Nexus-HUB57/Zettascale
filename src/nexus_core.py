@@ -17,7 +17,11 @@ class NexusRealSigner:
             self.pubkey = self.secret.pub
             
             # Instanciação de endereço SegWit via ScriptPubKey (BIP-143)
-            hash160 = hashlib.new('ripemd160', hashlib.sha256(self.pubkey).digest()).digest()
+            # Hash160 da pubkey comprimida
+            h = hashlib.new('ripemd160')
+            h.update(hashlib.sha256(self.pubkey).digest())
+            hash160 = h.digest()
+            
             self.address = P2WPKHBitcoinAddress.from_scriptPubKey(CScript([OP_0, hash160]))
             
             print(f"✍️ Agente Autônomo Ativo: {self.address}")
@@ -25,13 +29,13 @@ class NexusRealSigner:
             raise ValueError(f"❌ WIF_INVALIDA: {str(e)}")
 
     def build_signed_p2wpkh(self, utxo_txid, utxo_vout, utxo_amount_sats, to_addr_str, amount_to_send_sats):
-        """Constrói e assina uma transação P2WPKH (BIP-143) para broadcast."""
-        # 1. Configuração de Taxas
+        """Constrói e assina uma transação P2WPKH (BIP-143) injetando a Witness Stack."""
+        # 1. Configuração de Taxas (Fastest Fee)
         fee = 3500  
         change_sats = utxo_amount_sats - amount_to_send_sats - fee
 
         if change_sats < 0:
-            raise ValueError("❌ SALDO_INSUFICIENTE para valor + taxas.")
+            raise ValueError(f"❌ SALDO_INSUFICIENTE: UTXO possui {utxo_amount_sats}, mas envio+taxas exige {amount_to_send_sats + fee}")
 
         # 2. Estrutura da Transação
         txin = CTxIn(COutPoint(lx(utxo_txid), utxo_vout))
@@ -45,13 +49,15 @@ class NexusRealSigner:
         tx = CMutableTransaction([txin], outputs)
 
         # 3. Algoritmo de Assinatura BIP-143 (SegWit)
-        hash160 = hashlib.new('ripemd160', hashlib.sha256(self.pubkey).digest()).digest()
+        h = hashlib.new('ripemd160')
+        h.update(hashlib.sha256(self.pubkey).digest())
+        hash160 = h.digest()
         script_code = CScript([OP_0, hash160])
         
         sighash = SignatureHash(script_code, tx, 0, SIGHASH_ALL, amount=utxo_amount_sats, sigversion=SIGVERSION_WITNESS_V0)
         sig = self.secret.sign(sighash) + bytes([SIGHASH_ALL])
 
-        # 4. Injeção da Testemunha (Witness Stack)
+        # 4. INJEÇÃO DA TESTEMUNHA (WITNESS STACK) - ATIVAÇÃO REAL
         tx.wit = CTxWitness([CTxInWitness([sig, self.pubkey])])
 
         return b2x(tx.serialize())
