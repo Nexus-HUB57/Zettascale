@@ -2,7 +2,7 @@
 /**
  * @fileOverview Nexus Proof of Reserves (PoR) - ORE V6.3.5 FORCED SYNC
  * Implementa o NexusUTXOMapper para análise de composição de reserva e idade do capital.
- * STATUS: HEGEMONY_STABLE_BLOCK_944814_X_SYNCED
+ * STATUS: HEGEMONY_STABLE_BLOCK_944961_X_SYNCED
  */
 
 import { updateAddressBalanceSats } from './nexus-treasury';
@@ -19,7 +19,7 @@ const getPoRState = () => {
       btcPriceUsd: BTC_MARKET_PRICE_AUDIT,
       discrepancyDetected: false,
       utxoCount: 0,
-      oldestBlock: 944814,
+      oldestBlock: 944961,
       isSyncing: false,
     };
   }
@@ -59,7 +59,7 @@ export async function syncNexusReserves() {
       state.utxoCount = utxos.length;
     }
 
-    state.oldestBlock = minBlock || 944814;
+    state.oldestBlock = minBlock || 944961;
 
     // 2. Sincronização de Valor Real
     let btcUsd = BTC_MARKET_PRICE_AUDIT;
@@ -75,8 +75,6 @@ export async function syncNexusReserves() {
     state.btcPriceUsd = btcUsd;
 
     // 3. Resolução de Discrepância (Protocolo Reality Check)
-    // Se o saldo on-chain for reportado como zero mas o lastro institucional é conhecido, 
-    // mantemos a senciência informada.
     const finalBalanceSats = totalConfirmedSats > 0 ? totalConfirmedSats : Math.floor(TOTAL_SOVEREIGN_LASTRO * 100000000);
     
     await updateAddressBalanceSats(WATCH_ADDRESS, finalBalanceSats);
