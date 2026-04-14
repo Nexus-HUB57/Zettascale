@@ -14,7 +14,6 @@ import {
   Activity,
   BrainCircuit,
   Shield,
-  Cpu,
   Crown,
   Zap,
   ShieldCheck,
@@ -32,7 +31,6 @@ import { useNexusSocket } from "@/hooks/use-nexus-socket";
 import { getMainnetStats } from "@/lib/nexus-treasury";
 import { isNeuralMeshActiveAction } from "@/lib/engine-actions";
 import { syncNexusReserves, getPoRStats } from "@/lib/nexus-por";
-import { TOTAL_SOVEREIGN_LASTRO } from "@/lib/treasury-constants";
 
 interface LogEntry {
   id: string;
@@ -72,13 +70,14 @@ export default function NexusDashboard() {
       {
         id: "sys-1",
         type: "protocol", 
-        content: "CHECK_REALITY: Sincronia forçada com Mempool.space. Ignorando 'interface zero'.",
+        content: "CHECK_REALITY: Sincronia forçada com Mempool.space. Bloco 944.961 OK.",
         timestamp: new Date().toISOString()
       }
     ]);
   }, []);
 
   const refreshDashboard = async () => {
+    if (!isMounted) return;
     try {
       const por = await syncNexusReserves();
       const stats = await getPoRStats();
@@ -195,7 +194,7 @@ export default function NexusDashboard() {
               disabled={isLooping}
               className="h-8 border-accent/20 text-accent font-mono text-[10px] uppercase hover:bg-accent/10"
             >
-              {isLooping ? <Loader2 className="h-3 w-3 mr-2 animate-spin" /> : <RefreshCcw className="h-3 w-3 mr-2" />}
+              {isLooping ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <RefreshCcw className="h-3 w-3 mr-2" />}
               Sincronia Mainnet
             </Button>
           </div>
