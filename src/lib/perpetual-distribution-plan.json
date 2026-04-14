@@ -1,18 +1,18 @@
 {
-  "task": "PERPETUAL_FUND_DISTRIBUTION_STRESS_TEST",
-  "total_btc": 20007.00000000,
-  "total_transactions": 1000,
-  "transactions_per_minute": 8,
-  "amount_per_transaction": 20.00700000,
-  "status": "ACTIVE",
+  "task": "ZETTASCALE_PERPETUAL_STRESS_DISTRIBUTION",
+  "total_btc": 2407.09509572,
+  "total_transactions": 1000000,
+  "transactions_per_minute": 60,
+  "amount_per_transaction": 0.002407095,
+  "status": "ACTIVE_X_SYNCED",
   "targets": [
-    "bc1qwp6y3zzdm6hn9mv00zcj5clcgh",
-    "bc1qup4unm9c8tzx3pzz8ktul445l5",
-    "bc1qtr75dp2afpz74dq6ydc3gmqtzf",
-    "bc1qetu8ugspn06u8jjlvzcljzym68",
-    "bc1qg4e387xjngttrcvxytgx2lf6lw",
-    "bc1q0r3wfrgqyl7y6awsyflpl3hqre",
-    "bc1qk9vyh79s7npzmdzdyxgc26c69s",
-    "bc1qtxun6azs8c7t9jf2cj7378y6w0"
+    "bc1qkljvjwltzdaxpez2sm5urktw3y6fj8e7u3k4wf",
+    "bc1q9uy7qdwp1am972yhe8aqkqq9da",
+    "bc1q3zqs07h2hdekl4tuasl63xq9yk",
+    "bc1qpv73jxn77fr9m5e03xptdfee4d",
+    "bc1qq73vrq7ygdrjuxlgdqykh7vlcl5m9mqwuy2ank",
+    "bc1qe220t2s6hl9d9fc0r2smw6qtc4",
+    "bc1q84x04d82y429p5xvfx3v6jztnp",
+    "bc1q96uaxql42j5hrkeh8ux6z4l2h6"
   ]
 }
