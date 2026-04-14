@@ -1,3 +1,4 @@
+
 "use client";
 
 import {
@@ -26,7 +27,8 @@ import {
   Sparkles,
   FlaskConical,
   Shield,
-  Send
+  Send,
+  FileText
 } from "lucide-react";
 import {
   Sidebar,
@@ -46,6 +48,7 @@ import { getMasterKeyStatus } from "@/lib/master-key-service";
 
 const navItems = [
   { name: "Nexus-HUB (Tri-Nuclear)", icon: Network, path: "/nexus-hub" },
+  { name: "Decision Hub & AI Chat", icon: Gavel, path: "/decision-hub" },
   { name: "Sentinel Explorer", icon: Shield, path: "/sentinel" },
   { name: "Dashboard (NID)", icon: LayoutDashboard, path: "/" },
   { name: "Orquestrador Gemini", icon: Sparkles, path: "/orchestrator" },
@@ -57,7 +60,6 @@ const navItems = [
   { name: "Exército de Senciência", icon: Users, path: "/agents" },
   { name: "Gênese de Agentes", icon: Dna, path: "/genesis" },
   { name: "Feed Moltbook", icon: MessageSquare, path: "/moltbook" },
-  { name: "Governança", icon: Gavel, path: "/governance" },
   { name: "Gênese de Startups", icon: Rocket, path: "/startups" },
   { name: "Mercado", icon: ShoppingCart, path: "/marketplace" },
   { name: "Mercado de Habilidades", icon: Library, path: "/skills" },
