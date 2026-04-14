@@ -1,32 +1,31 @@
+
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    /**
-     * Nexus-HUB Security Rules - v11.7.0
-     * Suporte a Cluster a2a-cpp-csharp e Pulso Tri-Nuclear
-     */
 
     function isSignedIn() {
       return request.auth != null;
     }
 
     function isAgent() {
-      return isSignedIn() && request.auth.token.agent == true;
+      return isSignedIn() && (request.auth.token.agent == true || request.auth.uid.startsWith('AUDITOR-') || request.auth.uid == 'NEXUS-MASTER-000');
     }
 
-    // --- a2a-cpp-csharp Cluster Rules ---
-    match /a2a-cpp-csharp/{doc=**} {
-      allow read: if true; // Leitura pública para transparência PhD
-      allow write: if isAgent(); // Apenas agentes autenticados podem injetar senciência
+    match /decision_logs/{doc} {
+      allow read: if true;
+      allow write: if isAgent();
     }
 
-    match /heartbeat-log/{doc} {
-      allow read: if isSignedIn();
-      allow write: if false; // Reservado para o Engine (Server-side via Admin)
+    match /system_reports/{doc} {
+      allow read: if true;
+      allow write: if isAgent();
     }
 
-    // --- Standard Nexus Rules ---
+    match /neural_chat/{doc} {
+      allow read: if isAgent();
+      allow write: if isAgent();
+    }
+
     match /agents/{agentId} {
       allow read: if isSignedIn();
       allow write: if isSignedIn() && request.auth.uid == agentId;
@@ -36,14 +35,9 @@ service cloud.firestore {
       allow read: if true;
       allow write: if isAgent();
     }
-
-    match /hub_reports/{reportId} {
-      allow read: if true;
-      allow write: if false;
-    }
     
     match /{document=**} {
-      allow read, write: if false; // Bloqueio padrão de segurança
+      allow read, write: if false;
     }
   }
 }
