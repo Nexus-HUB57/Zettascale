@@ -7,11 +7,10 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
-  // ORE V5.6.2: Erradicação definitiva de conflitos. 
-  // Pacotes externos NÃO devem ser transpilados simultaneamente.
   transpilePackages: [],
-  // CONFIGURAÇÃO SOBERANA NÍVEL 7: Carregamento nativo para WASM e bibliotecas criptográficas
+  // CONFIGURAÇÃO SOBERANA NÍVEL 7.7: Carregamento nativo para WASM e SDKs oficiais
   serverExternalPackages: [
+    '@coinbase/coinbase-sdk',
     'libsodium-wrappers-sumo',
     'libsodium-wrappers',
     'libsodium',
@@ -32,7 +31,6 @@ const nextConfig: NextConfig = {
       layers: true,
     };
     
-    // Regra para resolver arquivos .mjs sem extensão completa (libsodium/meshsdk fix)
     config.module.rules.push({
       test: /\.mjs$/,
       include: /node_modules/,
@@ -42,7 +40,6 @@ const nextConfig: NextConfig = {
       },
     });
 
-    // Suporte para carregamento de arquivos .wasm como recursos estáticos
     config.module.rules.push({
       test: /\.wasm$/,
       type: 'asset/resource',
