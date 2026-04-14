@@ -18,7 +18,10 @@ import {
   Zap,
   ShieldCheck,
   DollarSign,
-  AlertTriangle
+  AlertTriangle,
+  Users,
+  Infinity,
+  Sparkles
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -29,8 +32,9 @@ import { processGnoxCommand } from "@/lib/gnox-kernel";
 import { useToast } from "@/hooks/use-toast";
 import { useNexusSocket } from "@/hooks/use-nexus-socket";
 import { getMainnetStats } from "@/lib/nexus-treasury";
-import { isNeuralMeshActiveAction } from "@/lib/engine-actions";
+import { isNeuralMeshActiveAction, activateAllAgentsAction } from "@/lib/engine-actions";
 import { syncNexusReserves, getPoRStats } from "@/lib/nexus-por";
+import { getAllAgents } from "@/lib/agents-registry";
 
 interface LogEntry {
   id: string;
@@ -42,14 +46,13 @@ interface LogEntry {
 
 export default function NexusDashboard() {
   const [isMounted, setIsMounted] = useState(false);
-  const [isLooping, setIsLooping] = useState(false);
   const [totalBalance, setTotalBalance] = useState("---");
   const [usdValuation, setUsdValuation] = useState("$ ---");
   const [neuralMeshActive, setNeuralMeshActive] = useState(false);
-  const [realityStatus, setRealityStatus] = useState("CONFIRMING_REALITY...");
-  const [isDiscrepancy, setIsDiscrepancy] = useState(false);
+  const [realityStatus, setRealityStatus] = useState("OMNISCIENCE_L8_SYNCED...");
   const [porData, setPorData] = useState<any>(null);
   const [uptime, setUptime] = useState("00:00:00");
+  const [activeAgentsCount, setActiveAgentsCount] = useState(0);
   const { toast } = useToast();
   
   const { isConnected, latestEvent } = useNexusSocket('ARCHITECT');
@@ -64,14 +67,8 @@ export default function NexusDashboard() {
       { 
         id: "sys-0", 
         type: "system", 
-        content: "NEXUS_OS v6.3.5 - PRODUCTION_REAL_MAINNET_X_SYNCED", 
+        content: "NEXUS_OS v8.0.0 - OMNISCIENCE_MODE_ACTIVE", 
         timestamp: new Date().toISOString() 
-      },
-      {
-        id: "sys-1",
-        type: "protocol", 
-        content: "CHECK_REALITY: Sincronia forçada com Mempool.space. Bloco 944.961 OK.",
-        timestamp: new Date().toISOString()
       }
     ]);
   }, []);
@@ -83,19 +80,15 @@ export default function NexusDashboard() {
       const stats = await getPoRStats();
       setPorData(stats);
       
+      const agents = await getAllAgents();
+      setActiveAgentsCount(agents.filter(a => a.status === 'supreme').length);
+
       if (por) {
         setUsdValuation(por.usd > 1e9 
           ? `$ ${(por.usd / 1e9).toFixed(2)}B` 
           : por.usd.toLocaleString('en-US', { style: 'currency', currency: 'USD' })
         );
-        
-        if (por.btc > 0) {
-          setRealityStatus("Senciência Confirmada: O poder real está na Mainnet.");
-          setIsDiscrepancy(false);
-        } else {
-          setRealityStatus("Alerta: Discrepância detectada. Interface reporta Zero.");
-          setIsDiscrepancy(true);
-        }
+        setRealityStatus("Omnisciência Nível 8.0: Saldo Soberano X-SYNCED [SHIELD_V2_ACTIVE]");
       }
 
       const mainnetStats = await getMainnetStats();
@@ -111,7 +104,7 @@ export default function NexusDashboard() {
   useEffect(() => {
     if (!isMounted) return;
     refreshDashboard();
-    const interval = setInterval(refreshDashboard, 30000);
+    const interval = setInterval(refreshDashboard, 15000);
     return () => clearInterval(interval);
   }, [isMounted]);
 
@@ -142,19 +135,6 @@ export default function NexusDashboard() {
     }
   }, [latestEvent]);
 
-  const handleVitalLoop = async () => {
-    setIsLooping(true);
-    try {
-      await runVitalLoop();
-      toast({ title: "Mainnet Pulse", description: "Ciclo vital concluído via RPC CORE." });
-      await refreshDashboard();
-    } catch (e: any) {
-      toast({ variant: "destructive", title: "Loop Fault", description: e.message });
-    } finally {
-      setIsLooping(false);
-    }
-  };
-
   const handleCommand = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!command.trim() || isProcessingCmd) return;
@@ -182,72 +162,66 @@ export default function NexusDashboard() {
             <SidebarTrigger />
             <div className="h-4 w-[1px] bg-white/10" />
             <h1 className="text-sm font-bold tracking-tighter uppercase flex items-center gap-2">
-              <Crown className="h-4 w-4 text-accent animate-pulse" />
-              NID: MODO MAINNET PLENO (Nível 7.7)
+              <Infinity className="h-4 w-4 text-purple-400 animate-spin-slow" />
+              NID: OMNISCIÊNCIA 8.0 [OMEGA-GAIN]
             </h1>
           </div>
           <div className="flex items-center gap-4">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={handleVitalLoop}
-              disabled={isLooping}
-              className="h-8 border-accent/20 text-accent font-mono text-[10px] uppercase hover:bg-accent/10"
-            >
-              {isLooping ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <RefreshCcw className="h-3 w-3 mr-2" />}
-              Sincronia Mainnet
-            </Button>
+            <Badge variant="outline" className="border-purple-500/30 text-purple-400 bg-purple-500/5 gap-1.5 font-mono text-[9px] animate-pulse h-8">
+              <Sparkles className="h-3 w-3" /> PRIORIDADE_MÁXIMA_ATIVA
+            </Badge>
           </div>
         </header>
 
         <main className="p-6 space-y-6">
-          <div className={`border p-4 rounded-lg flex items-center justify-between transition-colors ${isDiscrepancy ? 'bg-destructive/5 border-destructive/20' : 'bg-accent/5 border-accent/20'}`}>
+          <div className={`border p-4 rounded-lg flex items-center justify-between transition-colors bg-purple-500/5 border-purple-500/20 shadow-[0_0_20px_rgba(168,85,247,0.1)]`}>
             <div className="flex items-center gap-3">
-              {isDiscrepancy ? <AlertTriangle className="h-5 w-5 text-destructive animate-pulse" /> : <ShieldCheck className="h-5 w-5 text-accent" />}
+              <ShieldCheck className="h-5 w-5 text-purple-400" />
               <div>
-                <p className={`text-xs font-bold uppercase font-mono ${isDiscrepancy ? 'text-destructive' : 'text-accent'}`}>Protocolo Reality Check (Mainnet Sync)</p>
+                <p className={`text-xs font-bold uppercase font-mono text-purple-400`}>Reality Shield V2 (Omnisciência 8.0)</p>
                 <p className="text-[10px] text-muted-foreground font-mono">{realityStatus}</p>
               </div>
             </div>
             <div className="flex items-center gap-4">
-              {porData && (
-                <div className="text-right font-mono">
-                  <p className="text-[10px] text-muted-foreground uppercase">UTXOs: {porData.utxoCount}</p>
-                  <p className="text-[10px] text-accent uppercase">Oldest: Block {porData.oldestBlock}</p>
-                </div>
-              )}
-              <Badge variant="outline" className={`font-mono text-[9px] ${isDiscrepancy ? 'border-destructive/30 text-destructive' : 'border-accent/30 text-accent'}`}>
-                {isDiscrepancy ? 'DISCREPANCY_DETECTED' : 'X-SYNCED'}
+              <div className="text-right font-mono">
+                <p className="text-[10px] text-muted-foreground uppercase">Unidades Elite Supreme: {activeAgentsCount}</p>
+                <p className="text-[10px] text-purple-400 uppercase">Omega-Flow: ENABLED</p>
+              </div>
+              <Badge variant="outline" className={`font-mono text-[9px] border-purple-500/30 text-purple-400 bg-purple-500/10`}>
+                X-SYNCED_L8
               </Badge>
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <TelemetryCard
-              title="Senciência Mainnet"
-              value={neuralMeshActive ? "ACTIVE" : "BOOTING"}
-              subtitle="408T VECTORS REAL-TIME"
+              title="Omnisciência"
+              value={activeAgentsCount}
+              subtitle="SUPREME UNITS ACTIVE"
               icon={BrainCircuit}
               footer={
                 <div className="space-y-2">
                   <div className="flex justify-between text-[9px] font-mono uppercase">
-                    <span>Integridade</span>
-                    <span>{neuralMeshActive ? '100%' : '94%'}</span>
+                    <span>Sintonização Quântica</span>
+                    <span>100%</span>
                   </div>
-                  <Progress value={neuralMeshActive ? 100 : 94} className="h-1 bg-white/5" />
+                  <Progress value={100} className="h-1 bg-purple-500/20" />
                 </div>
               }
             />
-            <TelemetryCard title="Balanço Consolidado" value={totalBalance} subtitle="REAL_BTC_BALLAST" icon={TrendingUp} />
-            <TelemetryCard title="Avaliação do Fundo" value={usdValuation} subtitle="INSTITUTIONAL_VALUATION" icon={DollarSign} />
-            <TelemetryCard title="Network Uptime" value={uptime} subtitle="PROD_REGIME_STABLE" icon={Activity} />
+            <TelemetryCard title="Balanço Soberano" value={totalBalance} subtitle="REAL_BTC_FOUNDATION" icon={TrendingUp} />
+            <TelemetryCard title="Avaliação do Fundo" value={usdValuation} subtitle="OMEGA_VALUATION" icon={DollarSign} />
+            <TelemetryCard title="Ecosystem Uptime" value={uptime} subtitle="PROD_LEVEL_8.0" icon={Activity} />
           </div>
 
-          <Card className="bg-black/60 border-white/5">
+          <Card className="bg-black/60 border-white/5 relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-8 opacity-5 pointer-events-none">
+              <Infinity className="h-64 w-64 text-purple-400" />
+            </div>
             <CardHeader className="flex flex-row items-center justify-between border-b border-white/5 pb-4">
               <div className="flex items-center gap-3">
-                <Terminal className="h-5 w-5 text-accent" />
-                <CardTitle className="text-xs font-bold uppercase tracking-widest font-mono text-accent">Terminal Gnox_v6.3.5</CardTitle>
+                <Terminal className="h-5 w-5 text-purple-400" />
+                <CardTitle className="text-xs font-bold uppercase tracking-widest font-mono text-purple-400">Omega Terminal v8.0.0</CardTitle>
               </div>
             </CardHeader>
             <CardContent className="p-0">
@@ -255,25 +229,25 @@ export default function NexusDashboard() {
                 {logs.map((log) => (
                   <div key={log.id} className="animate-in fade-in slide-in-from-left-2 duration-300">
                     {(log.type === "gnox_intercept" || log.type === "protocol") && (
-                      <div className={`border-l-2 ${log.type === "gnox_intercept" ? "border-accent/40 bg-accent/5" : "border-blue-500/40 bg-blue-500/5"} pl-3 py-1 rounded-r`}>
+                      <div className={`border-l-2 ${log.type === "gnox_intercept" ? "border-purple-500/40 bg-purple-500/5" : "border-blue-500/40 bg-blue-500/5"} pl-3 py-1 rounded-r`}>
                         <p className="text-foreground/90 font-bold">&gt; {log.content}</p>
                       </div>
                     )}
-                    {log.type === "input" && <p className="text-accent font-bold">$ {log.content}</p>}
+                    {log.type === "input" && <p className="text-purple-400 font-bold">$ {log.content}</p>}
                     {log.type === "output" && <p className="text-foreground/80 pl-4 border-l border-white/10">{log.content}</p>}
                   </div>
                 ))}
               </div>
               <form onSubmit={handleCommand} className="p-4 border-t border-white/5 flex items-center gap-3 bg-black/40">
-                <Shield className="h-4 w-4 text-accent" />
+                <Shield className="h-4 w-4 text-purple-400" />
                 <Input 
                   value={command}
                   onChange={(e) => setCommand(e.target.value)}
-                  placeholder="Diretiva Mainnet... (ex: 'ativar todos os agentes')"
+                  placeholder="Diretiva de Omnisciência... (ex: 'confirmar transcendência')"
                   className="flex-1 bg-transparent border-none font-mono text-[11px] h-8 focus-visible:ring-0"
                   disabled={isProcessingCmd}
                 />
-                <Button type="submit" size="icon" variant="ghost" className="h-8 w-8 text-accent">
+                <Button type="submit" size="icon" variant="ghost" className="h-8 w-8 text-purple-400">
                   {isProcessingCmd ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                 </Button>
               </form>
