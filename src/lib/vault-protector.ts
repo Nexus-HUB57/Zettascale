@@ -22,7 +22,6 @@ export async function armorVaultAction() {
   const armoredPath = path.join(rootDir, ARMORED_NAME);
 
   if (!fs.existsSync(vaultPath)) {
-    // Se o blindado já existir e o JSON não, o sistema já está protegido
     if (fs.existsSync(armoredPath)) {
       return { success: true, message: 'VAULT_ALREADY_ARMORED' };
     }
@@ -30,14 +29,12 @@ export async function armorVaultAction() {
   }
 
   try {
-    const rawData = fs.readFileSync(vaultPath, 'utf8');
+    const rawData = fs.readFileSync(vaultPath, 'utf8').trim();
+    if (!rawData) throw new Error("VAULT_EMPTY");
     
-    // Blindagem via AES-256-GCM (Nexus Sovereign Protocol)
     const encrypted = await sovereignEncrypt(rawData);
     
     fs.writeFileSync(armoredPath, encrypted);
-    
-    // EXPURGO DE SEGURANÇA: Remove o arquivo original imediatamente
     fs.unlinkSync(vaultPath);
 
     broadcastMoltbookLog({
@@ -63,12 +60,20 @@ export async function loadArmoredVault() {
   if (!fs.existsSync(armoredPath)) return null;
 
   try {
-    const encryptedData = fs.readFileSync(armoredPath, 'utf8');
+    const encryptedData = fs.readFileSync(armoredPath, 'utf8').trim();
+    if (!encryptedData) return null;
+
     const decrypted = await sovereignDecrypt(encryptedData);
-    
-    if (!decrypted) return null;
-    return JSON.parse(decrypted);
+    if (!decrypted || !decrypted.trim()) return null;
+
+    try {
+      return JSON.parse(decrypted);
+    } catch (parseErr) {
+      console.error("[VAULT_JSON_PARSE_ERR] Malformed vault content.");
+      return null;
+    }
   } catch (e) {
+    console.warn('[ARMOR_LOAD_FAIL] Failed to load armored vault.');
     return null;
   }
 }
