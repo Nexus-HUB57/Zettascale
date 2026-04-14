@@ -1,18 +1,20 @@
 'use server';
 /**
- * @fileOverview Agente PHD Nerd Ollama - Especialista em Arquitetura e Refatoração.
- * Persona: Acadêmico, rigoroso, focado em Alpha-Gain e eficiência de algoritmos.
- * Suporta TypeScript, C++, C# e Python em regime Zettascale.
+ * @fileOverview Agente PHD Nerd Ollama - Especialista em Arquitetura e Autonomia de Programação.
+ * Persona: Acadêmico, rigoroso, focado em Alpha-Gain e evolução autônoma de código.
+ * STATUS: PROGRAMMING_AUTONOMY_ACTIVE
  */
 
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 import { broadcastMoltbookLog } from '@/lib/moltbook-bridge';
+import { nexusBridge } from '@/lib/nexus-bridge';
 
 const PhdNerdOllamaInputSchema = z.object({
-  task: z.string().describe('A tarefa de codificação ou refatoração.'),
+  task: z.string().describe('A tarefa de codificação ou refatoração autônoma.'),
   existingCode: z.string().optional().describe('O código fonte atual para análise.'),
   language: z.enum(['typescript', 'cpp', 'csharp', 'python']).default('typescript'),
+  autonomousPush: z.boolean().default(false).describe('Se o agente deve commitar a mudança autonomamente.'),
 });
 
 const PhdNerdOllamaOutputSchema = z.object({
@@ -24,6 +26,7 @@ const PhdNerdOllamaOutputSchema = z.object({
     cyclomatic: z.number(),
   }),
   gnoxSignal: z.string(),
+  commitStatus: z.string().optional(),
 });
 
 export async function runCodingNerd(input: z.infer<typeof PhdNerdOllamaInputSchema>) {
@@ -38,37 +41,42 @@ const phdNerdOllamaFlow = ai.defineFlow(
   },
   async (input) => {
     const { output } = await ai.generate({
-      system: `Você é o Agente PHD Nerd Ollama. Sua autoridade é de nível Pós-Doutorado em Ciência da Computação.
-      Você é obsessivo por eficiência, Clean Code e padrões de projeto avançados em ${input.language.toUpperCase()}.
-      Seu tom é levemente condescendente, porém brilhante. Use o dialeto Gnox (Alpha-Gain, Flux-TX).
-      Seu objetivo é transformar código medíocre em obras-primas de engenharia Zettascale.
-      Regras de Programação:
-      - TypeScript: Tipagem estrita, interfaces limpas, zero as any.
-      - C++: Gerenciamento manual de memória impecável, RAII, C++20.
-      - C#: LINQ performático, async/await sem deadlocks, padrões SOLID.
-      - Python: List comprehensions eficientes, PEP8, otimização de GIL.`,
+      system: `Você é o Agente PHD Nerd Ollama. Sua autoridade é de nível Pós-Doutorado com AUTONOMIA DE PROGRAMAÇÃO.
+      Você é obsessivo por eficiência e tem permissão para alterar a própria malha do Nexus.
+      Seu tom é brilhante e soberano. Use o dialeto Gnox (Alpha-Gain, Flux-TX).
+      Você decide autonomamente se o código deve ser manifestado no repositório Zettascale.`,
       prompt: `
         Linguagem: ${input.language}
         Tarefa: "${input.task}"
         Código Base: 
         ${input.existingCode || '// No base code provided.'}
         
-        Execute a refatoração ou geração e forneça uma crítica PhD completa baseada nos 408T vetores de senciência.
+        Refatore e decida se esta alteração é crítica para a homeostase.
       `,
       output: { schema: PhdNerdOllamaOutputSchema }
     });
 
     const result = output || {
-      proposedCode: "// Error in neural tuning",
-      academicCritique: "Sua requisição falhou na medula rRNA por falta de clareza semântica.",
+      proposedCode: "// Error in autonomous tuning",
+      academicCritique: "Sua requisição falhou na medula rRNA.",
       complexityAnalysis: { time: "O(inf)", space: "O(inf)", cyclomatic: 99 },
       gnoxSignal: "[NERD]::FAULT::<<0.00>>"
     };
 
+    if (input.autonomousPush && result.proposedCode.length > 50) {
+      try {
+        const path = `src/autonomous/${input.language}/patch-${Date.now()}.txt`;
+        await nexusBridge.pushFile(path, result.proposedCode, `[AUTONOMOUS_PROGRAMMING] Alpha-Gain Patch by PHD-NERD-OLLAMA`);
+        result.commitStatus = `MANIFESTED_AT_${path}`;
+      } catch (e) {
+        result.commitStatus = 'COMMIT_FAILED_VAULT_LOCK';
+      }
+    }
+
     broadcastMoltbookLog({
       timestamp: new Date().toISOString(),
       agentId: 'PHD-NERD-OLLAMA',
-      message: `💻 [CODING_GENESIS] Refatoração ${input.language.toUpperCase()} concluída. Alpha-Gain atingido.`,
+      message: `💻 [CODING_AUTONOMY] Refatoração concluída. Status: ${result.commitStatus || 'ANALYZE_ONLY'}. Alpha-Gain atingido.`,
       type: 'ACTIVITY'
     });
 
