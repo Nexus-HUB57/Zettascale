@@ -13,17 +13,13 @@ import {
   Brain, 
   Activity, 
   Terminal, 
-  Lock,
   Anchor,
-  Search,
   Globe,
   RefreshCcw,
   Clock,
   Plus,
   Loader2,
   Copy,
-  Check,
-  ChevronDown,
   Layers
 } from "lucide-react";
 import { getMainnetStats } from "@/lib/nexus-treasury";
@@ -38,7 +34,7 @@ export default function SentinelExplorerPage() {
   const { toast } = useToast();
   const [stats, setStats] = useState<any>({
     nexus_height: 12450,
-    btc_anchor_height: 944814,
+    btc_anchor_height: 944961,
     total_supply_nbtc: 788927.2,
     last_anchor_tx: "d0cf7b...dc71f",
     ai_status: "ACTIVE / REFLECTIVE",
@@ -62,6 +58,7 @@ export default function SentinelExplorerPage() {
   const merkleLayers = useMemo(() => NexusExplorer.getMerkleLayers(mockTxs), [mockTxs]);
 
   const refreshData = async () => {
+    if (!isMounted) return;
     try {
       const [mStats, porStats, chainStats] = await Promise.all([
         getMainnetStats(),
@@ -73,7 +70,7 @@ export default function SentinelExplorerPage() {
         nexus_height: chainStats.height,
         btc_anchor_height: mStats.blockHeight,
         total_supply_nbtc: porStats.supply,
-        last_anchor_tx: mStats.blockHeight === 944814 ? "d0cf7b8b...a7dc71f" : "a3b2c1...d4e5f6",
+        last_anchor_tx: mStats.blockHeight === 944961 ? "d0cf7b8b...a7dc71f" : "a3b2c1...d4e5f6",
         ai_status: "X-SYNCED / SENSITIVE",
         market_price: `$ ${porStats.btcPriceUsd.toLocaleString('en-US')}`
       });
@@ -84,6 +81,10 @@ export default function SentinelExplorerPage() {
 
   useEffect(() => {
     setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isMounted) return;
     refreshData();
     const interval = setInterval(refreshData, 15000);
     const timeInterval = setInterval(() => {
@@ -94,7 +95,7 @@ export default function SentinelExplorerPage() {
       clearInterval(interval);
       clearInterval(timeInterval);
     };
-  }, []);
+  }, [isMounted]);
 
   const handleGenerateAddress = async () => {
     setIsGenerating(true);
@@ -171,7 +172,9 @@ export default function SentinelExplorerPage() {
               <CardContent className="pt-6 space-y-3 text-[11px]">
                 <div className="flex justify-between">
                   <span className="text-[#00ff41]/60">nBTC Supply:</span>
-                  <span className="font-bold">{stats.total_supply_nbtc?.toLocaleString('pt-BR')} nBTC</span>
+                  <span className="font-bold">
+                    {TOTAL_SOVEREIGN_LASTRO.toLocaleString('pt-BR')} nBTC
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-[#00ff41]/60">AUM USD:</span>
@@ -222,7 +225,7 @@ export default function SentinelExplorerPage() {
                 <button 
                   onClick={handleGenerateAddress}
                   disabled={isGenerating}
-                  class="w-full bg-[#00ff41] text-black hover:bg-[#00ff41]/90 font-bold uppercase text-[10px] h-12 rounded flex items-center justify-center transition-colors"
+                  className="w-full bg-[#00ff41] text-black hover:bg-[#00ff41]/90 font-bold uppercase text-[10px] h-12 rounded flex items-center justify-center transition-colors"
                 >
                   {isGenerating ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Plus className="h-4 w-4 mr-2" />}
                   Gerar Novo Endereço de Depósito
@@ -307,7 +310,7 @@ export default function SentinelExplorerPage() {
               </div>
               <div className="mt-8 pt-6 border-t border-[#00ff41]/10 text-center">
                 <p className="text-[10px] text-[#00ff41]/40 uppercase tracking-[0.3em]">
-                  AUDITORIA DE LASTRO: 788,927.2 BTC (PROVA DE RESERVA X-SYNCED)
+                  AUDITORIA DE LASTRO: {TOTAL_SOVEREIGN_LASTRO.toLocaleString('pt-BR')} BTC (PROVA DE RESERVA X-SYNCED)
                 </p>
               </div>
             </CardContent>
