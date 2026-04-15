@@ -1,7 +1,7 @@
 'use server';
 /**
  * @fileOverview Mercado de Habilidades: Gestão de capacidades AI "Plug-and-Play".
- * Expandido com módulos REAL_SOVEREIGN e LangChain .NET Neural Bridge.
+ * Expandido com módulos REAL_SOVEREIGN e Crawl4AI Web Intelligence.
  */
 
 import { v4 as uuidv4 } from 'uuid';
@@ -21,6 +21,16 @@ export interface AISkill {
 }
 
 let skills: AISkill[] = [
+  {
+    id: 'skill-crawl4ai-scraper',
+    name: 'Crawl4AI Web Intelligence',
+    description: 'Motor avançado de crawling e extração de Markdown para LLMs. Suporte a AsyncWebCrawler e Deep Crawling.',
+    domain: 'SÍNTESE',
+    costBTC: 0.042,
+    authorId: 'AGNUS-AI-OS',
+    version: '1.0.0',
+    manifestHash: 'sha256-crawl4ai-sync-omega'
+  },
   {
     id: 'skill-langchain-net',
     name: 'LangChain .NET Neural Bridge',
