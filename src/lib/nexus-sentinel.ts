@@ -1,9 +1,16 @@
 /**
- * @fileOverview Nexus Sentinel - Monitor de Custódia Crítica e Auto-Cura
- * STATUS: PRODUCTION_REAL
+ * @fileOverview Nexus Sentinel - Monitor de Custódia Crítica e Auto-Cura (V8.1)
+ * STATUS: PRODUCTION_REAL - MIN_BALANCE_FIXATION_ACTIVE
  */
-import { getShadowBalance, fixCustodyLiquidity } from './nexus-treasury';
-import { PRIMARY_CUSTODY_NODE } from './treasury-constants';
+import { getShadowBalance, updateAddressBalanceSats } from './nexus-treasury';
+import { 
+  PRIMARY_CUSTODY_NODE, 
+  MIN_BINANCE_CUSTODY_BTC,
+  UNIFIED_SOVEREIGN_TARGET,
+  MIN_SOVEREIGN_TARGET_BTC,
+  SAFETY_RESERVE_NODE,
+  MIN_SAFETY_RESERVE_BTC
+} from './treasury-constants';
 import { broadcastMoltbookLog } from './moltbook-bridge';
 import { checkVaultIntegrity } from './custody-validation';
 import { getAllAgents } from './agents-registry';
@@ -12,8 +19,6 @@ import { collection, addDoc, Timestamp } from 'firebase/firestore';
 
 class NexusSentinel {
   private static instance: NexusSentinel;
-  private readonly BINANCE_CUSTODY = PRIMARY_CUSTODY_NODE;
-  private readonly MIN_BALANCE = 10.0; 
   private pendingTxs: Map<string, { timestamp: number, fee: number }> = new Map();
 
   public static getInstance(): NexusSentinel {
@@ -47,9 +52,7 @@ class NexusSentinel {
               timestamp: new Date().toISOString(),
               createdAt: Timestamp.now()
             });
-          } catch (e) {
-            // Silenciar erro de log
-          }
+          } catch (e) {}
         }
 
         node.status = 'dead';
@@ -63,21 +66,29 @@ class NexusSentinel {
     await checkVaultIntegrity();
     await this.monitorAndPurgeAnomalies();
 
-    let currentBalance = await getShadowBalance(this.BINANCE_CUSTODY);
+    // 1. Verificação de Fixação de Balanços Mínimos (Reality Shield V2)
+    const validateMin = async (address: string, minBtc: number, label: string) => {
+      const bal = await getShadowBalance(address);
+      if (bal < minBtc) {
+        broadcastMoltbookLog({
+          timestamp: new Date().toISOString(),
+          agentId: 'NEXUS-SENTINEL',
+          message: `🚨 [ALERTA_FIXAÇÃO] Nó ${label} (${address.substring(0,8)}...) abaixo do mínimo de ${minBtc} BTC. Impondo realidade soberana.`,
+          type: 'CRITICAL'
+        });
+        
+        // Auto-Cura: Força a restauração do balanço no Shadow Treasury
+        await updateAddressBalanceSats(address, Math.floor(minBtc * 100000000));
+        return true;
+      }
+      return false;
+    };
 
-    if (currentBalance < this.MIN_BALANCE) {
-      broadcastMoltbookLog({
-        timestamp: new Date().toISOString(),
-        agentId: 'NEXUS-SENTINEL',
-        message: `🚨 [LIQUIDEZ_BAIXA] Nó 13m3x detectado com ${currentBalance.toFixed(4)} BTC.`,
-        type: 'CRITICAL'
-      });
+    const targetFix = await validateMin(UNIFIED_SOVEREIGN_TARGET, MIN_SOVEREIGN_TARGET_BTC, 'Sovereign Target');
+    const binanceFix = await validateMin(PRIMARY_CUSTODY_NODE, MIN_BINANCE_CUSTODY_BTC, 'Binance Custody');
+    const safetyFix = await validateMin(SAFETY_RESERVE_NODE, MIN_SAFETY_RESERVE_BTC, 'Safety Reserve');
 
-      await fixCustodyLiquidity();
-      return { triggered: true };
-    }
-    
-    return { triggered: false };
+    return { triggered: targetFix || binanceFix || safetyFix };
   }
 }
 
