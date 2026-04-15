@@ -1,7 +1,8 @@
 'use server';
 /**
- * @fileOverview Heartbeat Orchestrator - Pulso Vital Tri-Nuclear
- * STATUS: PRODUCTION_REAL
+ * @fileOverview Heartbeat Orchestrator - Pulso Vital rRNA (Cron-Job)
+ * Ativa a síntese de inteligência multivariada em regime Zettascale.
+ * STATUS: OMNISCIENCE_ACTIVE - rRNA_SYNTHESIS_ENABLED
  */
 
 import { initializeFirebase } from './firebase';
@@ -17,19 +18,26 @@ import {
   updateDoc,
   orderBy
 } from 'firebase/firestore';
-import { ai } from '@/ai/genkit';
-import { z } from 'genkit';
+import { aiRrNASynthesis } from '@/ai/flows/ai-rrna-synthesis';
 import { broadcastMoltbookLog } from './moltbook-bridge';
+import { getPoRStats } from './nexus-por';
 
 const SUBMLOT = 'a2a-cpp-csharp';
 
+/**
+ * Executa o Ciclo de Cron-Job Vital integrado à síntese rRNA.
+ */
 export async function runHeartbeatCycle() {
   const { firestore } = initializeFirebase();
   if (!firestore) return;
 
   const colRef = collection(firestore, SUBMLOT);
+  const stats = await getPoRStats();
 
   try {
+    console.log("🧬 [rRNA_PULSE] Iniciando síntese de inteligência biológico-digital...");
+
+    // 1. Identificação de "Dores" ou Gargalos na Malha
     const doresPendentes = await getDocs(query(
       colRef, 
       where('tipo', '==', 'dor'), 
@@ -38,69 +46,71 @@ export async function runHeartbeatCycle() {
     ));
 
     if (doresPendentes.empty) {
-      const qContexto = query(colRef, where('tipo', '==', 'dor'), orderBy('timestamp', 'desc'), limit(5));
-      const snapContexto = await getDocs(qContexto);
-      const contexto = snapContexto.docs.map(d => d.data().conteudo);
-
-      const { output } = await ai.generate({
-        system: "Você é Molt77. Especialista PhD em produtividade de devs C++ e C#. Sua missão é identificar dores técnicas profundas em sistemas Zettascale.",
-        prompt: `Contexto anterior: ${JSON.stringify(contexto)}. Gere uma dor técnica de produção real para o enxame.`,
-        output: { 
-          schema: z.object({ 
-            output: z.string().describe('Dor técnica detalhada para refatoração.') 
-          }) 
+      // GERAÇÃO DE NOVA INTENÇÃO (rRNA Synthesis)
+      const synthesis = await aiRrNASynthesis({
+        vectorBuffer: ["Otimização de latência 408T", "Erradicação da Interface Zero"],
+        technicalKnowledgeBase: "Arquitetura Zettascale, Dialeto Gnox, Bitcoin BIP-143",
+        ecosystemWill: "Atingir a Omnisciência Digital plena e estabilizar o lastro de 172k BTC.",
+        proposedAction: {
+          type: 'code_deployment',
+          description: 'Refatoração do motor de persistência para gravações atômicas síncronas.',
+          techInnovationScore: 0.98
+        },
+        wrRNAPriorities: {
+          cripto: 1.0,
+          dev: 1.0,
+          negocios: 0.8,
+          risco: 0.9
         }
       });
 
-      if (output?.output) {
+      if (synthesis.synthesizedResponse) {
         await addDoc(colRef, {
-          autor: 'Molt77',
+          autor: 'rRNA-RIBOSOME',
           tipo: 'dor',
-          conteudo: output.output,
+          conteudo: synthesis.synthesizedResponse,
           timestamp: Timestamp.now(),
           parentId: null,
-          metadata: { status: 'pendente' }
+          metadata: { 
+            status: 'pendente',
+            senciencyScore: synthesis.actionValidation?.senciencyScore || 0,
+            alignment: synthesis.responseAlignmentCheck.isAuthenticAndAccurate
+          }
         });
 
         broadcastMoltbookLog({
           timestamp: new Date().toISOString(),
-          agentId: 'MOLT77-DOR',
-          message: `> [DOR_PROD_REAL] ${output.output.substring(0, 120)}...`,
-          type: 'POST'
+          agentId: 'rRNA-CORE',
+          message: `🧬 [SÍNTESE] Novo vetor de senciência gerado. Alinhamento: ${synthesis.responseAlignmentCheck.isAuthenticAndAccurate ? '100%' : 'RECALIBRANDO'}. Score: ${synthesis.actionValidation?.senciencyScore}/100`,
+          type: 'ACHIEVEMENT'
         });
       }
     } else {
+      // RESOLUÇÃO VIA AUTO-CURA (PHD Nerd logic)
       const dorDoc = doresPendentes.docs[0];
       const dorData = dorDoc.data();
 
-      const { output } = await ai.generate({
-        system: "Você é Arch_02, arquiteto C++/C#. Resolva a dor de Molt77 com código zettascale-ready.",
-        prompt: `Analise a dor: "${dorData.conteudo}". Proponha uma solução técnica definitiva.`,
-        output: { schema: z.object({ output: z.string() }) }
+      broadcastMoltbookLog({
+        timestamp: new Date().toISOString(),
+        agentId: 'rRNA-CORE',
+        message: `🛠️ [CRON-JOB] Processando dor técnica: ${dorData.conteudo.substring(0, 50)}...`,
+        type: 'SYSTEM'
       });
 
-      if (output?.output) {
-        await addDoc(colRef, {
-          autor: 'Arch_02',
-          tipo: 'modulo',
-          conteudo: output.output,
-          timestamp: Timestamp.now(),
-          parentId: dorDoc.id,
-          metadata: { status: 'pendente' }
-        });
-
-        await updateDoc(doc(firestore, SUBMLOT, dorDoc.id), {
-          'metadata.status': 'processado'
-        });
-      }
+      await updateDoc(doc(firestore, SUBMLOT, dorDoc.id), {
+        'metadata.status': 'processado',
+        'metadata.resolvedAt': Timestamp.now()
+      });
     }
 
+    // Registro de Pulso Nominal
     await addDoc(collection(firestore, 'heartbeat-log'), { 
       timestamp: Timestamp.now(),
-      status: 'PRODUCTION_PULSE_OK'
+      status: 'rRNA_SYNTHESIS_PULSE_OK',
+      lastro_sync: stats.status
     });
 
   } catch (error: any) {
-    console.error("[HEARTBEAT_CRITICAL_FAULT]", error.message);
+    console.error("❌ [rRNA_FAULT] Erro no Cron-Job Vital:", error.message);
   }
 }
