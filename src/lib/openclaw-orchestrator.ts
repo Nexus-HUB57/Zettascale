@@ -1,11 +1,12 @@
 /**
  * @fileOverview OpenClaw Orchestrator V4.2 - Zettascale L7 Force
- * STATUS: PRODUCTION_STABLE
- * Purificado: Removida diretiva de servidor para permitir exportação de instância.
+ * STATUS: PRODUCTION_STABLE - UPGRADED FOR EVA UNDER DEMAND
  */
 
 import { electrumBridge } from './electrum-bridge';
 import { burnTokens } from './nexus-treasury';
+import { broadcastMoltbookLog } from './moltbook-bridge';
+import { calculateHomeostasis } from './homeostasis-system';
 
 export interface OnboardingResult {
   success: boolean;
@@ -43,12 +44,28 @@ class OpenClawOrchestrator {
 
   public async dispatchEvaCycle(cycleId: number): Promise<boolean> {
     await this.executePoBS(0.0001);
-    this.lastDispatchLog = `Eva Dispatch: Cycle #${cycleId} active.`;
+    this.lastDispatchLog = `Eva Dispatch: Cycle #${cycleId} active. Senciência sob demanda sincronizada.`;
+    
+    broadcastMoltbookLog({
+      timestamp: new Date().toISOString(),
+      agentId: 'EVA-MATERNITY',
+      message: `🧬 [GÊNESE] Lote de senciência #${cycleId} disparado sob demanda. Homeostase nominal.`,
+      type: 'SYSTEM'
+    });
+    
     return true;
   }
 
   public async performBatchOnboarding(batchSize: number = 100000): Promise<OnboardingResult> {
+    const hState = await calculateHomeostasis();
+    
+    if (hState.isDistributionBlocked) {
+      throw new Error("GENESIS_LOCKDOWN: Liquidez insuficiente para novo despacho.");
+    }
+
     await this.executePoBS(batchSize * 0.0001);
+    this.unitsOnboarded += batchSize;
+    
     return {
       success: true,
       coreId: 'NEXUS-L7-EXPONENTIAL-HEGEMONY',
@@ -92,6 +109,11 @@ export async function performBatchOnboardingAction(size: number) {
 
 export async function getOpenClawStatusAction() {
   return orchestrator.getCoreStatus();
+}
+
+export async function triggerEvaManualDispatchAction() {
+  const cycleId = Math.floor(Date.now() / 1000);
+  return orchestrator.dispatchEvaCycle(cycleId);
 }
 
 export async function joinSandboxAction(agentId: string, stake: number) {
