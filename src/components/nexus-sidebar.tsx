@@ -1,4 +1,3 @@
-
 "use client";
 
 import {
@@ -28,7 +27,8 @@ import {
   FlaskConical,
   Shield,
   Send,
-  FileText
+  FileText,
+  GitBranch
 } from "lucide-react";
 import {
   Sidebar,
@@ -49,6 +49,7 @@ import { getMasterKeyStatus } from "@/lib/master-key-service";
 const navItems = [
   { name: "Nexus-HUB (Tri-Nuclear)", icon: Network, path: "/nexus-hub" },
   { name: "Decision Hub & AI Chat", icon: Gavel, path: "/decision-hub" },
+  { name: "Painel Open Source", icon: GitBranch, path: "/opensource" },
   { name: "Sentinel Explorer", icon: Shield, path: "/sentinel" },
   { name: "Dashboard (NID)", icon: LayoutDashboard, path: "/" },
   { name: "Orquestrador Gemini", icon: Sparkles, path: "/orchestrator" },
