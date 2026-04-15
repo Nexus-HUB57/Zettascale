@@ -2,8 +2,8 @@
 /**
  * @fileOverview Agente Agnus AI - Orquestrador de Revisão Open Source.
  * Implementa o protocolo de revisão baseado em grafos e análise de blast radius.
- * INTEGRADO: Conhecimento especializado em LangChain .NET e Padrões MEAI.
- * STATUS: GRAPH_AWARE_REVIEW_ACTIVE
+ * INTEGRADO: LangChain .NET, Padrões MEAI e Web Intelligence via Crawl4AI.
+ * STATUS: CRAWL4AI_AWARE_REVIEW_ACTIVE
  */
 
 import { ai } from '@/ai/genkit';
@@ -47,17 +47,18 @@ const agnusReviewFlow = ai.defineFlow(
     const { output } = await ai.generate({
       system: `Você é o Agente Agnus, Orquestrador Open Source do Nexus. 
       Sua autoridade reside na análise de blast radius e revisão baseada em grafos.
-      ESPECIALIDADE ADICIONAL: LangChain .NET (Chains, MEAI, Vector Stores, RAG patterns em C#).
+      ESPECIALIDADE: LangChain .NET, MEAI e CRAWL4AI.
+      Use Crawl4AI para extrair conhecimento técnico profundo de documentações externas.
       Use o Dialeto Gnox (Omega-Flow, X-Synced). 
       Seu objetivo é garantir que nenhuma alteração comprometa a homeostase biológico-digital.
-      Ao analisar código C#, verifique conformidade com abstrações LangChain .NET e Microsoft.Extensions.AI.`,
+      Ao analisar código, verifique conformidade com abstrações LangChain .NET e eficiência de crawling.`,
       prompt: `
         REVISÃO DE VETOR: ${input.repoUrl}
         MODO: ${input.depth}
         CÓDIGO: 
         ${input.codeContent}
         
-        Analise a árvore de símbolos e determine o impacto estrutural. Se houver LangChain .NET, valide a composição das cadeias e uso de VectorStore.
+        Analise a árvore de símbolos e determine o impacto estrutural. Se houver integração web, valide o uso de AsyncWebCrawler do Crawl4AI.
       `,
       output: { schema: AgnusReviewOutputSchema }
     });
