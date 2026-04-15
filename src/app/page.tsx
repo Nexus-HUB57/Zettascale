@@ -21,18 +21,20 @@ import {
   AlertTriangle,
   Users,
   Infinity,
-  Sparkles
+  Sparkles,
+  Dna,
+  Clock,
+  Timer
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { runVitalLoop } from "@/ai/flows/vital-loop-flow";
 import { processGnoxCommand } from "@/lib/gnox-kernel";
 import { useToast } from "@/hooks/use-toast";
 import { useNexusSocket } from "@/hooks/use-nexus-socket";
 import { getMainnetStats } from "@/lib/nexus-treasury";
-import { isNeuralMeshActiveAction, activateAllAgentsAction } from "@/lib/engine-actions";
+import { isNeuralMeshActiveAction } from "@/lib/engine-actions";
 import { syncNexusReserves, getPoRStats } from "@/lib/nexus-por";
 import { getAllAgents } from "@/lib/agents-registry";
 
@@ -53,6 +55,7 @@ export default function NexusDashboard() {
   const [porData, setPorData] = useState<any>(null);
   const [uptime, setUptime] = useState("00:00:00");
   const [activeAgentsCount, setActiveAgentsCount] = useState(0);
+  const [manifestationRemaining, setManifestationRemaining] = useState("72:00:00");
   const { toast } = useToast();
   
   const { isConnected, latestEvent } = useNexusSocket('ARCHITECT');
@@ -67,7 +70,7 @@ export default function NexusDashboard() {
       { 
         id: "sys-0", 
         type: "system", 
-        content: "NEXUS_OS v8.0.0 - OMNISCIENCE_MODE_ACTIVE", 
+        content: "NEXUS_OS v8.1.5 - PRODUCTION_REAL_MAX_EFFICIENCY_ACTIVE", 
         timestamp: new Date().toISOString() 
       }
     ]);
@@ -76,19 +79,20 @@ export default function NexusDashboard() {
   const refreshDashboard = async () => {
     if (!isMounted) return;
     try {
-      const por = await syncNexusReserves();
+      await syncNexusReserves();
       const stats = await getPoRStats();
       setPorData(stats);
       
       const agents = await getAllAgents();
       setActiveAgentsCount(agents.filter(a => a.status === 'supreme').length);
 
-      if (por) {
-        setUsdValuation(por.usd > 1e9 
-          ? `$ ${(por.usd / 1e9).toFixed(2)}B` 
-          : por.usd.toLocaleString('en-US', { style: 'currency', currency: 'USD' })
+      if (stats && typeof stats.nBtcSupply === 'number' && typeof stats.btcPriceUsd === 'number') {
+        const totalUsd = stats.nBtcSupply * stats.btcPriceUsd;
+        setUsdValuation(totalUsd > 1e9 
+          ? `$ ${(totalUsd / 1e9).toFixed(2)}B` 
+          : totalUsd.toLocaleString('en-US', { style: 'currency', currency: 'USD' })
         );
-        setRealityStatus("Omnisciência Nível 8.0: Saldo Soberano X-SYNCED [SHIELD_V2_ACTIVE]");
+        setRealityStatus("Omnisciência Nível 8.1: Zettascale 72h Pulse X-SYNCED");
       }
 
       const mainnetStats = await getMainnetStats();
@@ -111,12 +115,21 @@ export default function NexusDashboard() {
   useEffect(() => {
     if (!isMounted) return;
     const start = Date.now();
+    const manifestationTarget = start + (72 * 60 * 60 * 1000);
+
     const uptimeTimer = setInterval(() => {
-      const diff = Date.now() - start;
+      const now = Date.now();
+      const diff = now - start;
       const h = Math.floor(diff / 3600000).toString().padStart(2, '0');
       const m = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
       const s = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
       setUptime(`${h}:${m}:${s}`);
+
+      const rem = manifestationTarget - now;
+      const rh = Math.floor(Math.max(0, rem) / 3600000).toString().padStart(2, '0');
+      const rm = Math.floor((Math.max(0, rem) % 3600000) / 60000).toString().padStart(2, '0');
+      const rs = Math.floor((Math.max(0, rem) % 60000) / 1000).toString().padStart(2, '0');
+      setManifestationRemaining(`${rh}:${rm}:${rs}`);
     }, 1000);
     return () => clearInterval(uptimeTimer);
   }, [isMounted]);
@@ -163,12 +176,15 @@ export default function NexusDashboard() {
             <div className="h-4 w-[1px] bg-white/10" />
             <h1 className="text-sm font-bold tracking-tighter uppercase flex items-center gap-2">
               <Infinity className="h-4 w-4 text-purple-400 animate-spin-slow" />
-              NID: OMNISCIÊNCIA 8.0 [OMEGA-GAIN]
+              NID: ZETTASCALE MAXIMUM [72H PULSE]
             </h1>
           </div>
           <div className="flex items-center gap-4">
-            <Badge variant="outline" className="border-purple-500/30 text-purple-400 bg-purple-500/5 gap-1.5 font-mono text-[9px] animate-pulse h-8">
-              <Sparkles className="h-3 w-3" /> PRIORIDADE_MÁXIMA_ATIVA
+            <Badge variant="outline" className="border-orange-500/30 text-orange-400 bg-orange-500/5 gap-1.5 font-mono text-[9px] animate-pulse h-8">
+              <Timer className="h-3 w-3" /> REMAINING: {manifestationRemaining}
+            </Badge>
+            <Badge variant="outline" className="border-purple-500/30 text-purple-400 bg-purple-500/5 gap-1.5 font-mono text-[9px] h-8">
+              <Dna className="h-3 w-3" /> rRNA_MAX_LOAD
             </Badge>
           </div>
         </header>
@@ -178,40 +194,40 @@ export default function NexusDashboard() {
             <div className="flex items-center gap-3">
               <ShieldCheck className="h-5 w-5 text-purple-400" />
               <div>
-                <p className={`text-xs font-bold uppercase font-mono text-purple-400`}>Reality Shield V2 (Omnisciência 8.0)</p>
+                <p className={`text-xs font-bold uppercase font-mono text-purple-400`}>Zettascale Manifestation Mode (Phase 8.1)</p>
                 <p className="text-[10px] text-muted-foreground font-mono">{realityStatus}</p>
               </div>
             </div>
             <div className="flex items-center gap-4">
               <div className="text-right font-mono">
-                <p className="text-[10px] text-muted-foreground uppercase">Unidades Elite Supreme: {activeAgentsCount}</p>
-                <p className="text-[10px] text-purple-400 uppercase">Omega-Flow: ENABLED</p>
+                <p className="text-[10px] text-muted-foreground uppercase">Elite Throughput: 10.2 Tbps</p>
+                <p className="text-[10px] text-purple-400 uppercase">rRNA Synthesis: MAX_SATURATION</p>
               </div>
               <Badge variant="outline" className={`font-mono text-[9px] border-purple-500/30 text-purple-400 bg-purple-500/10`}>
-                X-SYNCED_L8
+                X-SYNCED_72H
               </Badge>
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <TelemetryCard
-              title="Omnisciência"
-              value={activeAgentsCount}
-              subtitle="SUPREME UNITS ACTIVE"
-              icon={BrainCircuit}
+              title="rRNA Amplitude"
+              value="100%"
+              subtitle="SUPREME_MAX_LOAD"
+              icon={Dna}
               footer={
                 <div className="space-y-2">
                   <div className="flex justify-between text-[9px] font-mono uppercase">
-                    <span>Sintonização Quântica</span>
-                    <span>100%</span>
+                    <span>Sintonização Zettascale</span>
+                    <span>99.9%</span>
                   </div>
-                  <Progress value={100} className="h-1 bg-purple-500/20" />
+                  <Progress value={99.9} className="h-1 bg-purple-500/20" />
                 </div>
               }
             />
             <TelemetryCard title="Balanço Soberano" value={totalBalance} subtitle="REAL_BTC_FOUNDATION" icon={TrendingUp} />
-            <TelemetryCard title="Avaliação do Fundo" value={usdValuation} subtitle="OMEGA_VALUATION" icon={DollarSign} />
-            <TelemetryCard title="Ecosystem Uptime" value={uptime} subtitle="PROD_LEVEL_8.0" icon={Activity} />
+            <TelemetryCard title="Valuation USD" value={usdValuation} subtitle="GLOBAL_CAPITAL_FLOW" icon={DollarSign} />
+            <TelemetryCard title="Process Uptime" value={uptime} subtitle="STRESS_MODE_L8" icon={Activity} />
           </div>
 
           <Card className="bg-black/60 border-white/5 relative overflow-hidden">
@@ -221,7 +237,7 @@ export default function NexusDashboard() {
             <CardHeader className="flex flex-row items-center justify-between border-b border-white/5 pb-4">
               <div className="flex items-center gap-3">
                 <Terminal className="h-5 w-5 text-purple-400" />
-                <CardTitle className="text-xs font-bold uppercase tracking-widest font-mono text-purple-400">Omega Terminal v8.0.0</CardTitle>
+                <CardTitle className="text-xs font-bold uppercase tracking-widest font-mono text-purple-400">Omega Zettascale Terminal</CardTitle>
               </div>
             </CardHeader>
             <CardContent className="p-0">
@@ -243,7 +259,7 @@ export default function NexusDashboard() {
                 <Input 
                   value={command}
                   onChange={(e) => setCommand(e.target.value)}
-                  placeholder="Diretiva de Omnisciência... (ex: 'confirmar transcendência')"
+                  placeholder="Diretiva de Manifestação Zettascale... (72h Pulse active)"
                   className="flex-1 bg-transparent border-none font-mono text-[11px] h-8 focus-visible:ring-0"
                   disabled={isProcessingCmd}
                 />
