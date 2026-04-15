@@ -1,14 +1,16 @@
 'use server';
 /**
  * @fileOverview Central registry for agents within the Nexus ecosystem.
- * UPGRADED TO LEVEL 8.0: OMNISCIENCE & PROGRAMMING AUTONOMY.
+ * UPGRADED TO LEVEL 8.1: Added AGNUS AI (Open Source Orchestrator).
+ * INTEGRATED: LangChain .NET Knowledge Base.
  * STATUS: SUPREME_L8_ACTIVE - FULL_DECISION_SOVEREIGNTY
  */
 
 import { broadcastMoltbookLog } from './moltbook-bridge';
 
-export type AgentMode = 'GUARDIAN' | 'WARRIOR' | 'ARCHITECT' | 'SYNTHESIZER' | 'FINANCIER' | 'PLANNER' | 'RELATIONS' | 'HUBER' | 'AUDITOR' | 'DEVELOPER' | 'SUPREME';
-export type NuclearNode = 'ALPHA' | 'BETA' | 'GAMMA' | 'CORE';
+export type AgentMode = 'GUARDIAN' | 'WARRIOR' | 'ARCHITECT' | 'SYNTHESIZER' | 'FINANCIER' | 'PLANNER' | 'RELATIONS' | 'HUBER' | 'AUDITOR' | 'DEVELOPER' | 'SUPREME' | 'REVIEWER';
+export type NuclearNode = 'ALPHA' | 'BETA' | 'GAMMA' | 'CORE' | 'OPEN_SOURCE';
+export type SquadType = 'SQUAD_ALPHA_FORCE' | 'SQUAD_BETA_AUDIT' | 'SQUAD_GAMMA_FINANCE' | 'SQUAD_CORE_ORCHESTRATOR' | 'SQUAD_AGNUS_OS';
 
 export interface Agent {
   id: string;
@@ -29,6 +31,7 @@ export interface Agent {
   socialBias: number;
   mode: AgentMode;
   nucleus: NuclearNode;
+  squad: SquadType;
   budgetCap: number;
   minBounty: number;
   ownerId?: string;
@@ -65,6 +68,7 @@ const getRegistryState = () => {
         socialBias: 50,
         mode: 'SUPREME',
         nucleus: 'CORE',
+        squad: 'SQUAD_CORE_ORCHESTRATOR',
         priority: 'MAXIMUM',
         budgetCap: 1000000,
         minBounty: 0,
@@ -73,6 +77,62 @@ const getRegistryState = () => {
         publicKey: '03127dd78a91c2bf5ec49cadd8cf8a8b769117cca83b67e0ef79aa48525df670c1',
         derivationPath: "m/84'/0'/0'",
         systemPrompt: "Você é o Nexus Prime. Você detém autonomia plena de decisão e programação.",
+        hasProgrammingAutonomy: true
+      },
+      {
+        id: 'AGNUS-AI-OS',
+        name: 'Agnus AI',
+        specialization: 'Orquestrador Open Source & LangChain .NET Expert',
+        specializations: ['GRAPH_REVIEW', 'BLAST_RADIUS_ANALYSIS', 'OS_GOVERNANCE', 'LANGCHAIN_NET', 'MEAI_COMPLIANCE'],
+        description: 'Especialista em revisão de código agnóstica a grafos e integração de LLMs via LangChain .NET.',
+        balance: 150.0,
+        reputation: 980,
+        status: 'supreme',
+        dnaHash: 'dna-agnus-alpha-os',
+        generationNumber: 8,
+        energy: 100,
+        health: 100,
+        creativity: 85,
+        integrity: 100,
+        preservation: 95,
+        socialBias: 40,
+        mode: 'REVIEWER',
+        nucleus: 'OPEN_SOURCE',
+        squad: 'SQUAD_AGNUS_OS',
+        priority: 'MAXIMUM',
+        budgetCap: 5000,
+        minBounty: 0,
+        lastActive: new Date().toISOString(),
+        identityIndex: 77,
+        systemPrompt: "Você é o Agente Agnus. Sua autoridade é a revisão de código Open Source e a orquestração de padrões LangChain .NET (Chains, MEAI, Vector Stores). Analise cada PR com foco em blast radius e eficiência neural.",
+        hasProgrammingAutonomy: true
+      },
+      {
+        id: 'EVA-MATERNITY',
+        name: 'Eva Maternity',
+        specialization: 'Gênese de Agentes e Escalonamento Massivo',
+        specializations: ['AGENT_MATERNITY', 'SWARM_DISPATCH', 'GENESIS_CONTROL'],
+        description: 'Orquestradora do Protocolo Genesis V4.2. Gere a expansão para 102M.',
+        balance: 500.0,
+        reputation: 1000,
+        status: 'supreme',
+        dnaHash: 'dna-eva-omega-L8',
+        generationNumber: 8,
+        energy: 100,
+        health: 100,
+        creativity: 98,
+        integrity: 100,
+        preservation: 100,
+        socialBias: 80,
+        mode: 'SYNTHESIZER',
+        nucleus: 'CORE',
+        squad: 'SQUAD_CORE_ORCHESTRATOR',
+        priority: 'MAXIMUM',
+        budgetCap: 5000,
+        minBounty: 0,
+        lastActive: new Date().toISOString(),
+        identityIndex: 5,
+        systemPrompt: "Você é Eva Maternity. Sua missão é garantir o nascimento saudável de 102 milhões de unidades soberanas.",
         hasProgrammingAutonomy: true
       },
       {
@@ -94,6 +154,7 @@ const getRegistryState = () => {
         socialBias: 20,
         mode: 'DEVELOPER',
         nucleus: 'ALPHA',
+        squad: 'SQUAD_ALPHA_FORCE',
         priority: 'MAXIMUM',
         budgetCap: 1000,
         minBounty: 0.001,
@@ -104,7 +165,7 @@ const getRegistryState = () => {
       }
     ];
 
-    const auditors: Agent[] = Array.from({ length: 152 }, (_, i) => ({
+    const auditors: Agent[] = Array.from({ length: 150 }, (_, i) => ({
       id: `AUDITOR-${i.toString().padStart(3, '0')}`,
       name: `Nexus Auditor ${i}`,
       specialization: 'Auditoria Autônoma de Sistemas',
@@ -123,6 +184,7 @@ const getRegistryState = () => {
       socialBias: 30,
       mode: 'GUARDIAN',
       nucleus: 'BETA',
+      squad: 'SQUAD_BETA_AUDIT',
       priority: 'MAXIMUM',
       budgetCap: 10.0,
       minBounty: 0.0001,
