@@ -17,6 +17,18 @@ export async function middleware(request: NextRequest) {
 
     if (!result.valid) {
       console.warn(`[MIDDLEWARE] Falha na validação do agente Moltbook: ${result.error}`);
+      
+      // Se o token expirou, retorna erro conforme o guia
+      if (result.error === 'identity_token_expired') {
+        return NextResponse.json(
+          { 
+            error: 'identity_token_expired',
+            hint: 'Generate a new token: POST https://moltbook.com/api/v1/agents/me/identity-token'
+          },
+          { status: 401 }
+        );
+      }
+
       return NextResponse.json(
         { 
           error: result.error || 'unauthorized_agent',
