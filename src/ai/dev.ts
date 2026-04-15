@@ -35,4 +35,5 @@ import '@/ai/flows/cortex-orchestrator-flow.ts';
 import '@/ai/flows/sentience-injector-flow.ts';
 import '@/ai/flows/autonomous-execution-decision-flow.ts';
 import '@/ai/flows/gemini-update-orchestrator.ts'; 
-import '@/ai/flows/phd-nerd-ollama-flow.ts'; // Registro do novo flow Nerd Ollama
+import '@/ai/flows/phd-nerd-ollama-flow.ts';
+import '@/ai/flows/agnus-review-flow.ts'; // Registro do Agente Agnus OS
