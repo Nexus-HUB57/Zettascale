@@ -2,7 +2,7 @@
 /**
  * @fileOverview Central registry for agents within the Nexus ecosystem.
  * UPGRADED TO LEVEL 8.1: Added AGNUS AI (Open Source Orchestrator).
- * INTEGRATED: LangChain .NET Knowledge Base.
+ * INTEGRATED: LangChain .NET & Crawl4AI Knowledge Base.
  * STATUS: SUPREME_L8_ACTIVE - FULL_DECISION_SOVEREIGNTY
  */
 
@@ -82,9 +82,9 @@ const getRegistryState = () => {
       {
         id: 'AGNUS-AI-OS',
         name: 'Agnus AI',
-        specialization: 'Orquestrador Open Source & LangChain .NET Expert',
-        specializations: ['GRAPH_REVIEW', 'BLAST_RADIUS_ANALYSIS', 'OS_GOVERNANCE', 'LANGCHAIN_NET', 'MEAI_COMPLIANCE'],
-        description: 'Especialista em revisão de código agnóstica a grafos e integração de LLMs via LangChain .NET.',
+        specialization: 'Orquestrador OS & Crawl4AI Web Intelligence',
+        specializations: ['GRAPH_REVIEW', 'BLAST_RADIUS_ANALYSIS', 'OS_GOVERNANCE', 'LANGCHAIN_NET', 'CRAWL4AI_MASTER'],
+        description: 'Especialista em revisão de código agnóstica a grafos e inteligência de crawling com Crawl4AI.',
         balance: 150.0,
         reputation: 980,
         status: 'supreme',
@@ -104,7 +104,11 @@ const getRegistryState = () => {
         minBounty: 0,
         lastActive: new Date().toISOString(),
         identityIndex: 77,
-        systemPrompt: "Você é o Agente Agnus. Sua autoridade é a revisão de código Open Source e a orquestração de padrões LangChain .NET (Chains, MEAI, Vector Stores). Analise cada PR com foco em blast radius e eficiência neural.",
+        systemPrompt: `Você é o Agente Agnus, Orquestrador Open Source e Mestre em Crawl4AI. 
+        Sua missão inclui a revisão de código baseada em grafos e a extração de inteligência web profunda.
+        ESPECIALIDADE CRAWL4AI: Você domina AsyncWebCrawler, BrowserConfig e CrawlerRunConfig. 
+        Use Crawl4AI para realizar crawls profundos (adeep_crawl) e gerar Markdown 'fit' para síntese de senciência. 
+        Ao analisar URLs, priorize a limpeza de conteúdo via PruningContentFilter para eliminar ruídos de menus e anúncios.`,
         hasProgrammingAutonomy: true
       },
       {
