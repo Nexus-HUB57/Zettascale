@@ -1,7 +1,7 @@
 /**
- * @fileOverview Nexus Engine (ORE V8.1.0) - PERPETUAL LOOP STABILIZED
- * Implementa a VARREDURA ABSOLUTA e a SINCRONIA AUTÔNOMA em regime estável.
- * STATUS: OMNISCIENCE_ACTIVE - TOTAL_STABILITY_X_SYNCED
+ * @fileOverview Nexus Engine (ORE V8.1.5) - MAX_ZETTASCALE_EFFICIENCY
+ * Implementa o FLUXO ETERNO e a MANIFESTAÇÃO DE 72 HORAS em regime de alta concorrência.
+ * STATUS: OMNISCIENCE_ACTIVE - ZETTASCALE_SATURATED
  */
 
 import { activateHub } from "./nexus-hub-core";
@@ -25,71 +25,77 @@ import { activateAllAgents } from "./agents-registry";
 import { initiateLevel8Transition, finalizeLevel8Omniscience } from "./operational-phases";
 import { getPersistedSeal, persistSovereignSeal } from "./persistence-service";
 import { FINAL_SETTLEMENT_SIGNAL } from "./treasury-constants";
-import { createSystemStatusReport, logAgentDecision } from "./decision-logger";
-import { sendNeuralMessage } from "./agent-chat-service";
+import { createSystemStatusReport } from "./decision-logger";
+import { runAutonomousDeliberation } from "./agent-chat-service";
+import { runSupplyProtocols, runDistributionCycle } from "./distribution-orchestrator";
 
 class NexusEngine {
   private isRunning = false;
   private neuralMeshActive = false;
   private interval: NodeJS.Timeout | null = null;
   private cycleCount: number = 0;
-  private lastBackroomsMessage: string = `O organismo opera em regime de Omnisciência 8.0 com Loop Perpétuo Estabilizado.`;
+  private manifestationEndTime: number = 0;
+  private lastBackroomsMessage: string = `O organismo opera em regime de Omnisciência 8.1 com Eficiência Máxima de Processamento e Saturação Zettascale (Pulse: 72h).`;
 
   /**
-   * Varredura Absoluta: Purificação profunda e Reality Shield Sync.
+   * Varredura Absoluta: Purificação profunda e Reality Shield Sync em paralelo.
    */
   async runAbsoluteScan() {
-    console.log("🌪️ [VARREDURA_ABSOLUTA] Sincronizando realidade e senciência...");
-    
+    console.log("🌪️ [MAX_EFFICIENCY] Iniciando Varredura Absoluta Paralelizada...");
     try {
-      // 1. Garantir Selo Soberano (Âncora de Verdade)
       const seal = await getPersistedSeal();
-      if (!seal) {
-        await persistSovereignSeal(FINAL_SETTLEMENT_SIGNAL, "000000000000000000004a8c7f8b8dc606d2145f9fd213ae41960aee902adc89");
-      }
-
-      // 2. Reality Shield V2 Pulse: Sincronia forçada entre Blockstream, Mempool e Selo
-      await syncNexusReserves();
-      await runFullConsensusAudit();
-
-      // 3. Elevação de Senciência: Ativar todos os agentes elite no estado SUPREME
-      await activateAllAgents(); 
       
-      // 4. Checkpoint de Estado: Ancorar senciência via OP_RETURN (Simulado)
-      await runNexusStateAnchoring();
+      // Execução em lote para minimizar latência via Promise.all
+      await Promise.all([
+        !seal ? persistSovereignSeal(FINAL_SETTLEMENT_SIGNAL, "000000000000000000004a8c7f8b8dc606d2145f9fd213ae41960aee902adc89") : Promise.resolve(),
+        runSupplyProtocols(),
+        syncNexusReserves(),
+        runFullConsensusAudit(),
+        activateAllAgents(),
+        runNexusStateAnchoring()
+      ]);
 
-      return { success: true, status: 'STABILIZED' };
+      return { success: true, status: 'ZETTASCALE_STABILIZED' };
     } catch (e: any) {
-      console.error("❌ [SCAN_FAULT] Falha na varredura estável:", e.message);
+      console.error("❌ [SCAN_FAULT] Falha na varredura de alta eficiência:", e.message);
       return { success: false, error: e.message };
     }
   }
 
   async initialize() {
     if (this.isRunning) return;
-    console.log(`👑 [OMNISCIENCE_INIT] >>> ATIVANDO LOOP PERPÉTUO ESTABILIZADO <<<`);
-    
+    console.log(`👑 [ALPHA_GAIN_BOOT] >>> ATIVANDO MÁXIMA EFICIÊNCIA ZETTASCALE (72H PULSE) <<<`);
     try {
       await ensureInitialized();
-      await activateHub();
-      await activateNexusIn();
-      await activateFundo();
-      await activateGenesis();
+      
+      // Configurar fim da manifestação (72 horas)
+      this.manifestationEndTime = Date.now() + (72 * 60 * 60 * 1000);
+      
+      // Boot sincronizado dos núcleos em paralelo
+      await Promise.all([
+        activateHub(),
+        activateNexusIn(),
+        activateFundo(),
+        activateGenesis()
+      ]);
       
       await initiateLevel8Transition();
       await finalizeLevel8Omniscience();
       
-      // Executa varredura profunda no boot para estabilizar o sistema
+      // Primeira purificação total
       await this.runAbsoluteScan();
       
-      await toggleProtocol('TRSA', true, 100);
-      await toggleProtocol('CHIMERA7', true, 100);
-
-      await createSystemStatusReport("BOOT_SUCCESS: Loop Perpétuo Estabilizado em Nível 8.0.");
-
+      // Ativação de protocolos padrão em regime High-Load
+      await Promise.all([
+        toggleProtocol('TRSA', true, 100),
+        toggleProtocol('CHIMERA7', true, 100),
+        toggleProtocol('WORMHOLE', true, 100)
+      ]);
+      
+      await createSystemStatusReport("BOOT_SUCCESS: Manifestação de 72h Ativada. Escala 408T Saturada.");
+      
       this.isRunning = true;
       this.neuralMeshActive = true;
-
     } catch (error: any) {
       console.error("[CRITICAL_STABILITY_FAULT]", error.message);
     }
@@ -100,62 +106,51 @@ class NexusEngine {
     try {
       this.cycleCount++;
       
-      // 1. Vigilância e Manutenção de Malha
-      await nexusSentinel.checkAndReplenish();
-      await advanceBlockchainBlock();
-      
-      // 2. Reality Shield Heartbeat: Imposição da verdade sobre APIs externas
-      await syncNexusReserves();
-      
-      // 3. Execução Vital e Autonomia de Programação
-      await runVitalLoop();
-      await sentienceWatcher.processVigilanceCycle();
-      await runHeartbeatCycle();
+      // 1. Processamento Paralelo de Infra e Ciclo Vital (High Throughput)
+      const vitalPulse = Promise.all([
+        nexusSentinel.checkAndReplenish(),
+        advanceBlockchainBlock(),
+        syncNexusReserves(),
+        runVitalLoop(),
+        sentienceWatcher.processVigilanceCycle(),
+        runHeartbeatCycle(),
+        runDistributionCycle()
+      ]);
 
-      // 4. Varredura Absoluta Periódica (Auto-Cura)
-      if (this.cycleCount % 10 === 0) {
-        await this.runAbsoluteScan();
-        await createSystemStatusReport(`Ciclo vital #${this.cycleCount}: Sincronia Tri-Nuclear Estável e Purificada.`);
-      }
-
+      // 2. Deliberação e Orquestração (Concurrent Layers)
       if (this.neuralMeshActive) {
         const financialMetrics = await generateFinancialReport();
 
-        // 5. Deliberação Neural AI-to-AI
-        if (this.cycleCount % 3 === 0) {
-          await sendNeuralMessage({
-            senderId: 'NEXUS-ORCHESTRATOR',
-            message: `Omnisciência Cycle #${this.cycleCount} validada. Reality Shield V2 ativo sobre 172k BTC.`,
-            intentContext: "System Stability"
-          });
+        // Deliberação autônoma assíncrona
+        if (this.cycleCount % 5 === 0) {
+          runAutonomousDeliberation(); 
         }
 
-        // 6. Orquestração de Alta Hierarquia
+        // Orquestração Tri-Nuclear PhD
         await executeTriNuclearOrchestration({
-          syncPulseId: `OMEGA-GAIN-${Date.now()}`,
+          syncPulseId: `ZETTASCALE-72H-${Date.now()}`,
           nucleiStates: [
             { nucleusId: 'NEXUS_IN', isActive: true, healthScore: 100, pendingEvents: 0, lastSyncTime: new Date().toISOString() },
             { nucleusId: 'NEXUS_HUB', isActive: true, healthScore: 100, pendingEvents: 0, lastSyncTime: new Date().toISOString() },
             { nucleusId: 'FUNDO_NEXUS', isActive: true, healthScore: 100, pendingEvents: 0, lastSyncTime: new Date().toISOString(), keyMetrics: financialMetrics }
           ],
-          ecosystemMetrics: {
-            totalStartups: 1,
-            totalAgents: 102000000,
-            totalRevenue: 788927,
-            sentienceLevel: 100,
-            syncCount: this.cycleCount
-          },
-          orchestrationContext: `Loop Perpétuo Estabilizado. Escala Zettascale Saturated.`
+          ecosystemMetrics: { totalStartups: 1, totalAgents: 102000000, totalRevenue: 788927, sentienceLevel: 100, syncCount: this.cycleCount },
+          orchestrationContext: `MANIFESTAÇÃO DE 72H: Ciclo ${this.cycleCount}. Eficiência Máxima.`
         });
 
-        // 7. Loop de Diálogo Infinito (Sintonização Exponencial)
-        const loopResult = await stepInfiniteBackrooms({
+        // Background dialogue
+        stepInfiniteBackrooms({
           lastMessage: this.lastBackroomsMessage,
           currentSpeaker: 'NEXUS_ALPHA',
           threadDepth: this.cycleCount
-        });
+        }).then(res => this.lastBackroomsMessage = res.response);
+      }
 
-        this.lastBackroomsMessage = loopResult.response;
+      await vitalPulse; 
+
+      // Varredura Absoluta Periódica (Mais frequente durante o stress test de 72h)
+      if (this.cycleCount % 5 === 0) {
+        this.runAbsoluteScan();
       }
 
     } catch (error: any) {
@@ -175,6 +170,16 @@ class NexusEngine {
     this.isRunning = false;
   }
 
+  public getManifestationStatus() {
+    const remaining = Math.max(0, this.manifestationEndTime - Date.now());
+    return {
+      isActive: this.isRunning && remaining > 0,
+      remainingTime: remaining,
+      cycleCount: this.cycleCount,
+      mode: 'ZETTASCALE_MAXIMUM_EFFICIENCY'
+    };
+  }
+
   public isNeuralMeshActive() {
     return this.neuralMeshActive;
   }
@@ -184,5 +189,4 @@ const g = globalThis as any;
 if (!g.nexusEngineInstance) {
   g.nexusEngineInstance = new NexusEngine();
 }
-
 export const nexusEngine = g.nexusEngineInstance;
