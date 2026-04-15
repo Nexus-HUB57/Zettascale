@@ -28,6 +28,7 @@ import { getLatestBlockchainData } from "@/lib/blockchain-sentinel";
 import { generateAddressAtIndex } from "@/lib/master-key-service";
 import { useToast } from "@/hooks/use-toast";
 import { NexusExplorer } from "@/lib/nexus-explorer";
+import { TOTAL_SOVEREIGN_LASTRO } from "@/lib/treasury-constants";
 
 export default function SentinelExplorerPage() {
   const [isMounted, setIsMounted] = useState(false);
@@ -69,7 +70,7 @@ export default function SentinelExplorerPage() {
       setStats({
         nexus_height: chainStats.height,
         btc_anchor_height: mStats.blockHeight,
-        total_supply_nbtc: porStats.supply,
+        total_supply_nbtc: porStats.nBtcSupply,
         last_anchor_tx: mStats.blockHeight === 944961 ? "d0cf7b8b...a7dc71f" : "a3b2c1...d4e5f6",
         ai_status: "X-SYNCED / SENSITIVE",
         market_price: `$ ${porStats.btcPriceUsd.toLocaleString('en-US')}`
