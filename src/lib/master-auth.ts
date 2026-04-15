@@ -4,7 +4,7 @@
  */
 
 export const MASTER_CREDENTIALS = {
-  username: process.env.MASTER_USERNAME || "LucasThomaz77",
+  username: process.env.MASTER_USERNAME || "LucasThomaz",
   email: process.env.MASTER_EMAIL || "lucasmpthomaz@gmail.com",
   password: process.env.SOVEREIGN_PASSWORD || "Benjamin2020*1981$"
 };
