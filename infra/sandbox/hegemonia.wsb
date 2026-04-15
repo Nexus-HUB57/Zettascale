@@ -1,0 +1,12 @@
+<Configuration>
+  <MappedFolders>
+    <MappedFolder>
+      <HostFolder>C:\Nexus\AgentKit</HostFolder>
+      <SandboxFolder>C:\Users\WDAGUtilityAccount\Desktop\AgentKit</SandboxFolder>
+      <ReadOnly>false</ReadOnly>
+    </MappedFolder>
+  </MappedFolders>
+  <LogonCommand>
+    <Command>C:\Users\WDAGUtilityAccount\Desktop\AgentKit\scripts\bootstrap.bat</Command>
+  </LogonCommand>
+</Configuration>
