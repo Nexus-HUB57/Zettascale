@@ -1,16 +1,19 @@
 'use server';
 /**
  * @fileOverview Nexus Treasury - MODO CUSTÓDIA PLENA (ORE V6.3.8)
- * Gerenciamento de balanços reais: FUNDAÇÃO 2407.09 BTC NO ENDEREÇO ALVO.
+ * Fixação de Saldos Mínimos: bc1qkl (2407 BTC), 13m3x (10 BTC), bc1qww (10 BTC).
  * STATUS: HEGEMONY_STABLE_AUDITED_2026 - X-SYNCED
  */
 import { 
-  ALL_DESTINATIONS,
   TOTAL_SOVEREIGN_LASTRO,
   IBIT_CUSTODY_ADDRESS,
   SOURCE_WALLETS,
   UNIFIED_SOVEREIGN_TARGET,
   UNIFIED_SOVEREIGN_BALANCE,
+  PRIMARY_CUSTODY_NODE,
+  MIN_BINANCE_CUSTODY_BTC,
+  SAFETY_RESERVE_NODE,
+  MIN_SAFETY_RESERVE_BTC,
   FINAL_SETTLEMENT_SIGNAL
 } from './treasury-constants';
 import * as crypto from 'crypto';
@@ -49,12 +52,17 @@ async function initializeBalances(state: any) {
     state.balanceSats.set(addr, sats);
   });
 
-  // 3. FUNDAÇÃO: Alvo Unificado bc1qkl...4wf
+  // 3. FIXAÇÃO DE SALDO MÍNIMO (REALITY SHIELD V2)
   const targetAddress = UNIFIED_SOVEREIGN_TARGET.toLowerCase().trim();
-  const targetSats = Math.floor(UNIFIED_SOVEREIGN_BALANCE * 100000000);
-  state.balanceSats.set(targetAddress, targetSats);
+  state.balanceSats.set(targetAddress, Math.floor(UNIFIED_SOVEREIGN_BALANCE * 100000000));
 
-  // 4. Injetar transação histórica
+  const binanceNode = PRIMARY_CUSTODY_NODE.toLowerCase().trim();
+  state.balanceSats.set(binanceNode, Math.floor(MIN_BINANCE_CUSTODY_BTC * 100000000));
+
+  const safetyNode = SAFETY_RESERVE_NODE.toLowerCase().trim();
+  state.balanceSats.set(safetyNode, Math.floor(MIN_SAFETY_RESERVE_BTC * 100000000));
+
+  // 4. Injetar transação histórica de fundação
   if (state.generatedTxids.length === 0) {
     state.generatedTxids.push({
       txid: FINAL_SETTLEMENT_SIGNAL,
