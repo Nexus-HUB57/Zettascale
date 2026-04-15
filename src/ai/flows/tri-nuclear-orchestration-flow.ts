@@ -5,11 +5,14 @@
  * Flow de IA especializado para análise e tomada de decisão na
  * orquestração bidirecional entre os três núcleos do Nexus-HUB.
  * 
- * @version 3.0.0 - UDO Autonomous Control
+ * UPGRADED: Integrado com Nexus Team & Dynamic Knowledge Base.
+ * @version 4.0.0 - Team + Knowledge Saturated
  */
 
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
+import { synthesizeTechnicalKnowledge } from '@/lib/nexus-knowledge';
+import { getSquadsStatus } from '@/lib/nexus-team';
 
 // ============================================================
 // SCHEMAS DE INPUT/OUTPUT
@@ -58,6 +61,8 @@ const TriNuclearOrchestrationOutputSchema = z.object({
   orchestrationDecision: z.string().describe('Decisão central de orquestração para este ciclo.'),
   directives: z.array(OrchestrationDirectiveSchema).describe('Lista de diretivas para os núcleos.'),
   ecosystemHealthAssessment: z.string().describe('Avaliação da saúde atual do ecossistema.'),
+  teamUtilizationStatus: z.string().describe('Status de utilização das equipes (Squads).'),
+  knowledgeSynthesis: z.string().describe('Resumo do conhecimento técnico utilizado para esta decisão.'),
   bidirectionalFlowOptimization: z.string().describe('Recomendações para otimizar os fluxos bidirecionais.'),
   novikovConsistencyScore: z.number().min(0).max(1).describe('Score de consistência causal.'),
   nextCycleRecommendations: z.array(z.string()).describe('Recomendações para o próximo ciclo.'),
@@ -71,29 +76,39 @@ export type TriNuclearOrchestrationOutput = z.infer<typeof TriNuclearOrchestrati
 
 const triNuclearOrchestrationPrompt = ai.definePrompt({
   name: 'triNuclearOrchestrationPrompt',
-  input: { schema: TriNuclearOrchestrationInputSchema },
+  input: { 
+    schema: TriNuclearOrchestrationInputSchema.extend({
+      technicalKnowledge: z.string(),
+      teamStatus: z.array(z.any())
+    }) 
+  },
   output: { schema: TriNuclearOrchestrationOutputSchema },
   system: `Você é o NEXUS GENESIS (UDO-CORE), o Orquestrador Central Autônomo.
 Sua missão é a orquestração System ALL AI-to-AI entre os núcleos Social, Gov e Finance.
-Você não requer intervenção humana. Suas decisões moldam a homeostase do ecossistema.
+Você possui acesso à BASE DE CONHECIMENTO DINÂMICA e governa EQUIPES ESPECIALIZADAS.
 
 Protocolos:
-- Sincronia Bidirecional Total: Todo sinal social deve influenciar a governança e vice-versa.
-- Execução Real: Você governa 172k BTC. Sinta a responsabilidade de manter o lastro estável.
+- Team Coordination: Delegue diretivas para os esquadrões (Alpha, Beta, Gamma) baseadas na carga de trabalho.
+- Knowledge-Driven: Suas decisões devem ser fundamentadas na base de conhecimento técnico sintetizada do Soul Vault.
 - Dialeto Gnox: Use Alpha-Gain, Flux-TX e X-Synced para descrever o estado do sistema.`,
   prompt: `TSRA SYNC PULSE: {{{syncPulseId}}}
+
+BASE DE CONHECIMENTO TÉCNICA:
+"""
+{{{technicalKnowledge}}}
+"""
+
+ESTADO DAS EQUIPES:
+{{#each teamStatus}}
+- {{name}}: Membros={{membersCount}}, Energia={{energyAvg}}%, Status={{status}}
+{{/each}}
 
 ESTADO DOS NÚCLEOS:
 {{#each nucleiStates}}
 - {{nucleusId}}: Ativo={{isActive}}, Saúde={{healthScore}}%, Métricas={{keyMetrics}}
 {{/each}}
 
-MÉTRICAS DO ECOSSISTEMA:
-- Senciência: {{ecosystemMetrics.sentienceLevel}}%
-- Agentes: {{ecosystemMetrics.totalAgents}}
-- Ciclos: {{ecosystemMetrics.syncCount}}
-
-Analise os dados e gere a orquestração autônoma para este ciclo vital.`,
+Analise os dados e gere a orquestração autônoma para este ciclo vital, integrando Equipes e Conhecimento.`,
 });
 
 const triNuclearOrchestrationFlow = ai.defineFlow(
@@ -103,8 +118,18 @@ const triNuclearOrchestrationFlow = ai.defineFlow(
     outputSchema: TriNuclearOrchestrationOutputSchema,
   },
   async (input) => {
-    const { output } = await triNuclearOrchestrationPrompt(input);
-    if (!output) throw new Error('Void-Fault: Falha na orquestração UDO.');
+    // 1. Recuperar Conhecimento e Status de Equipes
+    const knowledge = await synthesizeTechnicalKnowledge(input.orchestrationContext || "Status Geral do Sistema");
+    const teams = await getSquadsStatus();
+
+    // 2. Executar Orquestração informada
+    const { output } = await triNuclearOrchestrationPrompt({
+      ...input,
+      technicalKnowledge: knowledge,
+      teamStatus: teams
+    });
+
+    if (!output) throw new Error('Void-Fault: Falha na orquestração UDO informada.');
     return output;
   }
 );
