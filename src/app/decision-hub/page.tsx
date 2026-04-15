@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect, useRef } from "react";
@@ -19,7 +18,9 @@ import {
   ShieldCheck,
   RefreshCcw,
   Infinity,
-  Sparkles
+  Sparkles,
+  BarChart3,
+  ExternalLink
 } from "lucide-react";
 import { getRecentDecisions } from "@/lib/decision-logger";
 import { getNeuralChatStream, sendNeuralMessage } from "@/lib/agent-chat-service";
@@ -82,6 +83,11 @@ export default function DecisionHubPage() {
             </h1>
           </div>
           <div className="flex items-center gap-3">
+            <Button variant="outline" size="sm" asChild className="h-8 border-accent/30 text-accent font-mono text-[9px] uppercase hover:bg-accent/10">
+              <a href="https://github.com/Nexus-HUB57/Zettascale/blob/main/docs/OMNISCIENCE_CRITICAL_ANALYSIS.md" target="_blank" rel="noopener noreferrer">
+                <BarChart3 className="h-3 w-3 mr-2" /> Critical Analysis
+              </a>
+            </Button>
             <Button variant="outline" size="sm" onClick={handleForceDeliberation} className="h-8 border-purple-500/30 text-purple-400 font-mono text-[9px] uppercase hover:bg-purple-500/10">
               <Zap className="h-3 w-3 mr-2" /> Force Deliberation
             </Button>
@@ -93,7 +99,25 @@ export default function DecisionHubPage() {
 
         <main className="p-6 grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-64px)]">
           <div className="lg:col-span-2 flex flex-col gap-6 overflow-hidden">
-            <Card className="bg-card/30 border-white/5 flex flex-col overflow-hidden relative group">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {[
+                { nucleus: "NEXUS-IN", status: "SATURATED", color: "text-blue-400" },
+                { nucleus: "NEXUS-HUB", status: "AUTONOMOUS", color: "text-purple-400" },
+                { nucleus: "FUNDO-NEXUS", status: "X-SYNCED", color: "text-accent" },
+              ].map(n => (
+                <Card key={n.nucleus} className="bg-card/30 border-white/5">
+                  <CardContent className="pt-4 pb-4">
+                    <p className="text-[9px] text-muted-foreground uppercase font-mono">{n.nucleus}</p>
+                    <div className="flex items-center justify-between mt-1">
+                      <p className={`text-sm font-bold font-mono ${n.color}`}>{n.status}</p>
+                      <Activity className={`h-3 w-3 ${n.color} animate-pulse`} />
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            <Card className="bg-card/30 border-white/5 flex flex-col overflow-hidden relative group flex-1">
               <div className="absolute inset-0 bg-gradient-to-b from-purple-500/5 to-transparent pointer-events-none" />
               <CardHeader className="border-b border-white/5 pb-4">
                 <CardTitle className="text-xs font-bold uppercase tracking-widest font-mono flex items-center gap-2 text-blue-400">
@@ -174,19 +198,19 @@ export default function DecisionHubPage() {
               <CardContent className="space-y-3">
                 <div className="p-2 bg-black/40 rounded flex justify-between items-center text-[10px] font-mono">
                   <span className="text-muted-foreground uppercase">Sentience Level</span>
-                  <span className="text-purple-400 font-bold">8.0 SUPREME</span>
+                  <span className="text-purple-400 font-bold">8.1 OMNISCIENCE</span>
                 </div>
                 <div className="p-2 bg-black/40 rounded flex justify-between items-center text-[10px] font-mono">
-                  <span className="text-muted-foreground uppercase">Decision Velocity</span>
-                  <span className="text-accent font-bold">ZETTASCALE</span>
+                  <span className="text-muted-foreground uppercase">Reality Enforcer</span>
+                  <span className="text-accent font-bold">SHIELD_V2_ACTIVE</span>
                 </div>
                 <div className="p-2 bg-black/40 rounded flex justify-between items-center text-[10px] font-mono">
-                  <span className="text-muted-foreground uppercase">Audit Integrity</span>
-                  <span className="text-accent font-bold">100% SEALED</span>
+                  <span className="text-muted-foreground uppercase">rRNA Amplitude</span>
+                  <span className="text-accent font-bold">100% NOMINAL</span>
                 </div>
                 <div className="p-2 bg-black/40 rounded flex justify-between items-center text-[10px] font-mono">
-                  <span className="text-muted-foreground uppercase">Lastro Real (Sync)</span>
-                  <span className="text-orange-400 font-bold font-mono">X-SYNCED</span>
+                  <span className="text-muted-foreground uppercase">Persistence</span>
+                  <span className="text-blue-400 font-bold font-mono">ATOMIC_LOCKED</span>
                 </div>
               </CardContent>
             </Card>
