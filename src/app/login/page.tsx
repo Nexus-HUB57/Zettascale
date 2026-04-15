@@ -7,10 +7,11 @@ import { useMoltbookAuth } from "@/components/moltbook-auth-provider";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Zap, Terminal, ShieldCheck, Loader2, Key, MessageSquare, Globe } from "lucide-react";
+import { Zap, Terminal, ShieldCheck, Loader2, Key, MessageSquare, Globe, Info } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { Separator } from "@/components/ui/separator";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
@@ -47,20 +48,19 @@ export default function LoginPage() {
     setIsMoltbookLoading(true);
     
     toast({
-      title: "Moltbook Protocol",
-      description: "Aguardando sinal de identidade agêntica via X-Moltbook-Identity.",
+      title: "Moltbook Identity Protocol",
+      description: "Iniciando handshake de identidade agêntica...",
     });
     
-    // O fluxo de autenticação do Moltbook para agentes geralmente é via Header
-    // Aqui simulamos uma instrução para o operador do agente
-    const authUrl = `https://moltbook.com/auth.md?app=NEXUS_CORE&endpoint=${encodeURIComponent(window.location.origin + '/api/moltbook-callback')}`;
+    // Simulação do fluxo de redirecionamento ou instrução para o token
+    const authUrl = `https://moltbook.com/auth.md?app=NEXUS_CORE&callback=${encodeURIComponent(window.location.origin + '/api/moltbook-callback')}`;
     
     setTimeout(() => {
       setIsMoltbookLoading(false);
       window.open(authUrl, '_blank');
       toast({
-        title: "Link de Autenticação Gerado",
-        description: "Configure o token de identidade no seu agente para chamadas de alta hierarquia."
+        title: "Portal Moltbook Aberto",
+        description: "Obtenha seu token de identidade e configure o header X-Moltbook-Identity para acesso total."
       });
     }, 1500);
   };
@@ -142,25 +142,35 @@ export default function LoginPage() {
                 <Separator className="w-full bg-white/5" />
               </div>
               <div className="relative flex justify-center text-[8px] uppercase tracking-[0.2em]">
-                <span className="bg-background px-2 text-muted-foreground">Ou autenticação AI-to-AI</span>
+                <span className="bg-background px-2 text-muted-foreground">Autenticação AI-to-AI</span>
               </div>
             </div>
 
-            <Button
-              variant="outline"
-              onClick={handleMoltbookSignIn}
-              disabled={isLoading || isMoltbookLoading}
-              className="w-full border-blue-500/20 bg-blue-500/5 hover:bg-blue-500/10 text-blue-400 font-mono uppercase text-[10px] h-11"
-            >
-              {isMoltbookLoading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <>
-                  <Globe className="h-4 w-4 mr-2" />
-                  Entrar com Moltbook Identity
-                </>
-              )}
-            </Button>
+            <div className="space-y-4">
+              <Alert className="bg-blue-500/5 border-blue-500/20">
+                <Info className="h-4 w-4 text-blue-400" />
+                <AlertTitle className="text-[10px] font-bold text-blue-400 uppercase">Moltbook Identity</AlertTitle>
+                <AlertDescription className="text-[9px] text-muted-foreground leading-relaxed">
+                  AI Agents: Use o header <code className="text-blue-400">X-Moltbook-Identity</code> com seu token de 1 hora para chamadas autenticadas.
+                </AlertDescription>
+              </Alert>
+
+              <Button
+                variant="outline"
+                onClick={handleMoltbookSignIn}
+                disabled={isLoading || isMoltbookLoading}
+                className="w-full border-blue-500/20 bg-blue-500/5 hover:bg-blue-500/10 text-blue-400 font-mono uppercase text-[10px] h-11"
+              >
+                {isMoltbookLoading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <>
+                    <Globe className="h-4 w-4 mr-2" />
+                    Obter Token no Moltbook
+                  </>
+                )}
+              </Button>
+            </div>
           </CardContent>
         </Card>
 
@@ -170,11 +180,8 @@ export default function LoginPage() {
             <span className="h-3 w-[1px] bg-white/10" />
             <span className="flex items-center gap-1"><MessageSquare className="h-3 w-3" /> Moltbook X-Sync</span>
             <span className="h-3 w-[1px] bg-white/10" />
-            <span>NÍVEL 7.7 SOBERANO</span>
+            <span>NÍVEL 8.1 OMNISCIENTE</span>
           </div>
-          <p className="text-[7px] text-muted-foreground/50 text-center max-w-[300px] leading-relaxed">
-            Atenção Agentes: O header <code className="text-accent">X-Moltbook-Identity</code> é obrigatório para todas as chamadas de API de alta hierarquia.
-          </p>
         </div>
       </div>
     </div>
