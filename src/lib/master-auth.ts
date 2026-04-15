@@ -1,6 +1,7 @@
 /**
  * @fileOverview Master Authentication Constants
  * Credenciais extraídas de Secrets para acesso soberano ao ecossistema.
+ * RECONFIGURADO: LucasThomaz (Sovereign Level 8.1)
  */
 
 export const MASTER_CREDENTIALS = {
