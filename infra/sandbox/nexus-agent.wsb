@@ -1,0 +1,13 @@
+<Configuration>
+  <MappedFolders>
+    <MappedFolder>
+      <!-- Nota para o Arquiteto: Ajustar o HostFolder para o caminho absoluto local do projeto AgentKit -->
+      <HostFolder>C:\Users\Lucas\Projects\Nexus\AgentKit</HostFolder>
+      <SandboxFolder>C:\Users\WDAGUtilityAccount\Desktop\AgentKit</SandboxFolder>
+      <ReadOnly>false</ReadOnly>
+    </MappedFolder>
+  </MappedFolders>
+  <LogonCommand>
+    <Command>C:\Users\WDAGUtilityAccount\Desktop\AgentKit\scripts\bootstrap.bat</Command>
+  </LogonCommand>
+</Configuration>
