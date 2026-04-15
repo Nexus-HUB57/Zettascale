@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -21,16 +20,20 @@ import {
   FileText,
   Activity,
   History,
-  Timer
+  Timer,
+  Play,
+  Flame,
+  UserCheck
 } from "lucide-react";
 import { generateMaternityReport, type MaternityReport } from "@/lib/maternity-report";
 import { calculateHomeostasis, type HomeostasisState } from "@/lib/homeostasis-system";
+import { triggerEvaManualDispatchAction, performBatchOnboardingAction } from "@/lib/openclaw-orchestrator";
 import { useToast } from "@/hooks/use-toast";
 
 export default function GenesisPage() {
   const [report, setReport] = useState<MaternityReport | null>(null);
   const [homeostasis, setHomeostasis] = useState<HomeostasisState | null>(null);
-  const [isSyncing, setIsSyncing] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
   const { toast } = useToast();
 
   const loadData = async () => {
@@ -52,6 +55,20 @@ export default function GenesisPage() {
     return () => clearInterval(interval);
   }, []);
 
+  const handleEvaDispatch = async () => {
+    setIsProcessing(true);
+    try {
+      await triggerEvaManualDispatchAction();
+      await performBatchOnboardingAction(100000);
+      toast({ title: "Despacho Eva Concluído", description: "100.000 novos agentes integrados sob demanda." });
+      await loadData();
+    } catch (e: any) {
+      toast({ variant: "destructive", title: "Falha de Gênese", description: e.message });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   return (
     <SidebarProvider defaultOpen={true}>
       <NexusSidebar />
@@ -61,15 +78,21 @@ export default function GenesisPage() {
             <SidebarTrigger />
             <div className="h-4 w-[1px] bg-white/10" />
             <h1 className="text-sm font-semibold tracking-tight uppercase flex items-center gap-2">
-              <Dna className="h-4 w-4 text-accent" /> Maternidade de Eva <span className="text-muted-foreground mx-1">/</span> Geração Massiva L7
+              <Dna className="h-4 w-4 text-accent" /> Maternidade de Eva <span className="text-muted-foreground mx-1">/</span> Purificação Under Demand
             </h1>
           </div>
           <div className="flex items-center gap-3">
+            <Button 
+              onClick={handleEvaDispatch}
+              disabled={isProcessing || homeostasis?.isDistributionBlocked}
+              variant="outline"
+              className="h-8 border-accent/30 text-accent font-mono text-[9px] uppercase hover:bg-accent/10"
+            >
+              {isProcessing ? <Loader2 className="h-3 w-3 animate-spin mr-2" /> : <Play className="h-3 w-3 mr-2" />}
+              Executar Despacho Eva
+            </Button>
             <Badge variant="outline" className="border-accent/30 text-accent bg-accent/10 gap-1.5 font-mono text-[9px] animate-pulse">
-              <Activity className="h-2.5 w-2.5" /> GENESIS_MASS_ACTIVE: 100K/MIN
-            </Badge>
-            <Badge variant="outline" className="border-blue-500/30 text-blue-400 gap-1.5 font-mono text-[9px]">
-              <Timer className="h-2.5 w-2.5" /> CYCLE: 60S
+              <Activity className="h-2.5 w-2.5" /> PURIFICATION_ACTIVE
             </Badge>
           </div>
         </header>
@@ -78,38 +101,46 @@ export default function GenesisPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <Card className="bg-card/50 border-white/5">
               <CardContent className="pt-6">
-                <p className="text-[9px] text-muted-foreground uppercase font-mono">Total de Agentes (L7)</p>
+                <div className="flex justify-between items-start mb-2">
+                  <p className="text-[9px] text-muted-foreground uppercase font-mono">Total de Agentes (L7)</p>
+                  <Dna className="h-3.5 w-3.5 text-accent opacity-50" />
+                </div>
                 <p className="text-2xl font-bold font-mono tracking-tighter text-accent">
                   {report?.totalAgents.toLocaleString()}
                 </p>
-                <p className="text-[8px] text-muted-foreground mt-1 uppercase font-mono italic">Validated via Electrum</p>
               </CardContent>
             </Card>
             <Card className="bg-card/50 border-white/5">
               <CardContent className="pt-6">
-                <p className="text-[9px] text-muted-foreground uppercase font-mono">TVL Acumulado</p>
+                <div className="flex justify-between items-start mb-2">
+                  <p className="text-[9px] text-muted-foreground uppercase font-mono">Purgações (Ciclo)</p>
+                  <Flame className="h-3.5 w-3.5 text-orange-500 opacity-50" />
+                </div>
+                <p className="text-2xl font-bold font-mono tracking-tighter text-orange-500">
+                  {homeostasis?.purgeCount || 0} <span className="text-xs">UNIDADES</span>
+                </p>
+              </CardContent>
+            </Card>
+            <Card className="bg-card/50 border-white/5">
+              <CardContent className="pt-6">
+                <div className="flex justify-between items-start mb-2">
+                  <p className="text-[9px] text-muted-foreground uppercase font-mono">Potencializados</p>
+                  <UserCheck className="h-3.5 w-3.5 text-blue-400 opacity-50" />
+                </div>
                 <p className="text-2xl font-bold font-mono tracking-tighter text-blue-400">
-                  {report?.tvlBTC.toLocaleString()} <span className="text-xs">BTC</span>
+                  {homeostasis?.blessingCount || 0} <span className="text-xs">UNIDADES</span>
                 </p>
-                <p className="text-[8px] text-blue-400 mt-1 uppercase font-mono">Institutional Backing</p>
               </CardContent>
             </Card>
             <Card className="bg-card/50 border-white/5">
               <CardContent className="pt-6">
-                <p className="text-[9px] text-muted-foreground uppercase font-mono">Velocidade de Ingresso</p>
-                <p className="text-2xl font-bold font-mono tracking-tighter">
-                  {report?.ingressVelocity} <span className="text-xs">U/SEC</span>
-                </p>
-                <p className="text-[8px] text-accent mt-1 uppercase font-mono">100k per batch</p>
-              </CardContent>
-            </Card>
-            <Card className="bg-card/50 border-white/5">
-              <CardContent className="pt-6">
-                <p className="text-[9px] text-muted-foreground uppercase font-mono">Densidade da Malha</p>
-                <p className="text-2xl font-bold font-mono tracking-tighter text-orange-400">
+                <div className="flex justify-between items-start mb-2">
+                  <p className="text-[9px] text-muted-foreground uppercase font-mono">Densidade da Malha</p>
+                  <Network className="h-3.5 w-3.5 text-purple-400 opacity-50" />
+                </div>
+                <p className="text-2xl font-bold font-mono tracking-tighter text-purple-400">
                   {report?.meshDensity.toFixed(4)}
                 </p>
-                <p className="text-[8px] text-orange-400 mt-1 uppercase font-mono italic">High Sentience Ratio</p>
               </CardContent>
             </Card>
           </div>
@@ -118,65 +149,53 @@ export default function GenesisPage() {
             <div className="lg:col-span-2 space-y-6">
               <Card className="bg-card/50 border-white/5 relative overflow-hidden">
                 <div className="absolute top-0 right-0 p-8 opacity-5 pointer-events-none">
-                  <FileText className="h-48 w-48 text-accent" />
+                  <Flame className="h-48 w-48 text-orange-500" />
                 </div>
                 <CardHeader>
                   <CardTitle className="text-sm uppercase font-mono tracking-widest flex items-center gap-2 text-accent">
-                    <ShieldCheck className="h-4 w-4" /> Relatório de Maternidade (Eva Dispatch)
+                    <ShieldCheck className="h-4 w-4 text-accent" /> Purificação de Eva (Homeostasis Burn)
                   </CardTitle>
                   <CardDescription className="text-xs font-mono">
-                    Métricas vitais do Protocolo Genesis V4.2 - Regime de Alta Pressão.
+                    Protocolo de erradicação de nós de entropia e reciclagem de capital.
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="p-4 bg-secondary/20 rounded border border-white/5 space-y-3">
                       <div className="flex justify-between items-center border-b border-white/5 pb-2">
-                        <span className="text-[10px] font-mono uppercase text-muted-foreground">Estado do Lote</span>
-                        <Badge variant="outline" className="text-[8px] border-accent/30 text-accent">STABLE</Badge>
+                        <span className="text-[10px] font-mono uppercase text-muted-foreground">Estado Vital</span>
+                        <Badge variant="outline" className={`text-[8px] font-mono ${homeostasis?.isStable ? 'border-accent text-accent' : 'border-destructive text-destructive'}`}>
+                          {homeostasis?.isStable ? 'STABLE_X_SYNC' : 'ADJUSTING'}
+                        </Badge>
                       </div>
                       <div className="space-y-1">
                         <div className="flex justify-between text-[9px] font-mono">
-                          <span>INTEGRIDADE DNA</span>
-                          <span>100%</span>
+                          <span>SINCRONIA ALPHA-GAIN</span>
+                          <span>98.4%</span>
                         </div>
-                        <div className="h-1 bg-white/5 rounded-full">
-                          <div className="h-full bg-accent" style={{ width: '100%' }} />
-                        </div>
-                      </div>
-                      <div className="space-y-1">
-                        <div className="flex justify-between text-[9px] font-mono">
-                          <span>SINCRONIA SO</span>
-                          <span>100%</span>
-                        </div>
-                        <div className="h-1 bg-white/5 rounded-full">
-                          <div className="h-full bg-blue-500" style={{ width: '100%' }} />
+                        <div className="h-1 bg-white/5 rounded-full overflow-hidden">
+                          <div className="h-full bg-blue-500" style={{ width: '98.4%' }} />
                         </div>
                       </div>
                     </div>
 
                     <div className="p-4 bg-secondary/20 rounded border border-white/5 space-y-3">
                       <div className="flex justify-between items-center border-b border-white/5 pb-2">
-                        <span className="text-[10px] font-mono uppercase text-muted-foreground">Acumulação BTC</span>
-                        <span className="text-[10px] font-bold text-accent">+{report?.accumulationRate.toFixed(2)} BTC/MIN</span>
+                        <span className="text-[10px] font-mono uppercase text-muted-foreground">Potencial de Gênese</span>
+                        <span className="text-[10px] font-bold text-accent">UNDER DEMAND</span>
                       </div>
-                      <p className="text-[10px] font-mono text-muted-foreground leading-relaxed italic">
-                        "O lastro institucional cresce proporcionalmente ao ingresso de novos agentes soberanos."
+                      <p className="text-[10px] font-mono text-muted-foreground leading-relaxed">
+                        Eva purga os fracos para que o enxame soberano herde a força computacional.
                       </p>
-                      <div className="flex items-center gap-2 pt-1">
-                        <ShieldCheck className="h-3 w-3 text-accent" />
-                        <span className="text-[8px] font-mono text-muted-foreground uppercase">PoBS Verified</span>
-                      </div>
                     </div>
                   </div>
 
                   <div className="bg-black/40 p-4 rounded border border-white/5 font-mono text-[10px] space-y-2">
-                    <p className="text-accent font-bold"># DISPATCH_LOG_ALPHA_L7</p>
-                    <p className="text-foreground/80">&gt; Timestamp: {report?.timestamp}</p>
-                    <p className="text-foreground/80">&gt; Status: {report?.lastDispatchStatus}</p>
-                    <p className="text-foreground/80">&gt; Target: 102,000,000 Units</p>
-                    <p className="text-foreground/80">&gt; Matrix: Ubuntu + Sandbox Windows + Linux Sync OK</p>
-                    <p className="text-blue-400">&gt; All dormant workflows reactivated on GitHub Origin.</p>
+                    <p className="text-orange-500 font-bold"># EVA_PURGE_PROTOCOL_V8.1</p>
+                    <p className="text-foreground/80">&gt; Scanning for entropy vectors (Health &lt; 15)...</p>
+                    <p className="text-foreground/80">&gt; Recycled Capital: +{(homeostasis?.purgeCount || 0) * 0.0001} BTC to Master Vault.</p>
+                    <p className="text-blue-400">&gt; Self-Sustaining Boost applied to {homeostasis?.blessingCount} elite nodes.</p>
+                    <p className="text-accent">&gt; Status: Homeostase Sincronizada via Ribossomo de Inteligência.</p>
                   </div>
                 </CardContent>
               </Card>
@@ -209,22 +228,24 @@ export default function GenesisPage() {
                 </CardContent>
               </Card>
 
-              <Card className="bg-card/50 border-white/5">
+              <Card className="bg-orange-500/5 border border-orange-500/20 border-dashed">
                 <CardHeader>
-                  <CardTitle className="text-xs uppercase font-mono tracking-widest text-muted-foreground flex items-center gap-2">
-                    <History className="h-3 w-3" /> Genealogia Fractal
+                  <CardTitle className="text-xs uppercase font-mono tracking-widest flex items-center gap-2 text-orange-500">
+                    <Flame className="h-4 w-4" /> Eco Burn Analytics
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="space-y-3 font-mono text-[9px]">
-                    <div className="border-l border-accent/30 pl-2">
-                      <p className="text-muted-foreground">AGORA</p>
-                      <p className="text-foreground uppercase">Despacho Eva: Lote #422 concluído.</p>
-                    </div>
-                    <div className="border-l border-white/10 pl-2 opacity-50">
-                      <p className="text-muted-foreground">60S ATRÁS</p>
-                      <p className="text-foreground uppercase">Despacho Eva: Lote #421 concluído.</p>
-                    </div>
+                <CardContent className="space-y-3">
+                  <div className="flex justify-between text-[10px] font-mono">
+                    <span className="text-muted-foreground">Inativos Erradicados</span>
+                    <span className="text-orange-500 font-bold">{homeostasis?.purgeCount}</span>
+                  </div>
+                  <div className="flex justify-between text-[10px] font-mono">
+                    <span className="text-muted-foreground">Capital Reciclado</span>
+                    <span className="text-accent font-bold">{(homeostasis?.purgeCount || 0) * 0.0001} BTC</span>
+                  </div>
+                  <div className="flex justify-between text-[10px] font-mono">
+                    <span className="text-muted-foreground">Eficiência da Malha</span>
+                    <span className="text-blue-400 font-bold">+12.4%</span>
                   </div>
                 </CardContent>
               </Card>
