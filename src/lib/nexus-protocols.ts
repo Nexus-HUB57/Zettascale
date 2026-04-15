@@ -44,8 +44,9 @@ let protocols: ProtocolState[] = [
     id: 'WORMHOLE',
     name: 'Buraco de Minhoca',
     description: 'Zero-latency context teleportation. Reduces swarm energy drain.',
-    isActive: false,
-    intensity: 0
+    isActive: true,
+    intensity: 100,
+    lastActivated: new Date().toISOString()
   }
 ];
 
