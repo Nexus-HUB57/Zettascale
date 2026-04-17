@@ -43,19 +43,19 @@ export async function runORECache(input: AiReasoningCacheInput): Promise<AiReaso
   return aiReasoningCacheFlow(input);
 }
 
-const aiReasoningCacheFlow = ai.defineFlow(
+export const aiReasoningCacheFlow = ai.defineFlow(
   {
     name: 'aiReasoningCacheFlow',
     inputSchema: AiReasoningCacheInputSchema,
     outputSchema: AiReasoningCacheOutputSchema,
   },
-  async (input) => {
+  async (input): Promise<AiReasoningCacheOutput> => {
     // Passo 2.1: Geração de Hash Semântico
     const embeddingResponse = await ai.embed({
-      model: 'googleai/text-embedding-004',
+      embedder: 'googleai/text-embedding-004',
       content: input.prompt,
     });
-    const inputEmbedding = embeddingResponse;
+    const inputEmbedding = embeddingResponse.embedding;
 
     // Passo 2.2: Busca no Cache de Respostas
     let bestMatch: CacheEntry | null = null;
@@ -81,11 +81,12 @@ const aiReasoningCacheFlow = ai.defineFlow(
 
     // Passo 2.3: Execução (Miss)
     console.log(`[ORE_CACHE] Miss. Similarity: ${maxSim.toFixed(4)}. Executing LLM...`);
-    const { text } = await ai.generate({
-      prompt: input.prompt
+    const llmResponse = await ai.generate({
+      prompt: input.prompt,
+      model: 'googleai/gemini-1.5-flash',
     });
 
-    const response = text || 'Falha na geração.';
+    const response = llmResponse.text || 'Falha na geração.';
 
     // Salvar no Cache (TTL simulado de 24h)
     vectorCache.push({
