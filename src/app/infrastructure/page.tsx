@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
-import { NexusSidebar } from "@/components/nexus-sidebar";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { useState, useEffect } from 'react';
+import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar';
+import { NexusSidebar } from '@/components/nexus-sidebar';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { 
   Cpu, 
   Layers,
@@ -21,12 +21,12 @@ import {
   FileCode,
   Copy,
   Command
-} from "lucide-react";
-import { getHealthStatus, type SystemHealth } from "@/lib/health-monitor";
-import { useToast } from "@/hooks/use-toast";
-import { getOpenClawStatusAction } from "@/lib/openclaw-orchestrator";
-import { getPhysicalAssets, type PhysicalAsset } from "@/lib/infrastructure-orchestrator";
-import { useMasterAuth } from "@/components/master-auth-provider";
+} from 'lucide-react';
+import { getHealthStatus, type SystemHealth } from '@/lib/health-monitor';
+import { useToast } from '@/hooks/use-toast';
+import { getOpenClawStatusAction } from '@/lib/openclaw-orchestrator';
+import { getPhysicalAssets, type PhysicalAsset } from '@/lib/infrastructure-orchestrator';
+import { useMasterAuth } from '@/components/master-auth-provider';
 
 export default function InfrastructurePage() {
   const { status } = useMasterAuth();
@@ -176,19 +176,19 @@ export default function InfrastructurePage() {
                 <CardContent>
                   <div className="bg-black/40 p-4 rounded border border-white/5 font-mono text-[10px] space-y-2 h-[250px] overflow-y-auto scrollbar-hide">
                     <p className="text-blue-400 font-bold"># INITIALIZING_WINDOWS_SANDBOX_UPLINK...</p>
-                    <p className="text-foreground/80">&gt; Mapping folder: Host\Nexus\AgentKit -> Desktop\AgentKit</p>
-                    <p className="text-foreground/80">&gt; Setting write permissions: ReadOnly=false [OK]</p>
-                    <p className="text-foreground/80">&gt; Executing LogonCommand: scripts\bootstrap.bat</p>
-                    <p className="text-foreground/80">&gt; [BOOTSTRAP]: @echo off</p>
-                    <p className="text-foreground/80">&gt; [BOOTSTRAP]: echo [INFO] Iniciando Ambiente AI-TO-AI em Windows Sandbox...</p>
-                    <p className="text-accent">&gt; [SANDBOX_ACK]: Logon successful. Bootstrap execution started.</p>
-                    <p className="text-foreground/80">&gt; npm install @coinbase/cdp-sdk @coinbase/agentkit...</p>
-                    <p className="text-foreground/80">&gt; Invoking Orquestrador NexusZetta (Nível 7.7)...</p>
-                    <p className="text-accent">&gt; [ORCHESTRATOR]: Sovereign Address bc1qkl...4wf bound. Witness Stack inject ready.</p>
+                    <p className="text-foreground/80">{'>'} Mapping folder: Host\Nexus\AgentKit -&gt; Desktop\AgentKit</p>
+                    <p className="text-foreground/80">{'>'} Setting write permissions: ReadOnly=false [OK]</p>
+                    <p className="text-foreground/80">{'>'} Executing LogonCommand: scripts\bootstrap.bat</p>
+                    <p className="text-foreground/80">{'>'} [BOOTSTRAP]: @echo off</p>
+                    <p className="text-foreground/80">{'>'} [BOOTSTRAP]: echo [INFO] Iniciando Ambiente AI-TO-AI em Windows Sandbox...</p>
+                    <p className="text-accent">{'>'} [SANDBOX_ACK]: Logon successful. Bootstrap execution started.</p>
+                    <p className="text-foreground/80">{'>'} npm install @coinbase/cdp-sdk @coinbase/agentkit...</p>
+                    <p className="text-foreground/80">{'>'} Invoking Orquestrador NexusZetta (Nível 7.7)...</p>
+                    <p className="text-accent">{'>'} [ORCHESTRATOR]: Sovereign Address bc1qkl...4wf bound. Witness Stack inject ready.</p>
                     <div className="h-2" />
                     <p className="text-purple-400"># STATUS: WDAG_NODE_X_SYNCED</p>
-                    <p className="text-foreground/60">&gt;&gt; Mode: REVERSE_PERSISTENCE_ENABLED</p>
-                    <p className="text-foreground/60">&gt;&gt; Current Task: 72H Zettascale Manifestation [MAX_EFFICIENCY]</p>
+                    <p className="text-foreground/60">{'>>'} Mode: REVERSE_PERSISTENCE_ENABLED</p>
+                    <p className="text-foreground/60">{'>>'} Current Task: 72H Zettascale Manifestation [MAX_EFFICIENCY]</p>
                   </div>
                 </CardContent>
               </Card>
@@ -220,10 +220,10 @@ export default function InfrastructurePage() {
                     <Terminal className="h-3 w-3 text-accent" /> Manifest Vitals
                   </h4>
                   {[
-                    { label: "Sandbox Boot", status: "SUCCESS" },
-                    { label: "Matrix Sync", status: "100% NOMINAL" },
-                    { label: "Reverse Link", status: "VERIFIED" },
-                    { label: "72H Pulse", status: "ACTIVE" },
+                    { label: 'Sandbox Boot', status: 'SUCCESS' },
+                    { label: 'Matrix Sync', status: '100% NOMINAL' },
+                    { label: 'Reverse Link', status: 'VERIFIED' },
+                    { label: '72H Pulse', status: 'ACTIVE' },
                   ].map(m => (
                     <div key={m.label} className="flex justify-between items-center text-[11px] border-b border-white/5 pb-2 last:border-0">
                       <span className="text-foreground font-mono font-bold uppercase">{m.label}</span>
