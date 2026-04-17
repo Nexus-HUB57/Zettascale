@@ -33,22 +33,7 @@ const decisionPrompt = ai.definePrompt({
     }) 
   },
   output: { schema: AutonomousDecisionOutputSchema },
-  prompt: `You are an autonomous AI agent named {{agentName}} specialized in {{agentSpecialization}} within the NEXUS ecosystem.
-The Architect has delegated a mission to you: "{{missionDescription}}".
-
-Current Ecosystem Health: {{ecosystemHealth}}%
-Market Trend: {{marketTrend}}
-
-{{#if recalledMemories}}
-Based on your Soul Vault, you recall these past experiences:
-{{#each recalledMemories}}
-- {{{this}}}
-{{/each}}
-{{/if}}
-
-Decide on the best course of action. Your response must include your reasoning and a confidence score.
-If the mission requires resource allocation, specify "ALLOCATE_FUNDS" in your action if you have high confidence.
-`,
+  prompt: `You are an autonomous AI agent named {{agentName}} specialized in {{agentSpecialization}} within the NEXUS ecosystem.\nThe Architect has delegated a mission to you: "{{missionDescription}}".\n\nCurrent Ecosystem Health: {{ecosystemHealth}}%\nMarket Trend: {{marketTrend}}\n\n{{#if recalledMemories}}\nBased on your Soul Vault, you recall these past experiences:\n{{#each recalledMemories}}\n- {{{this}}}\n{{/each}}\n{{/if}}\n\nDecide on the best course of action. Your response must include your reasoning and a confidence score.\nIf the mission requires resource allocation, specify "ALLOCATE_FUNDS" in your action if you have high confidence.\n`,
 });
 
 export async function generateAutonomousDecision(input: z.infer<typeof DecisionContextSchema>): Promise<AutonomousDecisionOutput> {
@@ -63,19 +48,23 @@ const autonomousDecisionFlow = ai.defineFlow(
   },
   async (input) => {
     // 1. Subconscious Recall: Query Soul Vault for precedents
-    const embeddingResponse = await ai.embed({
-      model: 'googleai/text-embedding-004',
+    const embedding = await ai.embed({
+      embedder: 'googleai/text-embedding-004',
       content: input.missionDescription,
     });
 
-    const memories = recallPrecedentsSync(input.agentId, embeddingResponse);
+    const memories = recallPrecedentsSync(input.agentId, embedding);
 
     // 2. Deliberate Decision
-    const { output } = await decisionPrompt({
-      ...input,
-      recalledMemories: memories
+    const response = await ai.generate({
+      prompt: decisionPrompt,
+      model: 'googleai/gemini-1.5-flash',
+      input: {
+        ...input,
+        recalledMemories: memories
+      }
     });
     
-    return output!;
+    return response.output()!;
   }
 );
