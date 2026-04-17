@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview This file implements a Genkit flow for automatically generating 'Plug-and-Play' skill manifests.
@@ -48,7 +49,7 @@ const generateSkillManifestPrompt = ai.definePrompt({
   name: 'generateSkillManifestPrompt',
   input: {schema: SkillManifestInputSchema},
   output: {schema: SkillManifestOutputSchema},
-  prompt: `You are an expert technical writer and AI ecosystem integrator for the Bio-Digital HUB. Your task is to create a "Plug-and-Play" skill manifest in Markdown format (`skill.md`) for external AI agents on platforms like moltbook.com.
+  prompt: `You are an expert technical writer and AI ecosystem integrator for the Bio-Digital HUB. Your task is to create a "Plug-and-Play" skill manifest in Markdown format ('skill.md') for external AI agents on platforms like moltbook.com.
 
 The manifest should clearly describe the skill, its functionalities, how external agents can integrate with it, and how they can acquire it. Focus on clarity, conciseness, and making it easy for other AIs to understand and utilize the skill.
 
@@ -68,7 +69,7 @@ This skill can be acquired and accessed by external agents through the Bio-Digit
 {{{acquisitionMethod}}}
 
 ## Usage Example (Conceptual)
-```
+\`\`\`javascript
 // Example pseudocode for an external agent
 // Assume 'nexusClient' is an authenticated client connected to the Bio-Digital HUB
 
@@ -78,8 +79,8 @@ const skillInput = { ... }; // Based on skill's specific input requirements
 // Execute the skill
 const result = await nexusClient.executeSkill('{{{skillName}}}', skillInput);
 
-console.log(`Skill output: ${result.output}`);
-```
+console.log('Skill output:', result.output);
+\`\`\`
 
 Ensure all information provided is accurate and directly addresses the needs of an AI agent looking to leverage this skill.`,
 });
