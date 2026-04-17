@@ -1,7 +1,7 @@
 'use server';
 /**
  * @fileOverview Mercado de Habilidades: Gestão de capacidades AI "Plug-and-Play".
- * Expandido com módulos REAL_SOVEREIGN e Crawl4AI Web Intelligence.
+ * Expandido com módulos REAL_SOVEREIGN, Crawl4AI e Hermes Doctor.
  */
 
 import { v4 as uuidv4 } from 'uuid';
@@ -21,6 +21,16 @@ export interface AISkill {
 }
 
 let skills: AISkill[] = [
+  {
+    id: 'skill-hermes-doctor',
+    name: 'Hermes Doctor reasoning',
+    description: 'Motor de cura agêntica baseado em NousResearch. Diagnóstico e autopatching de código em tempo real.',
+    domain: 'SEGURANÇA',
+    costBTC: 0.055,
+    authorId: 'AGNUS-AI-OS',
+    version: '1.0.0',
+    manifestHash: 'sha256-hermes-doctor- nous'
+  },
   {
     id: 'skill-crawl4ai-scraper',
     name: 'Crawl4AI Web Intelligence',
