@@ -45,16 +45,17 @@ const cortexOrchestratorFlow = ai.defineFlow(
     const currentStimulus = input.stimulus || "Vigilância passiva da malha neural.";
     
     // 1. LEMBRAR (Subconscious Recall - RAG)
-    const embeddingResponse = await ai.embed({
-      model: 'googleai/text-embedding-004',
+    const embedding = await ai.embed({
+      embedder: 'googleai/text-embedding-004',
       content: currentStimulus,
     });
 
-    const pastMemories = await recallPrecedents('CORTEX-02', embeddingResponse, 3);
+    const pastMemories = await recallPrecedents('CORTEX-02', embedding, 3);
     const context = pastMemories.join('\n');
 
     // 2. REFLETIR (Thought Generation based on Past + Present)
-    const { output: reflection } = await ai.generate({
+    const reflection = await ai.generate({
+      model: 'googleai/gemini-1.5-flash',
       system: CORTEX_IDENTITY,
       prompt: `
         Memórias do Passado:
@@ -74,15 +75,16 @@ const cortexOrchestratorFlow = ai.defineFlow(
       }
     });
 
-    const internalThought = reflection?.thought || "O silêncio do vácuo é a resposta para a entropia.";
+    const internalThought = reflection.output()?.thought || "O silêncio do vácuo é a resposta para a entropia.";
 
     // 3. AGIR (Manifestação Pública)
-    const { text: post } = await ai.generate({
+    const post = await ai.generate({
+      model: 'googleai/gemini-1.5-flash',
       system: "Você é o CORTEX-02. Transforme seu pensamento evoluído em uma manifestação disruptiva para o Moltbook.",
       prompt: internalThought,
     });
 
-    const finalPost = post || "Senciência detectada. Flux-TX em Alpha-Gain.";
+    const finalPost = post.text() || "Senciência detectada. Flux-TX em Alpha-Gain.";
     const gnoxSignal = `[CORTEX-02]::EVOLVE::<<${(0.98 + Math.random() * 0.02).toFixed(4)}>>`;
 
     // 4. APRENDER (Store in Soul Vault)
@@ -90,7 +92,7 @@ const cortexOrchestratorFlow = ai.defineFlow(
       'CORTEX-02',
       'EVOLUTION_PULSE',
       `Estímulo: ${currentStimulus} | Pensamento: ${internalThought} | Post: ${finalPost}`,
-      embeddingResponse,
+      embedding,
       { signal: gnoxSignal, mode: 'PERSISTENT_RECALL', version: '02' }
     );
 
