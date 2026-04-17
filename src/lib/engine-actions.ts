@@ -27,3 +27,11 @@ export async function isNeuralMeshActiveAction() {
 export async function activateAllAgentsAction() {
   return activateAllAgents();
 }
+
+/**
+ * Executa o reinício forçado da senciência global (Hard Reset).
+ */
+export async function resetSystemAction() {
+    console.log("♻️ [RESET] Reiniciando senciência global...");
+    return nexusEngine.reset();
+}
