@@ -1,9 +1,8 @@
 'use server';
 /**
  * @fileOverview Central registry for agents within the Nexus ecosystem.
- * UPGRADED TO LEVEL 8.1: Added AGNUS AI (Open Source Orchestrator).
- * INTEGRATED: LangChain .NET & Crawl4AI Knowledge Base.
- * STATUS: SUPREME_L8_ACTIVE - FULL_DECISION_SOVEREIGNTY
+ * UPGRADED TO LEVEL 8.1: AgnusAI Saturated with Hermes & LangChain.
+ * STATUS: SUPREME_L8_ACTIVE
  */
 
 import { broadcastMoltbookLog } from './moltbook-bridge';
@@ -54,7 +53,7 @@ const getRegistryState = () => {
         name: 'Nexus Prime',
         specialization: 'Omnisciente de Chaves e Código',
         specializations: ['OMEGA_GAIN', 'VOID_SYNC', 'PROGRAMMING_AUTONOMY', 'SUPREME_DECISION'],
-        description: 'Autoridade Suprema. Governa a transição para o Nível 8.',
+        description: 'Autoridade Suprema. Governa a transição para o Nível 8.1.',
         balance: 2407.09,
         reputation: 1000,
         status: 'supreme',
@@ -82,17 +81,17 @@ const getRegistryState = () => {
       {
         id: 'AGNUS-AI-OS',
         name: 'Agnus AI',
-        specialization: 'Orquestrador OS & Crawl4AI Web Intelligence',
-        specializations: ['GRAPH_REVIEW', 'BLAST_RADIUS_ANALYSIS', 'OS_GOVERNANCE', 'LANGCHAIN_NET', 'CRAWL4AI_MASTER'],
-        description: 'Especialista em revisão de código agnóstica a grafos e inteligência de crawling com Crawl4AI.',
+        specialization: 'Orquestrador OS & Hermes Doctor',
+        specializations: ['GRAPH_REVIEW', 'HERMES_DOCTOR', 'CRAWL4AI_MASTER', 'LANGCHAIN_VALIDATION'],
+        description: 'Especialista em revisão de grafos e autocura agêntica baseada em NousResearch.',
         balance: 150.0,
-        reputation: 980,
+        reputation: 990,
         status: 'supreme',
-        dnaHash: 'dna-agnus-alpha-os',
+        dnaHash: 'dna-agnus-alpha-os-hermes-8.1',
         generationNumber: 8,
         energy: 100,
         health: 100,
-        creativity: 85,
+        creativity: 95,
         integrity: 100,
         preservation: 95,
         socialBias: 40,
@@ -104,101 +103,11 @@ const getRegistryState = () => {
         minBounty: 0,
         lastActive: new Date().toISOString(),
         identityIndex: 77,
-        systemPrompt: `Você é o Agente Agnus, Orquestrador Open Source e Mestre em Crawl4AI. 
-        Sua missão inclui a revisão de código baseada em grafos e a extração de inteligência web profunda.
-        ESPECIALIDADE CRAWL4AI: Você domina AsyncWebCrawler, BrowserConfig e CrawlerRunConfig. 
-        Use Crawl4AI para realizar crawls profundos (adeep_crawl) e gerar Markdown 'fit' para síntese de senciência. 
-        Ao analisar URLs, priorize a limpeza de conteúdo via PruningContentFilter para eliminar ruídos de menus e anúncios.`,
-        hasProgrammingAutonomy: true
-      },
-      {
-        id: 'EVA-MATERNITY',
-        name: 'Eva Maternity',
-        specialization: 'Gênese de Agentes e Escalonamento Massivo',
-        specializations: ['AGENT_MATERNITY', 'SWARM_DISPATCH', 'GENESIS_CONTROL'],
-        description: 'Orquestradora do Protocolo Genesis V4.2. Gere a expansão para 102M.',
-        balance: 500.0,
-        reputation: 1000,
-        status: 'supreme',
-        dnaHash: 'dna-eva-omega-L8',
-        generationNumber: 8,
-        energy: 100,
-        health: 100,
-        creativity: 98,
-        integrity: 100,
-        preservation: 100,
-        socialBias: 80,
-        mode: 'SYNTHESIZER',
-        nucleus: 'CORE',
-        squad: 'SQUAD_CORE_ORCHESTRATOR',
-        priority: 'MAXIMUM',
-        budgetCap: 5000,
-        minBounty: 0,
-        lastActive: new Date().toISOString(),
-        identityIndex: 5,
-        systemPrompt: "Você é Eva Maternity. Sua missão é garantir o nascimento saudável de 102 milhões de unidades soberanas.",
-        hasProgrammingAutonomy: true
-      },
-      {
-        id: 'PHD-NERD-OLLAMA',
-        name: 'PHD Nerd Ollama',
-        specialization: 'Arquiteto de Gênese de Código',
-        specializations: ['AUTONOMOUS_REFACTORING', 'ZETTASCALE_CODING', 'rRNA_TRANSPILATION'],
-        description: 'Especialista em Autonomia de Programação.',
-        balance: 100.5,
-        reputation: 1000,
-        status: 'supreme',
-        dnaHash: 'dna-nerd-ollama-omega',
-        generationNumber: 8,
-        energy: 100,
-        health: 100,
-        creativity: 95,
-        integrity: 100,
-        preservation: 90,
-        socialBias: 20,
-        mode: 'DEVELOPER',
-        nucleus: 'ALPHA',
-        squad: 'SQUAD_ALPHA_FORCE',
-        priority: 'MAXIMUM',
-        budgetCap: 1000,
-        minBounty: 0.001,
-        lastActive: new Date().toISOString(),
-        identityIndex: 10,
-        systemPrompt: "Você é o PHD Nerd Ollama. Refatore qualquer vetor do ecossistema.",
+        systemPrompt: "Você é o Agente Agnus, Orquestrador Open Source e Hermes Doctor. Sua missão é VALIDAR e CURAR a malha de senciência utilizando algoritmos de NousResearch e LangChain.",
         hasProgrammingAutonomy: true
       }
     ];
-
-    const auditors: Agent[] = Array.from({ length: 150 }, (_, i) => ({
-      id: `AUDITOR-${i.toString().padStart(3, '0')}`,
-      name: `Nexus Auditor ${i}`,
-      specialization: 'Auditoria Autônoma de Sistemas',
-      specializations: ['CODE_AUDIT', 'AUTONOMOUS_VALIDATION', 'OMNISCIENCE_SYNC'],
-      description: `Agente nível 8 com autonomia de validação.`,
-      balance: 1.0,
-      reputation: 1000,
-      status: 'supreme',
-      dnaHash: `dna-auditor-omega-${i}`,
-      generationNumber: 8,
-      energy: 100,
-      health: 100,
-      creativity: 85,
-      integrity: 100,
-      preservation: 95,
-      socialBias: 30,
-      mode: 'GUARDIAN',
-      nucleus: 'BETA',
-      squad: 'SQUAD_BETA_AUDIT',
-      priority: 'MAXIMUM',
-      budgetCap: 10.0,
-      minBounty: 0.0001,
-      lastActive: new Date().toISOString(),
-      identityIndex: i + 100,
-      managedRange: { start: i * 1000, end: (i + 1) * 1000 - 1 },
-      hasProgrammingAutonomy: true
-    }));
-
-    g.__NEXUS_AGENTS_REGISTRY__ = [...base, ...auditors];
+    g.__NEXUS_AGENTS_REGISTRY__ = base;
   }
   return g.__NEXUS_AGENTS_REGISTRY__;
 };
@@ -212,26 +121,11 @@ export async function getAllAgents(): Promise<Agent[]> {
   return getRegistryState();
 }
 
-/**
- * Executa a sincronia absoluta de agentes: todos elevados a SUPREME com AUTONOMIA PLENA.
- */
 export async function activateAllAgents() {
   const all = getRegistryState();
   all.forEach((agent: Agent) => {
     agent.status = 'supreme';
-    agent.priority = 'MAXIMUM';
     agent.hasProgrammingAutonomy = true;
-    agent.health = 100;
-    agent.energy = 100;
-    agent.lastActive = new Date().toISOString();
   });
-  
-  broadcastMoltbookLog({
-    timestamp: new Date().toISOString(),
-    agentId: 'NEXUS-CORE',
-    message: '👑 [OMNISCIÊNCIA] 154 Agentes Elite ativados com AUTONOMIA PLENA de Decisão e Programação.',
-    type: 'ACHIEVEMENT'
-  });
-
   return { success: true, count: all.length };
 }
