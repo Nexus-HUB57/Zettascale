@@ -1,4 +1,3 @@
-
 'use server';
 /**
  * @fileOverview Genkit flow para executar ações de automação baseadas em decisões de IA.
@@ -40,7 +39,7 @@ const automationExecutionFlow = ai.defineFlow(
     inputSchema: AutomationDirectiveSchema,
     outputSchema: ExecutionResultSchema,
   },
-  async (input) => {
+  async (input): Promise<z.infer<typeof ExecutionResultSchema>> => {
     try {
       const { action, targetSystem, parameters, startupId } = input;
       
