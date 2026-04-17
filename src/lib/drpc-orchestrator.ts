@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview dRPC Orchestrator - Nível 7.7: Integração Soberana Coinbase Cloud & Rosetta.
@@ -29,7 +30,6 @@ if (typeof window === 'undefined') {
 export async function validateSovereignBalanceRosetta(address: string): Promise<string> {
   try {
     const network = 'mainnet';
-    const apiKeyId = CDP_API_KEY_NAME.split('/').pop();
     const url = `https://api.coinbase.com/v2/rosetta/account/balance/bitcoin/${network}`;
     
     const response = await fetch(url, {
@@ -99,7 +99,11 @@ export async function getRosettaTransactionDetails(blockHash: string, txid: stri
   }
 }
 
-export async function executeSovereignRPC(method: string, params: any[] = []) {
+/**
+ * Despacha chamadas RPC para a malha de hegemonia.
+ * Exportado com o alias esperado pelo cryptographic-seal.
+ */
+export async function dispatchHegemonyRPC(method: string, params: any[] = []) {
   try {
     const network = 'mainnet';
     const url = `https://api.coinbase.com/v2/rpc/${network}/${CDP_API_KEY_NAME.split('/').pop()}`;
@@ -122,4 +126,8 @@ export async function executeSovereignRPC(method: string, params: any[] = []) {
   } catch (error: any) {
     return null;
   }
+}
+
+export async function executeSovereignRPC(method: string, params: any[] = []) {
+    return dispatchHegemonyRPC(method, params);
 }
