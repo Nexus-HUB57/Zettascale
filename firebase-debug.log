@@ -1,0 +1,67 @@
+[debug] [2026-04-17T01:06:54.413Z] ----------------------------------------------------------------------
+[debug] [2026-04-17T01:06:54.415Z] Command:       /nix/store/ixbb20farqh1f4fqbmsn6b1ixn8mc8ij-nodejs-20.18.1/bin/node /home/user/.global_modules/bin/firebase init
+[debug] [2026-04-17T01:06:54.416Z] CLI Version:   15.15.0
+[debug] [2026-04-17T01:06:54.416Z] Platform:      linux
+[debug] [2026-04-17T01:06:54.416Z] Node Version:  v20.18.1
+[debug] [2026-04-17T01:06:54.416Z] Time:          Fri Apr 17 2026 01:06:54 GMT+0000 (Coordinated Universal Time)
+[debug] [2026-04-17T01:06:54.417Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-04-17T01:07:00.773Z] No OAuth tokens found
+[debug] [2026-04-17T01:07:00.774Z] No OAuth tokens found
+[error] Failed to fetch Firebase Project from current Studio Workspace: Unable to refresh auth: not yet authenticated.
+[info] 
+     ######## #### ########  ######## ########     ###     ######  ########
+     ##        ##  ##     ## ##       ##     ##  ##   ##  ##       ##
+     ######    ##  ########  ######   ########  #########  ######  ######
+     ##        ##  ##    ##  ##       ##     ## ##     ##       ## ##
+     ##       #### ##     ## ######## ########  ##     ##  ######  ########
+
+You're about to initialize a Firebase project in this directory:
+
+  /home/user/studio
+
+[info] 
+=== Project Setup
+[info] 
+[info] First, let's associate this project directory with a Firebase project.
+[info] You can create multiple project aliases by running firebase use --add, 
+[info] 
+[debug] [2026-04-17T01:09:41.618Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2026-04-17T01:10:09.851Z] Running auto auth
+[debug] [2026-04-17T01:10:09.877Z] No OAuth tokens found
+[debug] [2026-04-17T01:10:09.880Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects pageSize=100
+[debug] [2026-04-17T01:10:10.427Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects 200
+[debug] [2026-04-17T01:10:10.427Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects [omitted]
+[debug] [2026-04-17T01:13:06.702Z] ----------------------------------------------------------------------
+[debug] [2026-04-17T01:13:06.707Z] Command:       /nix/store/ixbb20farqh1f4fqbmsn6b1ixn8mc8ij-nodejs-20.18.1/bin/node /home/user/.global_modules/bin/firebase login --no-localhost
+[debug] [2026-04-17T01:13:06.707Z] CLI Version:   15.15.0
+[debug] [2026-04-17T01:13:06.708Z] Platform:      linux
+[debug] [2026-04-17T01:13:06.708Z] Node Version:  v20.18.1
+[debug] [2026-04-17T01:13:06.708Z] Time:          Fri Apr 17 2026 01:13:06 GMT+0000 (Coordinated Universal Time)
+[debug] [2026-04-17T01:13:06.709Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-04-17T01:13:06.721Z] No OAuth tokens found
+[debug] [2026-04-17T01:13:06.721Z] No OAuth tokens found
+[error] Failed to fetch Firebase Project from current Studio Workspace: Unable to refresh auth: not yet authenticated.
+[info] i  The Firebase CLI’s MCP server feature can optionally make use of Gemini in Firebase. Learn more about Gemini in Firebase and how it uses your data: https://firebase.google.com/docs/gemini-in-firebase#how-gemini-in-firebase-uses-your-data 
+[info] 
+[info] i  Firebase optionally collects CLI and Emulator Suite usage and error reporting information to help improve our products. Data is collected in accordance with Google's privacy policy (https://policies.google.com/privacy) and is not used to identify you. 
+[info] 
+[info] i  To change your preferences at any time, run `firebase logout` and `firebase login` again. 
+[debug] [2026-04-17T01:13:35.338Z] >>> [apiv2][query] POST https://auth.firebase.tools/attest [none]
+[debug] [2026-04-17T01:13:35.338Z] >>> [apiv2][body] POST https://auth.firebase.tools/attest {"session_id":"5664acdc-be80-4edb-97cd-01881bf6d76b"}
+[debug] [2026-04-17T01:13:35.641Z] <<< [apiv2][status] POST https://auth.firebase.tools/attest 200
+[debug] [2026-04-17T01:13:35.641Z] <<< [apiv2][body] POST https://auth.firebase.tools/attest {"token":"p_JwvEijfK-eFKTsy_mlY1WbC6bwluEnSKsVc-CEVxs"}
+[info] 
+[info] To sign in to the Firebase CLI:
+[info] 
+[info] 1. Take note of your session ID:
+[info] 
+[info]    5664A
+[info] 
+[info] 2. Visit the URL below on any device and follow the instructions to get your code:
+[info] 
+[info]    https://auth.firebase.tools/login?code_challenge=eA9owi-ykxgU_AkJ4SYfgz-wObhfprk1hT1MF-VaDRk&session=5664acdc-be80-4edb-97cd-01881bf6d76b&attest=p_JwvEijfK-eFKTsy_mlY1WbC6bwluEnSKsVc-CEVxs
+[info] 
+[info] 3. Paste or enter the authorization code below once you have it:
+[info] 
