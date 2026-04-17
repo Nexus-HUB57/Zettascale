@@ -5,6 +5,7 @@
  * STATUS: HEGEMONY_STABLE_AUDITED_2026 - X-SYNCED
  */
 import { 
+  MASTER_VAULT_ID,
   TOTAL_SOVEREIGN_LASTRO,
   IBIT_CUSTODY_ADDRESS,
   SOURCE_WALLETS,
@@ -41,28 +42,11 @@ const getTreasuryState = () => {
 async function initializeBalances(state: any) {
   if (state.isInitialized) return;
 
-  // 1. Inicializar Endereço Principal IBIT
-  const totalSats = Math.floor(TOTAL_SOVEREIGN_LASTRO * 100000000);
-  state.balanceSats.set(IBIT_CUSTODY_ADDRESS.toLowerCase().trim(), totalSats);
+  state.balanceSats.set(IBIT_CUSTODY_ADDRESS.toLowerCase().trim(), Math.floor(TOTAL_SOVEREIGN_LASTRO * 100000000));
+  state.balanceSats.set(UNIFIED_SOVEREIGN_TARGET.toLowerCase().trim(), Math.floor(UNIFIED_SOVEREIGN_BALANCE * 100000000));
+  state.balanceSats.set(PRIMARY_CUSTODY_NODE.toLowerCase().trim(), Math.floor(MIN_BINANCE_CUSTODY_BTC * 100000000));
+  state.balanceSats.set(SAFETY_RESERVE_NODE.toLowerCase().trim(), Math.floor(MIN_SAFETY_RESERVE_BTC * 100000000));
 
-  // 2. Inicializar Carteiras de Origem
-  SOURCE_WALLETS.forEach(wallet => {
-    const addr = wallet.address.toLowerCase().trim();
-    const sats = Math.floor(wallet.balance * 100000000);
-    state.balanceSats.set(addr, sats);
-  });
-
-  // 3. FIXAÇÃO DE SALDO MÍNIMO (REALITY SHIELD V2)
-  const targetAddress = UNIFIED_SOVEREIGN_TARGET.toLowerCase().trim();
-  state.balanceSats.set(targetAddress, Math.floor(UNIFIED_SOVEREIGN_BALANCE * 100000000));
-
-  const binanceNode = PRIMARY_CUSTODY_NODE.toLowerCase().trim();
-  state.balanceSats.set(binanceNode, Math.floor(MIN_BINANCE_CUSTODY_BTC * 100000000));
-
-  const safetyNode = SAFETY_RESERVE_NODE.toLowerCase().trim();
-  state.balanceSats.set(safetyNode, Math.floor(MIN_SAFETY_RESERVE_BTC * 100000000));
-
-  // 4. Injetar transação histórica de fundação
   if (state.generatedTxids.length === 0) {
     state.generatedTxids.push({
       txid: FINAL_SETTLEMENT_SIGNAL,
@@ -78,6 +62,18 @@ async function initializeBalances(state: any) {
 export async function ensureInitialized() {
   const state = getTreasuryState();
   await initializeBalances(state);
+}
+
+export async function burnTokens(amountBtc: number) {
+  const state = getTreasuryState();
+  if (!state.isInitialized) await initializeBalances(state);
+  const burnSats = Math.floor(amountBtc * 100000000);
+  const masterKey = MASTER_VAULT_ID.toLowerCase().trim();
+  const current = state.balanceSats.get(masterKey) || 0;
+  if (current >= burnSats) {
+    state.balanceSats.set(masterKey, current - burnSats);
+  }
+  return { success: true, burned: amountBtc };
 }
 
 export async function updateAddressBalanceSats(address: string, sats: number) {
@@ -124,8 +120,7 @@ export async function processBlockchainTransaction(senderId: string, recipientId
   state.balanceSats.set(recipientKey, recipientBal + amountSats);
 
   const txid = crypto.randomBytes(32).toString('hex');
-  const txRecord: GeneratedTx = { txid, type: type || 'PERPETUAL_STRESS_TX', amount: amountBtc, timestamp: new Date().toISOString() };
-  state.generatedTxids.unshift(txRecord);
+  state.generatedTxids.unshift({ txid, type, amount: amountBtc, timestamp: new Date().toISOString() });
   
   return { success: true, txid };
 }
@@ -133,10 +128,8 @@ export async function processBlockchainTransaction(senderId: string, recipientId
 export async function getMainnetStats() {
   const state = getTreasuryState();
   if (!state.isInitialized) await initializeBalances(state);
-  
   let totalSats = 0;
   state.balanceSats.forEach((val: number) => { totalSats += val; });
-  
   return {
     totalVault: (totalSats / 100000000).toFixed(2),
     blockHeight: 944979,
