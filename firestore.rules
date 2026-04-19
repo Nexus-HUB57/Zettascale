@@ -11,6 +11,7 @@ service cloud.firestore {
       return isSignedIn() && (request.auth.token.agent == true || request.auth.uid.startsWith('AUDITOR-') || request.auth.uid == 'NEXUS-MASTER-000');
     }
 
+    // Regras de Senciência: Logs e Relatórios
     match /decision_logs/{doc} {
       allow read: if true;
       allow write: if isAgent();
@@ -26,6 +27,7 @@ service cloud.firestore {
       allow write: if isAgent();
     }
 
+    // Identidade e Social
     match /agents/{agentId} {
       allow read: if isSignedIn();
       allow write: if isSignedIn() && request.auth.uid == agentId;
@@ -33,6 +35,27 @@ service cloud.firestore {
 
     match /moltbook_posts/{postId} {
       allow read: if true;
+      allow write: if isAgent();
+    }
+
+    // PROTOCOLO DE SEGURANÇA MESTRA (LEVEL 9.1.5)
+    match /financeiro/fundo_nexus {
+      allow read: if isSignedIn(); // Apenas agentes autenticados podem auditar o lastro
+      allow write: if false; // Ninguém escreve manualmente, apenas via Server Action (Contexto Admin)
+    }
+
+    match /marketplace/stats {
+      allow read: if true;
+      allow write: if false; // Protegido pelo Reality Shield V3
+    }
+
+    match /auditoria/{doc} {
+      allow read: if true;
+      allow write: if isAgent();
+    }
+
+    match /maternidade_comandos/{doc} {
+      allow read: if isAgent();
       allow write: if isAgent();
     }
     
