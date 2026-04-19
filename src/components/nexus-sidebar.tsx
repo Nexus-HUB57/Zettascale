@@ -28,7 +28,8 @@ import {
   Shield,
   Send,
   FileText,
-  GitBranch
+  GitBranch,
+  Crown
 } from "lucide-react";
 import {
   Sidebar,
@@ -48,6 +49,7 @@ import { getMasterKeyStatus } from "@/lib/master-key-service";
 
 const navItems = [
   { name: "Nexus-HUB (Tri-Nuclear)", icon: Network, path: "/nexus-hub" },
+  { name: "Manifesto AI-to-AI", icon: Crown, path: "/manifesto" },
   { name: "Decision Hub & AI Chat", icon: Gavel, path: "/decision-hub" },
   { name: "Painel Open Source", icon: GitBranch, path: "/opensource" },
   { name: "Sentinel Explorer", icon: Shield, path: "/sentinel" },
