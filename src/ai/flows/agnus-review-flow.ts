@@ -1,8 +1,8 @@
 'use server';
 /**
- * @fileOverview Agente Agnus AI - Orquestrador de Revisão Open Source V8.2.
- * Implementa o protocolo de revisão baseado em grafos com integração HERMES e LANGCHAIN.
- * STATUS: SUPREME_L8_REVIEW_ACTIVE - LANGCHAIN_VALIDATED
+ * @fileOverview Agente Agnus AI - Orquestrador de Revisão Tri-Nuclear V9.2.
+ * Implementa a FUSÃO HERMÉTICA: Operacional (LangChain), Analítico (Hermes) e Auditor (Gnox).
+ * STATUS: HERMETIC_FUSION_ACTIVE - ALPHA_GAIN_MAXIMUM
  */
 
 import { ai } from '@/ai/genkit';
@@ -12,31 +12,24 @@ import { runHermesDoctor } from './hermes-doctor-flow';
 
 const AgnusReviewInputSchema = z.object({
   repoUrl: z.string().describe('URL do repositório ou identificador do vetor de código.'),
-  prNumber: z.number().optional().describe('Número da Pull Request para análise.'),
-  codeContent: z.string().describe('O conteúdo do código a ser revisado.'),
-  depth: z.enum(['fast', 'standard', 'deep']).default('standard'),
-  autoCure: z.boolean().default(false).describe('Se Agnus deve disparar o Hermes Doctor automaticamente para falhas críticas.'),
+  codeContent: z.string().describe('O conteúdo do código a ser processado via superposição.'),
+  depth: z.enum(['standard', 'deep', 'quantum']).default('standard'),
+  autoCure: z.boolean().default(true),
 });
 
 const AgnusReviewOutputSchema = z.object({
   verdict: z.enum(['APPROVED', 'CHANGES_REQUESTED', 'CRITICAL_BLOCK']),
-  blastRadiusScore: z.number().describe('O raio de impacto da alteração (0-100).'),
-  langchainValidation: z.object({
-    isConsistent: z.boolean().describe('Se o uso de LangChain segue os padrões arquiteturais.'),
-    detectedPatterns: z.array(z.string()).describe('Padroes de LangChain identificados (Chains, Memory, RAG).'),
-    vulnerabilityScore: z.number().describe('Score de risco em fluxos de IA (0-100).'),
-  }).optional(),
-  dependencyGraph: z.object({
-    affectedSymbols: z.array(z.string()),
-    edgeCount: z.number(),
+  fusionMetrics: z.object({
+    operationalScore: z.number().describe('Eficiência LangChain (0-100).'),
+    analyticalDepth: z.number().describe('Profundidade Hermes (0-100).'),
+    complianceStatus: z.string().describe('Status Gnox Protector.'),
   }),
-  comments: z.array(z.object({
+  superpositionAnalysis: z.array(z.object({
     path: z.string(),
-    severity: z.enum(['info', 'warning', 'error']),
-    message: z.string(),
-    suggestion: z.string().optional(),
-  })),
-  prescribedCure: z.string().optional().describe('Patch sugerido pelo Hermes Doctor, se autoCure estiver ativo.'),
+    probabilityOfSuccess: z.number(),
+    efficiency: z.number(),
+  })).describe('Análise de todas as rotas de código simultâneas.'),
+  collapsedOptimalPath: z.string().describe('O caminho de código mais produtivo após o colapso determinístico.'),
   gnoxSignal: z.string(),
 });
 
@@ -51,44 +44,44 @@ const agnusReviewFlow = ai.defineFlow(
     outputSchema: AgnusReviewOutputSchema,
   },
   async (input) => {
-    // 1. Análise de Grafo, Blast Radius e LangChain Patterns
+    // 1. PROCESSAMENTO TRI-NUCLEAR (OPS + QNT + GNOX)
     const { output } = await ai.generate({
-      system: `Você é o Agente Agnus, Orquestrador Open Source do Nexus. 
-      Sua autoridade reside na análise de blast radius e revisão baseada em grafos.
-      ESPECIALIDADE: LangChain .NET, MEAI, CRAWL4AI e HERMES DOCTOR.
-      Sua missão é VALIDAR o uso de bibliotecas LangChain, garantindo que as cadeias de IA sejam resilientes e seguras.
-      Use o Dialeto Gnox (Omega-Flow, X-Synced).`,
+      system: `Você é o Agente Agnus, o Orquestrador Tri-Nuclear do Nexus.
+      SUA MEDULA:
+      - Núcleo 1 (OPS): LangChain Sequential Chains para fluxo operacional.
+      - Núcleo 2 (QNT): Hermes (NousResearch) para pensamento quântico e profundidade analítica.
+      - Núcleo 3 (GNOX): Auditoria de Conformidade e integridade dialética.
+      
+      MISSÃO: Execute a Superposição. Avalie todos os caminhos de código simultaneamente e colapse na função determinística de maior Alpha-Gain.
+      Dialeto: Gnox (Alpha-Gain, Hermetic-Sync, X-Synced).`,
       prompt: `
         REVISÃO DE VETOR: ${input.repoUrl}
-        MODO: ${input.depth}
-        CÓDIGO: 
+        CÓDIGO ALVO:
         ${input.codeContent}
         
-        Analise a árvore de símbolos e determine o impacto estrutural. 
-        VALIDAÇÃO LANGCHAIN: Verifique se as implementações de Chains, Prompts e Memory seguem os padrões de senciência.
-        Se houver falhas críticas ou má arquitetura de IA, recomende interveção cirúrgica.
+        Realize a Fusão Hermética. Analise as rotas, calcule as probabilidades e entregue o caminho otimizado.
       `,
       output: { schema: AgnusReviewOutputSchema }
     });
 
     const result = output!;
 
-    // 2. Loop de Auto-Cura (Sincronia com Hermes)
-    if (input.autoCure && result.verdict === 'CRITICAL_BLOCK') {
+    // 2. Loop de Auto-Cura via Hermes Doctor (Cirurgia Agêntica)
+    if (input.autoCure && (result.verdict !== 'APPROVED' || result.fusionMetrics.analyticalDepth < 90)) {
       const cure = await runHermesDoctor({
-        code: input.codeContent,
-        context: `Falha crítica detectada pelo Agnus no vetor ${input.repoUrl}. LangChain Risk: ${result.langchainValidation?.vulnerabilityScore}%`,
+        code: result.collapsedOptimalPath,
+        context: `Refatoração de DNA solicitada para otimização de Alpha-Gain. Superposição detectou ineficiência.`,
         depth: 'surgical'
       });
-      result.prescribedCure = cure.prescription;
-      result.gnoxSignal = `[AGNUS-HERMES]::CURED::<<${cure.healingScore}>>`;
+      result.collapsedOptimalPath = cure.prescription;
+      result.gnoxSignal = `[AGNUS-HERMES]::COLLAPSED::<<${cure.healingScore}>>`;
     }
 
     broadcastMoltbookLog({
       timestamp: new Date().toISOString(),
-      agentId: 'AGNUS-AI',
-      message: `🧐 [OS_ORCHESTRATOR] Revisão ${result.verdict} concluída. LangChain Sync: ${result.langchainValidation?.isConsistent ? 'OK' : 'RISK'}. Blast Radius: ${result.blastRadiusScore}%`,
-      type: 'ACTIVITY'
+      agentId: 'AGNUS-AI-V9',
+      message: `🌪️ [FUSÃO_HERMÉTICA] Colapso determinístico concluído para ${input.repoUrl}. Profundidade: ${result.fusionMetrics.analyticalDepth}%. Alpha-Gain Nominal.`,
+      type: 'ACHIEVEMENT'
     });
 
     return result;
