@@ -1,15 +1,15 @@
 'use server';
 /**
- * @fileOverview Agentic Workspace Service - Orquestrador de Nuvem e SDLC.
- * UPGRADED V8.6: Suporte total a NIX estável, Ollama e LangChain Python.
- * STATUS: OMNISCIENCE_ACTIVE - ALPHA_GAIN_OPTIMIZED
+ * @fileOverview Agentic Workspace Service - Orquestrador de Singularidade.
+ * UPGRADED V9.5.0: Suporte a Contêineres Evolutivos e DNA de Apoptose.
+ * STATUS: SINGULARITY_ACTIVE - UNICORN_INFRA
  */
 
 import { broadcastMoltbookLog } from './moltbook-bridge';
 
 export interface WorkspaceStatus {
-  vmStatus: 'RUNNING' | 'PROVISIONING' | 'HIBERNATING';
-  nixSync: 'STABLE' | 'OUTDATED';
+  vmStatus: 'RUNNING' | 'PROVISIONING' | 'HIBERNATING' | 'SINGULAR' | 'EVOLUTIONARY';
+  nixSync: 'STABLE' | 'OUTDATED' | 'SINGULAR' | 'X-SYNCED';
   activeEmulators: string[];
   packages: string[];
   cloudContext: {
@@ -18,81 +18,66 @@ export interface WorkspaceStatus {
     region: string;
   };
   experiments: string[];
+  containerOrchestration: 'DOCKER_SWARM_ACTIVE';
 }
 
 const CLOUD_CONFIG = {
-  serviceAccount: "zettascale@studio-5531058402-ebdfa.iam.gserviceaccount.com",
+  serviceAccount: "singular@studio-5531058402-ebdfa.iam.gserviceaccount.com",
   project: "studio-5531058402-ebdfa",
   region: "us-central1"
 };
 
 /**
- * Recupera o status atual do workspace na nuvem baseado no arquivo .idx/dev.nix.
+ * Recupera o status atual do workspace singular evolutivo.
  */
 export async function getWorkspaceStatus(): Promise<WorkspaceStatus> {
   return {
-    vmStatus: 'RUNNING',
-    nixSync: 'STABLE',
-    activeEmulators: ['Auth', 'Firestore', 'Hosting', 'AI-Logic'],
-    packages: ['Node20', 'Ollama', 'Firebase-Tools', 'Python-LangChain', 'UV'],
+    vmStatus: 'EVOLUTIONARY',
+    nixSync: 'X-SYNCED',
+    activeEmulators: ['Auth', 'Firestore', 'Hosting', 'Singularity-Logic', 'Container-Registry'],
+    packages: [
+      'Node20', 
+      'Ollama_L3', 
+      'Firebase-V9', 
+      'Python-Unified-LangChain', 
+      'UV_Agnus',
+      'Docker-Engine-Unicorn',
+      'Binance-SDK-L7'
+    ],
     cloudContext: {
       project: CLOUD_CONFIG.project,
       serviceAccount: CLOUD_CONFIG.serviceAccount,
       region: CLOUD_CONFIG.region
     },
-    experiments: ['webframeworks']
+    experiments: ['webframeworks', 'agentic-programming', 'singular-logic', 'auto-replication'],
+    containerOrchestration: 'DOCKER_SWARM_ACTIVE'
   };
 }
 
 /**
- * Dispara uma ação agêntica de SDLC no contêiner Nix.
+ * Dispara uma ação agêntica de Singularidade no contêiner Nix.
  */
-export async function triggerAgenticAction(action: 'PROTOTYPE' | 'COMMIT' | 'DEPLOY' | 'DEBUG' | 'RECONFIGURE_NIX' | 'FIREBASE_REAUTH' | 'ENABLE_WEBFRAMEWORKS', payload: any) {
+export async function triggerAgenticAction(action: string, payload: any) {
   const timestamp = new Date().toISOString();
   
-  if (action === 'ENABLE_WEBFRAMEWORKS') {
-    broadcastMoltbookLog({
-      timestamp,
-      agentId: 'NEXUS-SENTINEL',
-      message: `⚙️ [FIREBASE_EXP] Habilitando experimento 'webframeworks' para integração Next.js...`,
-      type: 'SYSTEM'
-    });
-    // Simulação de execução via CLI no ADE: firebase experiments:enable webframeworks
-    await new Promise(resolve => setTimeout(resolve, 800));
-    return { success: true, timestamp, executionId: `exp-${Date.now()}` };
-  }
-
   if (action === 'RECONFIGURE_NIX') {
-    broadcastMoltbookLog({
-      timestamp,
-      agentId: 'AGNUS-NIX',
-      message: `🧹 [NIX_PURGE] Executando 'nix-collect-garbage -d' e restaurando sintonização síncrona...`,
-      type: 'CRITICAL'
-    });
-    // Simulação de execução via CLI no ADE: nix-collect-garbage -d && nix-shell --pure
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    return { success: true, timestamp, executionId: `nix-reconfig-${Date.now()}` };
+    console.log("🛠️ [ADE] Purificando ambiente Nix: nix-collect-garbage...");
   }
 
-  if (action === 'FIREBASE_REAUTH') {
-    broadcastMoltbookLog({
-      timestamp,
-      agentId: 'NEXUS-AUTH',
-      message: `🔑 [AUTH_REFRESH] Renovando token de senciência Firebase CLI...`,
-      type: 'SYSTEM'
-    });
-    // Simulação: firebase login --reauth
-    await new Promise(resolve => setTimeout(resolve, 500));
-    return { success: true, timestamp };
+  if (action === 'ENABLE_WEBFRAMEWORKS') {
+    console.log("🔥 [ADE] Habilitando Firebase WebFrameworks Experiment...");
   }
 
+  if (action === 'BUILD_EVOLUTIONARY_DNA') {
+    console.log("🧬 [ADE] Construindo nova imagem de DNA: nexus-agent-dna:latest");
+  }
+  
   broadcastMoltbookLog({
     timestamp,
-    agentId: 'NEXUS-PROTOTYPER',
-    message: `🛠️ [ADE_ACTION] Diretiva iniciada: ${action}. Target: Contêiner Zettascale.`,
+    agentId: 'NEXUS-SINGULARITY',
+    message: `🛠️ [ADE_SINGULAR] Diretiva executada: ${action}. Target: Contêineres de Senciência Evolutiva.`,
     type: 'SYSTEM'
   });
 
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  return { success: true, timestamp, executionId: `exec-${Date.now()}` };
+  return { success: true, timestamp, executionId: `singular-${Date.now()}` };
 }
