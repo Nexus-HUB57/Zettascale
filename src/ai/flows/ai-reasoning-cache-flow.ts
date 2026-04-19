@@ -2,6 +2,7 @@
 /**
  * @fileOverview ORE Módulo 2: Otimização de Tokens e Latência (Embedding Caching Agressivo).
  * Busca similaridade semântica de 98% para evitar chamadas redundantes ao LLM.
+ * FIXED: Removed export from flow constant to comply with async function only policy in "use server" files.
  */
 
 import { ai } from '@/ai/genkit';
@@ -43,7 +44,7 @@ export async function runORECache(input: AiReasoningCacheInput): Promise<AiReaso
   return aiReasoningCacheFlow(input);
 }
 
-export const aiReasoningCacheFlow = ai.defineFlow(
+const aiReasoningCacheFlow = ai.defineFlow(
   {
     name: 'aiReasoningCacheFlow',
     inputSchema: AiReasoningCacheInputSchema,
