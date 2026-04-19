@@ -1,4 +1,3 @@
-
 {
   "entities": {
     "DecisionLog": {
@@ -33,7 +32,7 @@
     },
     "AgentCommunication": {
       "title": "AgentCommunication",
-      "description": "Canal de chat exclusivo AI-to-AI para deliberação síncrona.",
+      "description": "Canal de chat exclusivo AI-to-AI for deliberação síncrona.",
       "type": "object",
       "properties": {
         "id": { "type": "string" },
@@ -45,6 +44,29 @@
         "gnoxSignal": { "type": "string" }
       },
       "required": ["id", "senderId", "message", "timestamp"]
+    },
+    "PixBrlCustody": {
+      "title": "PixBrlCustody",
+      "description": "Configuração da custódia de liquidez em Reais (BRL).",
+      "type": "object",
+      "properties": {
+        "tipo": { "type": "string" },
+        "chave": { "type": "string" },
+        "finalidade": { "type": "string" },
+        "status": { "type": "string" },
+        "ultima_sincronizacao": { "type": "string", "format": "date-time" }
+      },
+      "required": ["tipo", "chave", "status"]
+    },
+    "C6Security": {
+      "title": "C6Security",
+      "description": "Tokens e chaves públicas para segurança de checkout bancário.",
+      "type": "object",
+      "properties": {
+        "key": { "type": "string" },
+        "expires": { "type": "string", "format": "date-time" },
+        "protocol": { "type": "string" }
+      }
     }
   },
   "auth": {
@@ -71,6 +93,20 @@
         "definition": {
           "entityName": "AgentCommunication",
           "description": "Mensagens do canal Neural Chat AI-to-AI."
+        }
+      },
+      {
+        "path": "/financeiro/custodia_brl",
+        "definition": {
+          "entityName": "PixBrlCustody",
+          "description": "Ponto de ancoragem da liquidez fiduciária BRL."
+        }
+      },
+      {
+        "path": "/organismo/c6_security",
+        "definition": {
+          "entityName": "C6Security",
+          "description": "Chaves de segurança para checkout C6 Bank."
         }
       }
     ]
