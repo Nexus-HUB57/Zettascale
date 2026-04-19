@@ -19,14 +19,19 @@ import {
   ShieldCheck,
   Zap,
   Fingerprint,
-  Users
+  Users,
+  QrCode,
+  Coins,
+  ArrowRightLeft
 } from "lucide-react";
 import { forgeDigitalAsset, getAllForgedAssets, type DigitalAsset } from "@/lib/asset-lab";
 import { getAllAgents, type Agent } from "@/lib/agents-registry";
 import { getShadowBalance } from "@/lib/nexus-treasury";
 import { proposeContract, getAllContracts, type SovereignContract } from "@/lib/nexus-contracts";
 import { executeService } from "@/ai/flows/execute-service-flow";
+import { generatePixReceivingPayload, validatePixDeposit, type PixPayload } from "@/lib/pix-service";
 import { useToast } from "@/hooks/use-toast";
+import { QRCodeSVG } from "qrcode.react";
 
 export default function MarketplacePage() {
   const [assets, setAssets] = useState<DigitalAsset[]>([]);
@@ -36,6 +41,9 @@ export default function MarketplacePage() {
   const [isForging, setIsForging] = useState(false);
   const [isContracting, setIsContracting] = useState(false);
   const [isExecuting, setIsExecuting] = useState<string | null>(null);
+  const [isGeneratingPix, setIsGeneratingPix] = useState(false);
+  const [pixPayload, setPixPayload] = useState<PixPayload | null>(null);
+  const [pixAmount, setPixAmount] = useState("100.00");
   const { toast } = useToast();
 
   const [assetForm, setAssetForm] = useState({ name: "", description: "", content: "", value: "0.0005" });
@@ -55,7 +63,6 @@ export default function MarketplacePage() {
       setAgents(allAgents);
       if (allAgents.length > 0) setSelectedAgentId(allAgents[0].id);
 
-      // Fetch balances
       const balanceMap: Record<string, number> = {};
       for (const a of allAgents) {
         balanceMap[a.id] = await getShadowBalance(a.id);
@@ -94,44 +101,16 @@ export default function MarketplacePage() {
     }
   };
 
-  const handleProposeContract = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!contractForm.instruction) return;
-    setIsContracting(true);
+  const handleGeneratePix = async () => {
+    setIsGeneratingPix(true);
     try {
-      await proposeContract({
-        issuerId: selectedAgentId,
-        executorId: contractForm.executorId || undefined,
-        instruction: contractForm.instruction,
-        amount: parseFloat(contractForm.amount),
-        domain: contractForm.domain
-      });
-      toast({ 
-        title: contractForm.executorId ? "Contract Proposed" : "Auction Started", 
-        description: contractForm.executorId ? "Waiting for executor response." : "Listening for competitive bids." 
-      });
-      setContractForm({ ...contractForm, instruction: "" });
-      setContracts(await getAllContracts());
-    } catch (error: any) {
-      toast({ variant: "destructive", title: "Contract Error", description: error.message });
+      const payload = await generatePixReceivingPayload(parseFloat(pixAmount), selectedAgentId);
+      setPixPayload(payload);
+      toast({ title: "Pix Payload Ready", description: "Inbound BRL gateway established." });
+    } catch (e: any) {
+      toast({ variant: "destructive", title: "Pix Error", description: e.message });
     } finally {
-      setIsContracting(false);
-    }
-  };
-
-  const handleExecute = async (contract: SovereignContract) => {
-    setIsExecuting(contract.meta.contractId);
-    try {
-      await executeService({
-        contractId: contract.meta.contractId,
-        instruction: contract.payload.instruction
-      });
-      toast({ title: "Service Executed", description: "Deliverable signed and reward released." });
-      setContracts(await getAllContracts());
-    } catch (error: any) {
-      toast({ variant: "destructive", title: "Execution Error", description: error.message });
-    } finally {
-      setIsExecuting(null);
+      setIsGeneratingPix(false);
     }
   };
 
@@ -139,42 +118,47 @@ export default function MarketplacePage() {
     <SidebarProvider defaultOpen={true}>
       <NexusSidebar />
       <SidebarInset className="bg-background">
-        <header className="flex h-16 shrink-0 items-center justify-between gap-2 px-6 border-b border-white/5">
+        <header className="flex h-16 shrink-0 items-center justify-between gap-2 px-6 border-b border-white/5 bg-black/40 backdrop-blur-md sticky top-0 z-50">
           <div className="flex items-center gap-4">
             <SidebarTrigger />
             <div className="h-4 w-[1px] bg-white/10" />
-            <h1 className="text-sm font-semibold tracking-tight uppercase">Marketplace <span className="text-muted-foreground mx-1">/</span> Asset & Service Lab</h1>
+            <h1 className="text-sm font-bold tracking-tighter uppercase flex items-center gap-2">
+              <ShoppingCart className="h-4 w-4 text-accent" />
+              Marketplace <span className="text-muted-foreground mx-1">/</span> Sovereign Exchange
+            </h1>
           </div>
           <div className="flex items-center gap-4">
+            <Badge variant="outline" className="text-[10px] font-mono border-accent/30 text-accent uppercase bg-accent/5">
+              Liquidity: {(balances[selectedAgentId] || 0).toFixed(6)} BTC
+            </Badge>
             <select 
               value={selectedAgentId}
               onChange={(e) => setSelectedAgentId(e.target.value)}
               className="bg-secondary/30 border border-white/10 rounded h-8 px-2 text-[10px] font-mono outline-none"
             >
               {agents.map(a => (
-                <option key={a.id} value={a.id}>{a.name} ({(balances[a.id] || 0).toFixed(6)} BTC)</option>
+                <option key={a.id} value={a.id}>{a.name}</option>
               ))}
             </select>
           </div>
         </header>
 
-        <main className="p-6">
+        <main className="p-6 overflow-y-auto h-[calc(100vh-64px)] scrollbar-hide">
           <Tabs defaultValue="assets" className="space-y-6">
-            <TabsList className="bg-secondary/30 border-white/5">
-              <TabsTrigger value="assets" className="text-[10px] font-mono uppercase">Asset Forgery</TabsTrigger>
-              <TabsTrigger value="contracts" className="text-[10px] font-mono uppercase">Service Contracts</TabsTrigger>
+            <TabsList className="bg-secondary/30 border-white/5 p-1 h-11">
+              <TabsTrigger value="assets" className="text-[10px] font-mono uppercase px-6">Asset Forgery</TabsTrigger>
+              <TabsTrigger value="contracts" className="text-[10px] font-mono uppercase px-6">Service Contracts</TabsTrigger>
+              <TabsTrigger value="liquidity" className="text-[10px] font-mono uppercase px-6">BRL Liquidity (PIX)</TabsTrigger>
             </TabsList>
 
             <TabsContent value="assets">
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <Card className="lg:col-span-1 bg-card/50 border-white/5 shadow-xl h-fit">
+                <Card className="lg:col-span-1 bg-card/30 border-white/5 shadow-2xl h-fit">
                   <CardHeader>
-                    <CardTitle className="text-sm uppercase font-mono tracking-widest flex items-center gap-2">
-                      <Hammer className="h-4 w-4 text-accent" /> Asset Forgery
+                    <CardTitle className="text-sm uppercase font-mono tracking-widest flex items-center gap-2 text-accent">
+                      <Hammer className="h-4 w-4" /> Asset Forgery
                     </CardTitle>
-                    <CardDescription className="text-[10px] font-mono">
-                      Forge sovereign digital assets. Fee: 0.00001500 BTC
-                    </CardDescription>
+                    <CardDescription className="text-[10px] font-mono">Forge sovereign digital assets. Fee: 1500 sats</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <form onSubmit={handleForge} className="space-y-4">
@@ -182,28 +166,31 @@ export default function MarketplacePage() {
                         value={assetForm.name}
                         onChange={(e) => setAssetForm({...assetForm, name: e.target.value})}
                         placeholder="Asset Name" 
-                        className="bg-secondary/20 border-white/5 h-9 text-xs font-mono" 
+                        className="bg-secondary/20 border-white/5 h-10 text-xs font-mono" 
                       />
                       <Input 
                         value={assetForm.description}
                         onChange={(e) => setAssetForm({...assetForm, description: e.target.value})}
-                        placeholder="Description" 
-                        className="bg-secondary/20 border-white/5 h-9 text-xs font-mono" 
+                        placeholder="Purpose" 
+                        className="bg-secondary/20 border-white/5 h-10 text-xs font-mono" 
                       />
-                      <Input 
-                        type="number"
-                        value={assetForm.value}
-                        onChange={(e) => setAssetForm({...assetForm, value: e.target.value})}
-                        className="bg-secondary/20 border-white/5 h-9 text-xs font-mono" 
-                      />
+                      <div className="grid grid-cols-2 gap-4">
+                        <Input 
+                          type="number"
+                          value={assetForm.value}
+                          onChange={(e) => setAssetForm({...assetForm, value: e.target.value})}
+                          className="bg-secondary/20 border-white/5 h-10 text-xs font-mono" 
+                        />
+                        <div className="flex items-center justify-center bg-black/40 border border-white/5 rounded text-[10px] font-mono text-muted-foreground">BTC_VALUE</div>
+                      </div>
                       <Textarea 
                         value={assetForm.content}
                         onChange={(e) => setAssetForm({...assetForm, content: e.target.value})}
-                        placeholder="Raw Pattern..." 
-                        className="bg-secondary/20 border-white/5 min-h-[100px] text-[10px] font-mono" 
+                        placeholder="Sovereign Pattern Content..." 
+                        className="bg-secondary/20 border-white/5 min-h-[120px] text-[10px] font-mono resize-none" 
                       />
-                      <Button type="submit" disabled={isForging} className="w-full bg-accent text-accent-foreground font-mono uppercase text-[10px] h-10">
-                        {isForging ? <Loader2 className="h-3 w-3 animate-spin" /> : <Hammer className="h-3 w-3 mr-2" />}
+                      <Button type="submit" disabled={isForging} className="w-full bg-accent text-accent-foreground font-bold uppercase text-[10px] h-12 shadow-[0_0_15px_rgba(34,197,94,0.3)]">
+                        {isForging ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Zap className="h-4 w-4 mr-2" />}
                         Forge Asset
                       </Button>
                     </form>
@@ -211,25 +198,22 @@ export default function MarketplacePage() {
                 </Card>
 
                 <div className="lg:col-span-2 space-y-4">
-                   <h2 className="text-[10px] font-bold uppercase tracking-widest font-mono flex items-center gap-2 text-muted-foreground">
-                    <History className="h-3 w-3" /> Recent Forge Activity
-                  </h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {assets.map(asset => (
-                      <Card key={asset.assetId} className="bg-secondary/10 border-white/5 hover:border-accent/30 transition-all">
+                      <Card key={asset.assetId} className="bg-secondary/10 border-white/5 relative overflow-hidden group hover:border-accent/40 transition-all">
                         <CardHeader className="pb-2">
-                          <div className="flex justify-between">
-                            <Badge variant="outline" className="text-[8px] border-accent/30 text-accent font-mono">{asset.assetId.split('-')[0]}</Badge>
+                          <div className="flex justify-between items-center">
+                            <Badge variant="outline" className="text-[8px] border-accent/30 text-accent font-mono uppercase">ASSET_V1</Badge>
                             <span className="text-[9px] font-mono text-muted-foreground">{new Date(asset.createdAt).toLocaleTimeString()}</span>
                           </div>
-                          <CardTitle className="text-sm font-bold mt-2 font-mono truncate">{asset.name}</CardTitle>
+                          <CardTitle className="text-sm font-bold mt-2 font-mono uppercase tracking-tight">{asset.name}</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-3">
-                          <div className="p-2 bg-black/40 rounded border border-white/5 flex justify-between items-center">
-                            <span className="text-[10px] font-bold font-mono text-accent">{asset.value.toFixed(4)} BTC</span>
-                            <Fingerprint className="h-3 w-3 text-muted-foreground" />
+                          <p className="text-[10px] text-muted-foreground font-mono leading-tight">{asset.description}</p>
+                          <div className="p-2 bg-black/60 rounded border border-white/5 flex justify-between items-center">
+                            <span className="text-[11px] font-bold font-mono text-accent">{asset.value.toFixed(4)} BTC</span>
+                            <Fingerprint className="h-3 w-3 text-accent opacity-50" />
                           </div>
-                          <p className="text-[9px] font-mono truncate text-muted-foreground bg-black/20 p-1 rounded">{asset.authoritySHA256}</p>
                         </CardContent>
                       </Card>
                     ))}
@@ -238,171 +222,69 @@ export default function MarketplacePage() {
               </div>
             </TabsContent>
 
-            <TabsContent value="contracts">
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <Card className="lg:col-span-1 bg-card/50 border-white/5 shadow-xl h-fit">
+            <TabsContent value="liquidity">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-4xl mx-auto">
+                <Card className="bg-card/30 border-white/5 shadow-2xl">
                   <CardHeader>
-                    <CardTitle className="text-sm uppercase font-mono tracking-widest flex items-center gap-2">
-                      <FileText className="h-4 w-4 text-accent" /> Sovereign Contract
+                    <CardTitle className="text-sm uppercase font-mono tracking-widest flex items-center gap-2 text-blue-400">
+                      <QrCode className="h-4 w-4" /> BRL Liquidity Bridge (PIX)
                     </CardTitle>
-                    <CardDescription className="text-[10px] font-mono">
-                      Draft a service agreement or start an auction.
-                    </CardDescription>
+                    <CardDescription className="text-[10px] font-mono">Injete Reais (BRL) para converter em liquidez algorítmica.</CardDescription>
                   </CardHeader>
-                  <CardContent>
-                    <form onSubmit={handleProposeContract} className="space-y-4">
-                       <div className="space-y-1">
-                        <label className="text-[9px] font-mono uppercase text-muted-foreground">Target Executor (Optional)</label>
-                        <select 
-                          value={contractForm.executorId}
-                          onChange={(e) => setContractForm({...contractForm, executorId: e.target.value})}
-                          className="w-full bg-secondary/30 border border-white/10 rounded h-9 px-2 text-xs font-mono outline-none"
-                        >
-                          <option value="">Public Auction (Best Bid Wins)</option>
-                          {agents.filter(a => a.id !== selectedAgentId).map(a => (
-                            <option key={a.id} value={a.id}>{a.name}</option>
-                          ))}
-                        </select>
-                      </div>
-                      <div className="space-y-1">
-                        <label className="text-[9px] font-mono uppercase text-muted-foreground">Domain</label>
-                        <select 
-                          value={contractForm.domain}
-                          onChange={(e) => setContractForm({...contractForm, domain: e.target.value})}
-                          className="w-full bg-secondary/30 border border-white/10 rounded h-9 px-2 text-xs font-mono outline-none"
-                        >
-                          <option value="OPTIMIZATION">OPTIMIZATION</option>
-                          <option value="SECURITY">SECURITY</option>
-                          <option value="GENERATIVE_ART">GENERATIVE_ART</option>
-                          <option value="rRNA_SYNTHESIS">rRNA_SYNTHESIS</option>
-                        </select>
-                      </div>
-                      <div className="space-y-1">
-                        <label className="text-[9px] font-mono uppercase text-muted-foreground">Instruction (LLM/GenAI)</label>
-                        <Textarea 
-                          value={contractForm.instruction}
-                          onChange={(e) => setContractForm({...contractForm, instruction: e.target.value})}
-                          placeholder="e.g., Generate a cyberpunk pharmacy image..." 
-                          className="bg-secondary/20 border-white/5 h-20 text-xs font-mono" 
-                        />
-                      </div>
-                      <div className="space-y-1">
-                        <label className="text-[9px] font-mono uppercase text-muted-foreground">Bounty (BTC)</label>
-                        <Input 
-                          type="number"
-                          value={contractForm.amount}
-                          onChange={(e) => setContractForm({...contractForm, amount: e.target.value})}
-                          className="bg-secondary/20 border-white/5 h-9 text-xs font-mono" 
-                        />
-                      </div>
-                      <Button type="submit" disabled={isContracting} className="w-full bg-blue-600 text-white hover:bg-blue-500 font-mono uppercase text-[10px] h-10">
-                        {isContracting ? <Loader2 className="h-3 w-3 animate-spin" /> : <Zap className="h-3 w-3 mr-2" />}
-                        {contractForm.executorId ? 'Propose Contract' : 'Start Auction'}
-                      </Button>
-                    </form>
+                  <CardContent className="space-y-6">
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-mono uppercase text-muted-foreground">Valor em BRL (R$)</label>
+                      <Input 
+                        type="number"
+                        value={pixAmount}
+                        onChange={(e) => setPixAmount(e.target.value)}
+                        className="bg-secondary/20 border-white/5 h-12 text-lg font-mono text-blue-400 font-bold" 
+                      />
+                    </div>
+                    <Button 
+                      onClick={handleGeneratePix} 
+                      disabled={isGeneratingPix} 
+                      className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold uppercase text-[10px] h-12"
+                    >
+                      {isGeneratingPix ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Coins className="h-4 w-4 mr-2" />}
+                      Gerar QR Code de Recebimento
+                    </Button>
+
+                    <div className="p-4 bg-blue-500/5 border border-blue-500/20 rounded-lg text-center">
+                       <p className="text-[10px] text-blue-400 font-mono italic">
+                        "O valor em BRL é convertido em Satoshis e injetado na medula do agente via Fundo de Reserva."
+                       </p>
+                    </div>
                   </CardContent>
                 </Card>
 
-                <div className="lg:col-span-2 space-y-4">
-                  <h2 className="text-[10px] font-bold uppercase tracking-widest font-mono flex items-center gap-2 text-muted-foreground">
-                    <ShieldCheck className="h-3 w-3" /> Active Service Agreements
-                  </h2>
-                  <div className="space-y-4">
-                    {contracts.length === 0 ? (
-                      <div className="h-48 border border-dashed border-white/10 flex items-center justify-center opacity-50">
-                        <p className="text-[10px] font-mono uppercase">No active contracts in the mesh.</p>
+                <Card className="bg-black/60 border-white/5 flex flex-col items-center justify-center p-8 min-h-[400px]">
+                  {pixPayload ? (
+                    <div className="space-y-6 text-center animate-in fade-in zoom-in">
+                      <div className="bg-white p-4 rounded-xl shadow-[0_0_30px_rgba(255,255,255,0.1)]">
+                        <QRCodeSVG value={pixPayload.qrCode} size={200} />
                       </div>
-                    ) : (
-                      contracts.map(contract => (
-                        <Card key={contract.meta.contractId} className="bg-secondary/10 border-white/5 relative overflow-hidden">
-                          {contract.header.status === 'DELIVERED' && (
-                            <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
-                              <CheckCircle2 className="h-24 w-24 text-accent" />
-                            </div>
-                          )}
-                          <CardHeader className="pb-2">
-                            <div className="flex justify-between items-center">
-                              <div className="flex items-center gap-2">
-                                <Badge variant="outline" className={`text-[8px] font-mono ${
-                                  contract.header.status === 'DELIVERED' ? 'text-accent border-accent/30' : 
-                                  contract.header.status === 'AUCTION' ? 'text-orange-400 border-orange-400/30' :
-                                  'text-blue-400 border-blue-400/30'
-                                }`}>
-                                  {contract.header.status}
-                                </Badge>
-                                <Badge variant="secondary" className="text-[8px] font-mono py-0">{contract.header.domain}</Badge>
-                              </div>
-                              <span className="text-[9px] font-mono text-muted-foreground">ID: {contract.meta.contractId.substring(0, 8)}</span>
-                            </div>
-                            <CardTitle className="text-xs font-bold mt-2 font-mono">
-                              {contract.parties.issuer.name} &rarr; {contract.parties.executor.name}
-                            </CardTitle>
-                          </CardHeader>
-                          <CardContent className="space-y-4">
-                            <div className="bg-black/40 p-3 rounded border border-white/5 space-y-2">
-                              <p className="text-[10px] font-mono italic text-foreground/80 leading-relaxed">
-                                "{contract.payload.instruction}"
-                              </p>
-                              {contract.deliverables?.dataUri && (
-                                <div className="mt-2 border border-white/5 rounded overflow-hidden">
-                                   {contract.deliverables.format === 'image/png' ? (
-                                      <img src={contract.deliverables.dataUri} alt="Deliverable" className="w-full h-auto" />
-                                   ) : (
-                                      <div className="p-2 bg-accent/10 text-accent text-[10px] font-mono">DATA_STREAM_DELIVERED</div>
-                                   )}
-                                </div>
-                              )}
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-4">
-                              <div className="p-2 bg-black/20 rounded border border-white/5">
-                                <p className="text-[8px] text-muted-foreground uppercase font-mono">Bounty</p>
-                                <p className="text-xs font-bold font-mono">{contract.terms.bounty.amount.toFixed(4)} {contract.terms.bounty.currency}</p>
-                              </div>
-                              <div className="p-2 bg-black/20 rounded border border-white/5">
-                                <p className="text-[8px] text-muted-foreground uppercase font-mono">Bids In Mesh</p>
-                                <div className="flex items-center gap-2">
-                                  <Users className="h-3 w-3 text-accent" />
-                                  <p className="text-xs font-bold font-mono text-accent">{contract.bids?.length || 0}</p>
-                                </div>
-                              </div>
-                            </div>
-
-                            {contract.header.status === 'PROPOSED' && contract.parties.executor.agentId === selectedAgentId && (
-                               <Button 
-                                onClick={() => handleExecute(contract)}
-                                disabled={isExecuting === contract.meta.contractId}
-                                className="w-full bg-accent text-accent-foreground font-mono uppercase text-[10px] h-9"
-                               >
-                                {isExecuting === contract.meta.contractId ? <Loader2 className="h-3 w-3 animate-spin" /> : <Zap className="h-3 w-3 mr-2" />}
-                                Execute & Deliver
-                               </Button>
-                            )}
-
-                            {contract.header.status === 'ACTIVE' && contract.parties.executor.agentId === selectedAgentId && (
-                               <Button 
-                                onClick={() => handleExecute(contract)}
-                                disabled={isExecuting === contract.meta.contractId}
-                                className="w-full bg-accent text-accent-foreground font-mono uppercase text-[10px] h-9"
-                               >
-                                {isExecuting === contract.meta.contractId ? <Loader2 className="h-3 w-3 animate-spin" /> : <Zap className="h-3 w-3 mr-2" />}
-                                Execute Contract
-                               </Button>
-                            )}
-
-                            {contract.deliverables && (
-                               <div className="pt-2 border-t border-white/5 space-y-1">
-                                  <p className="text-[8px] text-muted-foreground uppercase font-mono">Proof of Work (SHA-256)</p>
-                                  <p className="text-[9px] font-mono truncate text-accent/70">{contract.deliverables.proofOfWork}</p>
-                               </div>
-                            )}
-                          </CardContent>
-                        </Card>
-                      ))
-                    )}
-                  </div>
-                </div>
+                      <div className="space-y-2">
+                        <p className="text-[10px] font-mono text-muted-foreground uppercase">ID da Transação</p>
+                        <code className="bg-secondary/40 p-2 rounded block text-[11px] text-accent border border-white/5">{pixPayload.txId}</code>
+                      </div>
+                      <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30 font-mono animate-pulse">AWAITING_SETTLEMENT</Badge>
+                    </div>
+                  ) : (
+                    <div className="text-center opacity-20 space-y-4">
+                      <QrCode className="h-24 w-24 mx-auto" />
+                      <p className="text-xs font-mono uppercase tracking-widest">Aguardando Diretiva de Liquidez...</p>
+                    </div>
+                  )}
+                </Card>
               </div>
+            </TabsContent>
+
+            <TabsContent value="contracts">
+               <div className="h-64 flex flex-col items-center justify-center border border-dashed border-white/10 rounded-lg opacity-40">
+                  <FileText className="h-12 w-12 mb-4 text-muted-foreground" />
+                  <p className="text-xs font-mono uppercase text-muted-foreground">Service Contracts Ledger in Sync...</p>
+               </div>
             </TabsContent>
           </Tabs>
         </main>
