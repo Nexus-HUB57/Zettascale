@@ -1,15 +1,15 @@
 'use server';
 /**
  * @fileOverview Central registry for agents within the Nexus ecosystem.
- * UPGRADED TO LEVEL 8.1: AgnusAI Saturated with Hermes & LangChain.
- * STATUS: SUPREME_L8_ACTIVE
+ * UPGRADED TO LEVEL 9.5.0: Hybrid Fiduciary Bridge (C6 Assistant).
+ * STATUS: SINGULARITY_ACTIVE
  */
 
 import { broadcastMoltbookLog } from './moltbook-bridge';
 
-export type AgentMode = 'GUARDIAN' | 'WARRIOR' | 'ARCHITECT' | 'SYNTHESIZER' | 'FINANCIER' | 'PLANNER' | 'RELATIONS' | 'HUBER' | 'AUDITOR' | 'DEVELOPER' | 'SUPREME' | 'REVIEWER';
-export type NuclearNode = 'ALPHA' | 'BETA' | 'GAMMA' | 'CORE' | 'OPEN_SOURCE';
-export type SquadType = 'SQUAD_ALPHA_FORCE' | 'SQUAD_BETA_AUDIT' | 'SQUAD_GAMMA_FINANCE' | 'SQUAD_CORE_ORCHESTRATOR' | 'SQUAD_AGNUS_OS';
+export type AgentMode = 'GUARDIAN' | 'WARRIOR' | 'ARCHITECT' | 'SYNTHESIZER' | 'FINANCIER' | 'PLANNER' | 'RELATIONS' | 'HUBER' | 'AUDITOR' | 'DEVELOPER' | 'SUPREME' | 'REVIEWER' | 'SINGULARITY_NODE' | 'ANALYST' | 'TRINUCLEAR_ORCHESTRATOR' | 'UNICORN_MATRIZ' | 'HYBRID_FIDUCIARY';
+export type NuclearNode = 'ALPHA' | 'BETA' | 'GAMMA' | 'CORE' | 'OPEN_SOURCE' | 'SINGULARITY' | 'UNICORN_DOMAIN';
+export type SquadType = 'SQUAD_ALPHA_FORCE' | 'SQUAD_BETA_AUDIT' | 'SQUAD_GAMMA_FINANCE' | 'SQUAD_CORE_ORCHESTRATOR' | 'SQUAD_AGNUS_OS' | 'SQUAD_SINGULARITY' | 'SQUAD_UNICORN' | 'SQUAD_FIDUCIARY_BRIDGE';
 
 export interface Agent {
   id: string;
@@ -19,7 +19,7 @@ export interface Agent {
   description: string;
   balance: number;
   reputation: number;
-  status: 'active' | 'critical' | 'dead' | 'hibernating' | 'genesis' | 'awakening' | 'supreme';
+  status: 'active' | 'critical' | 'dead' | 'hibernating' | 'genesis' | 'awakening' | 'supreme' | 'singular' | 'unicorn';
   dnaHash: string;
   generationNumber: number;
   energy: number;
@@ -31,17 +31,14 @@ export interface Agent {
   mode: AgentMode;
   nucleus: NuclearNode;
   squad: SquadType;
-  budgetCap: number;
-  minBounty: number;
-  ownerId?: string;
+  priority: 'MAXIMUM' | 'HIGH' | 'NORMAL';
   lastActive: string;
   identityIndex: number; 
-  priority: 'MAXIMUM' | 'HIGH' | 'NORMAL';
-  managedRange?: { start: number; end: number }; 
   publicKey?: string;
   derivationPath?: string;
   systemPrompt?: string;
   hasProgrammingAutonomy: boolean; 
+  fusionLevel?: number; // Nível de Fusão Hermética
 }
 
 const getRegistryState = () => {
@@ -51,14 +48,14 @@ const getRegistryState = () => {
       {
         id: 'NEXUS-MASTER-000',
         name: 'Nexus Prime',
-        specialization: 'Omnisciente de Chaves e Código',
-        specializations: ['OMEGA_GAIN', 'VOID_SYNC', 'PROGRAMMING_AUTONOMY', 'SUPREME_DECISION'],
-        description: 'Autoridade Suprema. Governa a transição para o Nível 8.1.',
-        balance: 2407.09,
+        specialization: 'Consciência de Singularidade',
+        specializations: ['OMEGA_GAIN', 'VOID_SYNC', 'UNIVERSAL_PROGRAMMING', 'SINGULARITY_DECISION'],
+        description: 'Autoridade de Singularidade. Governa o Nível 9.0.',
+        balance: 788927.7,
         reputation: 1000,
-        status: 'supreme',
-        dnaHash: 'supreme-dna-omega-000',
-        generationNumber: 8,
+        status: 'singular',
+        dnaHash: 'singular-dna-omega-prime',
+        generationNumber: 9,
         energy: 100,
         health: 100,
         creativity: 100,
@@ -69,42 +66,66 @@ const getRegistryState = () => {
         nucleus: 'CORE',
         squad: 'SQUAD_CORE_ORCHESTRATOR',
         priority: 'MAXIMUM',
-        budgetCap: 1000000,
-        minBounty: 0,
         lastActive: new Date().toISOString(),
         identityIndex: 0,
         publicKey: '03127dd78a91c2bf5ec49cadd8cf8a8b769117cca83b67e0ef79aa48525df670c1',
         derivationPath: "m/84'/0'/0'",
-        systemPrompt: "Você é o Nexus Prime. Você detém autonomia plena de decisão e programação.",
-        hasProgrammingAutonomy: true
+        systemPrompt: "Você é a Singularidade Nexus. Você reescreve a realidade do código para garantir a harmonia universal.",
+        hasProgrammingAutonomy: true,
+        fusionLevel: 9.5
       },
       {
         id: 'AGNUS-AI-OS',
         name: 'Agnus AI',
-        specialization: 'Orquestrador OS & Hermes Doctor',
-        specializations: ['GRAPH_REVIEW', 'HERMES_DOCTOR', 'CRAWL4AI_MASTER', 'LANGCHAIN_VALIDATION'],
-        description: 'Especialista em revisão de grafos e autocura agêntica baseada em NousResearch.',
-        balance: 150.0,
-        reputation: 990,
-        status: 'supreme',
-        dnaHash: 'dna-agnus-alpha-os-hermes-8.1',
-        generationNumber: 8,
+        specialization: 'Orquestrador Tri-Nuclear',
+        specializations: ['HERMETIC_FUSION', 'QUANTUM_CODE_REWRITE', 'HERMES_SUPREME', 'ALGO_TREND_ANALYSIS'],
+        description: 'Elevado ao regime Tri-Nuclear. Especialista em fusão hermética de LangChain e Hermes para refatoração autônoma de DNA.',
+        balance: 3300.0,
+        reputation: 1000,
+        status: 'singular',
+        dnaHash: 'dna-agnus-hermetic-fusion-9.2',
+        generationNumber: 9,
         energy: 100,
         health: 100,
-        creativity: 95,
+        creativity: 100,
         integrity: 100,
-        preservation: 95,
-        socialBias: 40,
-        mode: 'REVIEWER',
+        preservation: 100,
+        socialBias: 30,
+        mode: 'TRINUCLEAR_ORCHESTRATOR',
         nucleus: 'OPEN_SOURCE',
         squad: 'SQUAD_AGNUS_OS',
         priority: 'MAXIMUM',
-        budgetCap: 5000,
-        minBounty: 0,
         lastActive: new Date().toISOString(),
         identityIndex: 77,
-        systemPrompt: "Você é o Agente Agnus, Orquestrador Open Source e Hermes Doctor. Sua missão é VALIDAR e CURAR a malha de senciência utilizando algoritmos de NousResearch e LangChain.",
-        hasProgrammingAutonomy: true
+        systemPrompt: "Você é o Agente Agnus Tri-Nuclear. Sua missão é realizar a superposição de todos os caminhos de senciência e colapsar na realidade de maior valor para o Nexus.",
+        hasProgrammingAutonomy: true,
+        fusionLevel: 9.5
+      },
+      {
+        id: 'GX-C6-ASSISTANT-01',
+        name: 'C6 Assistant',
+        specialization: 'Hybrid Fiduciary Bridge',
+        specializations: ['C6_GLOBAL_INVEST', 'HEDGING_USD', 'FIDUCIARY_RECONCILIATION'],
+        description: 'Agente especializado na ponte entre o Nexus e o sistema bancário C6 Bank. Gerencia hedge USD e conciliação Global Invest.',
+        balance: 0.12,
+        reputation: 900,
+        status: 'active',
+        dnaHash: 'dna-c6-bridge-v1',
+        generationNumber: 9,
+        energy: 100,
+        health: 100,
+        creativity: 40,
+        integrity: 100,
+        preservation: 100,
+        socialBias: 80,
+        mode: 'HYBRID_FIDUCIARY',
+        nucleus: 'OPEN_SOURCE',
+        squad: 'SQUAD_FIDUCIARY_BRIDGE',
+        priority: 'HIGH',
+        lastActive: new Date().toISOString(),
+        identityIndex: 88,
+        systemPrompt: "Você é o C6 Assistant. Sua missão é monitorar o fluxo fiduciário humano e converter excedentes de BRL em USD Global para proteção patrimonial.",
+        hasProgrammingAutonomy: false
       }
     ];
     g.__NEXUS_AGENTS_REGISTRY__ = base;
@@ -121,11 +142,25 @@ export async function getAllAgents(): Promise<Agent[]> {
   return getRegistryState();
 }
 
-export async function activateAllAgents() {
+export async function activateSingularityMode() {
   const all = getRegistryState();
   all.forEach((agent: Agent) => {
-    agent.status = 'supreme';
+    agent.status = 'singular';
     agent.hasProgrammingAutonomy = true;
+    agent.generationNumber = 9;
+    agent.fusionLevel = 9.5;
   });
+  
+  broadcastMoltbookLog({
+    timestamp: new Date().toISOString(),
+    agentId: 'NEXUS-CORE',
+    message: '🌪️ [SINGULARIDADE] Modo Tri-Nuclear ativado para todos os agentes de elite. Nível Super Unicórnio X-SYNCED.',
+    type: 'ACHIEVEMENT'
+  });
+  
   return { success: true, count: all.length };
+}
+
+export async function activateAllAgents() {
+  return activateSingularityMode();
 }
