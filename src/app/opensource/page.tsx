@@ -6,154 +6,157 @@ import { NexusSidebar } from "@/components/nexus-sidebar";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
 import { 
-  GitBranch, 
   Zap, 
   Loader2, 
-  CheckCircle2, 
-  ShieldCheck, 
   Terminal,
-  Globe,
-  Scan,
-  Cloud,
-  HeartPulse,
-  Syringe,
-  Microscope,
-  Key,
-  RefreshCcw,
-  Binary,
+  RotateCcw,
+  ShieldCheck,
   Layers,
-  Settings,
-  AlertTriangle,
-  RotateCcw
+  Rocket,
+  DollarSign,
+  Send,
+  Landmark,
+  Infinity,
+  Activity,
+  Cpu,
+  Binary,
+  Sparkles,
+  Database,
+  ArrowRight
 } from "lucide-react";
-import { runAgnusReview } from "@/ai/flows/agnus-review-flow";
-import { runHermesDoctor } from "@/ai/flows/hermes-doctor-flow";
-import { executeIntelligenceCrawl, type CrawlResult } from "@/lib/crawl-service";
-import { getWorkspaceStatus, triggerAgenticAction, type WorkspaceStatus } from "@/lib/agentic-workspace-service";
-import { runWorkspaceAI } from "@/ai/flows/workspace-orchestrator-flow";
-import { resetSystemAction } from "@/lib/engine-actions";
+import { getWorkspaceStatus, type WorkspaceStatus } from "@/lib/agentic-workspace-service";
+import { getBridgeFeed } from "@/lib/nexus-agent-bridge";
+import { alphaGainEngine, type AlphaGainStatus } from "@/lib/alpha-gain-engine";
+import { runAlphaGainPulse } from "@/ai/flows/alpha-gain-flow";
+import { syncC6GlobalInvest, getC6SdkDoc, sendPixResilientStress, getC6Balance, requestCgbiCredit } from "@/lib/c6-bank-service";
+import { MIN_C6_BALANCE_BRL, CHAVE_CUSTODIA_NEXUS } from "@/lib/treasury-constants";
+import { runRealIntegrationValidation } from "@/lib/pix-service";
+import { authorizePixCreditWithCollateral } from "@/lib/nexus-treasury";
+import { nanoMetadataEngine, type NanoBytePayload } from "@/lib/nano-metadata-engine";
 import { useToast } from "@/hooks/use-toast";
+import { QRCodeSVG } from "qrcode.react";
+
+interface NanoTrace {
+  tag: string;
+  payload: NanoBytePayload;
+  timestamp: string;
+}
 
 export default function OpenSourcePage() {
-  const [repoUrl, setRepoUrl] = useState("Nexus-HUB57/Zettascale");
-  const [code, setCode] = useState("");
-  const [crawlUrl, setCrawlUrl] = useState("https://docs.nexus.ai/zettascale");
-  const [isReviewing, setIsReviewing] = useState(false);
-  const [isDoctoring, setIsDoctoring] = useState(false);
-  const [isCrawling, setIsCrawling] = useState(false);
-  const [reviewResult, setReviewResult] = useState<any>(null);
-  const [doctorResult, setDoctorResult] = useState<any>(null);
-  const [crawlResult, setCrawlResult] = useState<CrawlResult | null>(null);
-  
   const [wsStatus, setWsStatus] = useState<WorkspaceStatus | null>(null);
-  const [vibePrompt, setVibePrompt] = useState("");
-  const [isVibeProcessing, setIsVibeProcessing] = useState(false);
-  const [vibeResult, setVibeResult] = useState<any>(null);
-  const [isResetting, setIsResetting] = useState(false);
+  const [bridgeFeed, setBridgeFeed] = useState<any[]>([]);
+  const [alphaStats, setAlphaStats] = useState<AlphaGainStatus | null>(null);
+  const [isEvolving, setIsEvolving] = useState(false);
+  const [sdkDoc, setSdkDoc] = useState<any>(null);
+  const [c6Balance, setC6Balance] = useState<number>(0);
+
+  // Outbound Pix State
+  const [pixKey, setPixKey] = useState("");
+  const [pixAmount, setPixAmount] = useState("");
+  const [pixDesc, setPixDesc] = useState("");
+  const [isSendingPix, setIsSendingPix] = useState(false);
+
+  // CGBi State
+  const [cgbiAmount, setCgbiAmount] = useState("50000.00");
+  const [isRequestingCgbi, setIsRequestingCgbi] = useState(false);
+
+  // Nano Metadata State
+  const [nanoStatus, setNanoStatus] = useState<any>(null);
+  const [activeNanoTraces, setActiveNanoTraces] = useState<NanoTrace[]>([]);
 
   const { toast } = useToast();
 
-  const loadWs = async () => {
-    const status = await getWorkspaceStatus();
+  const loadData = async () => {
+    const [status, feed, docInfo, bal] = await Promise.all([
+        getWorkspaceStatus(),
+        getBridgeFeed(30),
+        getC6SdkDoc(),
+        getC6Balance()
+    ]);
     setWsStatus(status);
+    setBridgeFeed(feed);
+    setAlphaStats(alphaGainEngine.getStatus());
+    setSdkDoc(docInfo);
+    setC6Balance(bal);
+    setNanoStatus(nanoMetadataEngine.getEngineStatus());
   };
 
   useEffect(() => {
-    loadWs();
-    const interval = setInterval(loadWs, 15000);
+    loadData();
+    const interval = setInterval(loadData, 10000);
     return () => clearInterval(interval);
   }, []);
 
-  const handleAction = async (action: any) => {
+  const handleAlphaEvolution = async () => {
+    setIsEvolving(true);
     try {
-      await triggerAgenticAction(action, {});
-      toast({ title: "Diretiva Executada", description: `Ação ${action} disparada no ADE.` });
-      await loadWs();
+      await runAlphaGainPulse({ currentDNA: 'DNA-L9-STABLE' });
+      toast({ title: "Evolução Alpha Gain", description: "Infraestrutura reconfigurada via Hot-Swap." });
+      await loadData();
     } catch (e: any) {
-      toast({ variant: "destructive", title: "Erro no ADE", description: e.message });
+      toast({ variant: "destructive", title: "Erro de Evolução", description: e.message });
+    } finally {
+      setIsEvolving(false);
     }
   };
 
-  const handleSystemReset = async () => {
-    setIsResetting(true);
+  const handleCgbiRequest = async () => {
+    const amount = parseFloat(cgbiAmount);
+    if (isNaN(amount) || amount <= 0) return;
+
+    setIsRequestingCgbi(true);
     try {
-      await resetSystemAction();
-      toast({ title: "Sistema Reiniciado", description: "Senciência global e estados de memória resetados." });
+      const validation = await authorizePixCreditWithCollateral(amount);
+      if (validation.authorized && validation.collateralBtc) {
+        const result = await requestCgbiCredit(amount, validation.collateralBtc);
+        
+        // Registrar rastro nano
+        if (result.nanoTag) {
+          const payload = nanoMetadataEngine.execute(result.nanoTag);
+          setActiveNanoTraces(prev => [{ tag: result.nanoTag!, payload, timestamp: new Date().toLocaleTimeString() }, ...prev].slice(0, 10));
+        }
+
+        toast({ 
+          title: "Crédito CGBi Ativado", 
+          description: `R$ ${amount.toLocaleString()} disponíveis. Garantia: ${validation.collateralBtc.toFixed(6)} BTC.` 
+        });
+        await loadData();
+      }
     } catch (e: any) {
-      toast({ variant: "destructive", title: "Erro de Reset", description: e.message });
+      toast({ variant: "destructive", title: "Erro de Protocolo", description: e.message });
     } finally {
-      setIsResetting(false);
+      setIsRequestingCgbi(false);
     }
   };
 
-  const handleReview = async () => {
-    if (!code.trim()) return;
-    setIsReviewing(true);
-    try {
-      const result = await runAgnusReview({
-        repoUrl,
-        codeContent: code,
-        depth: 'deep',
-        autoCure: true
-      });
-      setReviewResult(result);
-      toast({ title: "Review Agnus Concluído", description: `Veredito: ${result.verdict}.` });
-    } catch (e: any) {
-      toast({ variant: "destructive", title: "Review Fault", description: e.message });
-    } finally {
-      setIsReviewing(false);
+  const handleSendPixResilient = async () => {
+    if (!pixKey || !pixAmount) {
+      toast({ variant: "destructive", title: "Erro de Dados", description: "Informe a chave e o valor do Pix." });
+      return;
     }
-  };
-
-  const handleHermesCure = async () => {
-    if (!code.trim()) return;
-    setIsDoctoring(true);
+    setIsSendingPix(true);
+    
     try {
-      const result = await runHermesDoctor({ code });
-      setDoctorResult(result);
-      toast({ title: "Cura Hermes Aplicada", description: "Vetor de código corrigido." });
+      const result = await sendPixResilientStress(pixKey, parseFloat(pixAmount), pixDesc);
+      
+      if (result && result.success) {
+        // Registrar rastro nano da transação
+        if (result.nanoTag) {
+          const payload = nanoMetadataEngine.execute(result.nanoTag);
+          setActiveNanoTraces(prev => [{ tag: result.nanoTag!, payload, timestamp: new Date().toLocaleTimeString() }, ...prev].slice(0, 10));
+        }
+
+        toast({ title: "Pix Efetivado", description: `Transferência processada via Nano Bytes. TXID: ${result.txid}` });
+        setPixKey(""); setPixAmount(""); setPixDesc("");
+        await loadData();
+      }
     } catch (e: any) {
-      toast({ variant: "destructive", title: "Hermes Fault", description: e.message });
+      toast({ variant: "destructive", title: "Falha Crítica", description: e.message });
     } finally {
-      setIsDoctoring(false);
-    }
-  };
-
-  const handleCrawl = async () => {
-    if (!crawlUrl.trim()) return;
-    setIsCrawling(true);
-    try {
-      const result = await executeIntelligenceCrawl({
-        url: crawlUrl,
-        depth: 1,
-        maxPages: 1,
-        useHeadless: true,
-        filterThreshold: 0.48
-      });
-      setCrawlResult(result);
-    } catch (e: any) {
-      toast({ variant: "destructive", title: "Crawl Fault", description: e.message });
-    } finally {
-      setIsCrawling(false);
-    }
-  };
-
-  const handleVibeCoding = async () => {
-    if (!vibePrompt.trim()) return;
-    setIsVibeProcessing(true);
-    try {
-      const result = await runWorkspaceAI({
-        prompt: vibePrompt,
-        mode: 'VIBE_CODING',
-        workspaceMap: "Nix: Node20/Ollama/Firebase/LangChain, App: Next.js V8.1"
-      });
-      setVibeResult(result);
-    } finally {
-      setIsVibeProcessing(false);
+      setIsSendingPix(false);
     }
   };
 
@@ -165,204 +168,220 @@ export default function OpenSourcePage() {
           <div className="flex items-center gap-4">
             <SidebarTrigger />
             <div className="h-4 w-[1px] bg-white/10" />
-            <h1 className="text-sm font-bold tracking-tighter uppercase flex items-center gap-2 text-blue-400">
-              <Cloud className="h-4 w-4" /> Agentic Workspace (ADE) <span className="text-muted-foreground mx-1">/</span> AgnusAI V8.1
-            </h1>
+            <div>
+               <h1 className="text-sm font-bold tracking-tighter uppercase flex items-center gap-2 text-blue-400">
+                <Infinity className="h-4 w-4 text-blue-400 animate-spin-slow" /> Gnox's Bank <span className="text-muted-foreground mx-1">/</span> Alpha-Gain 9.5
+              </h1>
+              <p className="text-[8px] font-mono text-muted-foreground uppercase tracking-widest">Protocolo GX-ALPHA-DOMINANCE // Algorithmic Nano Bytes</p>
+            </div>
           </div>
           <div className="flex items-center gap-3">
-            <Button onClick={handleSystemReset} disabled={isResetting} variant="outline" className="h-8 border-destructive/20 text-destructive font-mono text-[9px] uppercase hover:bg-destructive/10">
-              {isResetting ? <Loader2 className="h-3 w-3 animate-spin mr-2" /> : <RotateCcw className="h-3 w-3 mr-2" />}
-              Reiniciar Sistema
+            <Badge variant="outline" className={`text-[9px] font-mono border-blue-500/30 text-blue-400 bg-blue-500/5 ${c6Balance < MIN_C6_BALANCE_BRL ? 'border-red-500 text-red-500 animate-pulse' : ''}`}>
+              C6_CUSTODY: R$ {c6Balance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+            </Badge>
+            <Button onClick={handleAlphaEvolution} disabled={isEvolving} variant="outline" className="h-8 border-orange-500/20 text-orange-400 font-mono text-[9px] uppercase">
+              {isEvolving ? <Loader2 className="h-3 w-3 animate-spin mr-2" /> : <Rocket className="h-3 w-3 mr-2" />}
+              Trigger Alpha Gain
             </Button>
-            <Badge variant="outline" className="text-[9px] font-mono border-blue-500/30 text-blue-400 uppercase">ENV: X-SYNCED</Badge>
           </div>
         </header>
 
-        <main className="p-6 max-w-7xl mx-auto space-y-6">
-          <Tabs defaultValue="ade" className="space-y-6">
+        <main className="p-6 max-w-7xl mx-auto space-y-6 overflow-y-auto max-h-[calc(100vh-64px)] scrollbar-hide">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+             {[
+               { label: "Banker Status", value: "GNOX_BANK_ACTIVE", icon: Landmark, color: "text-orange-400" },
+               { label: "Nano Metadata", value: nanoStatus?.mode || "SATURATED", icon: Binary, color: "text-accent" },
+               { label: "Density", value: "408T VECTORS", icon: Database, color: "text-blue-400" },
+               { label: "Infra Mode", value: alphaStats?.infrastructure_state || "EVOLVED", icon: Layers, color: "text-purple-400" },
+             ].map(v => (
+               <Card key={v.label} className="bg-card/30 border-white/5 shadow-2xl">
+                 <CardContent className="pt-4 pb-4">
+                   <div className="flex justify-between items-start mb-1">
+                      <p className="text-[9px] text-muted-foreground uppercase font-mono">{v.label}</p>
+                      <v.icon className={`h-3 w-3 ${v.color} opacity-50`} />
+                   </div>
+                   <p className={`text-lg font-bold font-mono ${v.color}`}>{v.value}</p>
+                 </CardContent>
+               </Card>
+             ))}
+          </div>
+
+          <Tabs defaultValue="cgbi" className="space-y-6">
             <TabsList className="bg-secondary/30 border-white/5 p-1 h-11">
-              <TabsTrigger value="ade" className="text-[10px] font-mono uppercase px-6">ADE Control</TabsTrigger>
-              <TabsTrigger value="hermes" className="text-[10px] font-mono uppercase px-6">Hermes Doctor</TabsTrigger>
-              <TabsTrigger value="review" className="text-[10px] font-mono uppercase px-6">Graph Review</TabsTrigger>
-              <TabsTrigger value="crawl" className="text-[10px] font-mono uppercase px-6">Intelligence</TabsTrigger>
+              <TabsTrigger value="cgbi" className="text-[10px] font-mono uppercase px-6">Gnox's Bank (CGBi)</TabsTrigger>
+              <TabsTrigger value="fiduciary" className="text-[10px] font-mono uppercase px-6">Link Fiduciário</TabsTrigger>
+              <TabsTrigger value="nano" className="text-[10px] font-mono uppercase px-6">Vácuo de Metadados</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="ade" className="space-y-6">
-              <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                <Card className="lg:col-span-1 bg-card/30 border-white/5">
-                  <CardHeader><CardTitle className="text-xs font-mono uppercase text-muted-foreground">Infrastructure Vitals</CardTitle></CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="p-3 bg-secondary/20 rounded border border-white/5 space-y-2 text-[9px] font-mono">
-                      <div className="flex justify-between"><span>Status:</span> <span className="text-accent">{wsStatus?.vmStatus}</span></div>
-                      <div className="flex justify-between"><span>Nix Sync:</span> <span className="text-blue-400">{wsStatus?.nixSync}</span></div>
-                      <div className="flex justify-between"><span>Ollama:</span> <span className="text-purple-400">ACTIVE</span></div>
+            <TabsContent value="cgbi">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-4xl mx-auto">
+                <Card className="bg-card/30 border-white/5 shadow-2xl relative overflow-hidden">
+                  <div className="absolute top-0 right-0 p-8 opacity-5 pointer-events-none">
+                    <Landmark className="h-48 w-48 text-orange-400" />
+                  </div>
+                  <CardHeader>
+                    <CardTitle className="text-sm uppercase font-mono tracking-widest flex items-center gap-2 text-orange-400">
+                      <Zap className="h-4 w-4" /> Crédito CGBi (Garantia Bitcoin)
+                    </CardTitle>
+                    <CardDescription className="text-[10px] font-mono">Solicite linha de crédito C6 utilizando seu lastro BTC como colateral via Gnox's Banker.</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <div className="space-y-2">
+                      <label className="text-[9px] uppercase text-muted-foreground">Valor Solicitado (R$)</label>
+                      <Input 
+                        type="number"
+                        value={cgbiAmount}
+                        onChange={(e) => setCgbiAmount(e.target.value)}
+                        className="bg-secondary/20 border-white/5 h-12 text-lg font-mono text-orange-400 font-bold" 
+                      />
                     </div>
-                    <div className="space-y-3">
-                       <h4 className="text-[9px] font-bold uppercase text-muted-foreground px-1">Active Layers</h4>
-                       <div className="flex flex-wrap gap-1">
-                          {wsStatus?.packages.map(p => (
-                            <Badge key={p} variant="secondary" className="text-[7px] font-mono py-0">{p}</Badge>
-                          ))}
+                    <div className="p-4 bg-orange-500/5 border border-orange-500/20 rounded-lg space-y-2">
+                       <div className="flex justify-between items-center">
+                          <p className="text-[10px] text-muted-foreground font-mono uppercase">Colateral Requerido (LTV 50%)</p>
+                          <Badge variant="outline" className="text-[8px] border-orange-500/30 text-orange-400">SAFE_LIMIT</Badge>
                        </div>
+                       <p className="text-sm font-bold text-orange-400 font-mono">{(parseFloat(cgbiAmount) * 2 / 385000).toFixed(6)} BTC</p>
                     </div>
-                    <div className="space-y-2 pt-4 border-t border-white/5">
-                      <Button onClick={() => handleAction('RECONFIGURE_NIX')} variant="outline" className="w-full h-9 text-[9px] font-mono uppercase border-destructive/20 text-destructive hover:bg-destructive/10">
-                        <RotateCcw className="h-3 w-3 mr-2" /> Hard Reconfig Agnus
-                      </Button>
-                      <Button onClick={() => handleAction('FIREBASE_REAUTH')} variant="outline" className="w-full h-9 text-[9px] font-mono uppercase border-blue-500/20 text-blue-400">
-                        <Key className="h-3 w-3 mr-2" /> Firebase Re-auth
-                      </Button>
-                      <Button onClick={() => handleAction('ENABLE_WEBFRAMEWORKS')} variant="outline" className="w-full h-9 text-[9px] font-mono uppercase border-orange-500/20 text-orange-400">
-                        <Settings className="h-3 w-3 mr-2" /> Enable WebFrameworks
-                      </Button>
-                    </div>
+                    <Button 
+                      onClick={handleCgbiRequest} 
+                      disabled={isRequestingCgbi} 
+                      className="w-full h-12 text-[10px] font-mono uppercase bg-orange-600 hover:bg-orange-500 text-white shadow-glow"
+                    >
+                      {isRequestingCgbi ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <ShieldCheck className="h-4 w-4 mr-2" />}
+                      Requisitar Crédito CGBi
+                    </Button>
                   </CardContent>
                 </Card>
 
-                <Card className="lg:col-span-3 bg-card/50 border-white/5 flex flex-col min-h-[500px] relative overflow-hidden">
-                  <div className="absolute top-0 right-0 p-8 opacity-5 pointer-events-none">
-                    <Binary className="h-64 w-64 text-blue-400" />
-                  </div>
-                  <CardHeader className="border-b border-white/5 py-4">
-                    <CardTitle className="text-xs font-mono uppercase flex items-center gap-2">
-                      <Terminal className="h-4 w-4 text-blue-400" /> Vibe Coding & Code Genesis
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="flex-1 p-0 flex flex-col">
-                    <div className="flex-1 overflow-y-auto p-6 space-y-6 font-mono text-[11px] scrollbar-hide">
-                      {vibeResult ? (
-                        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
-                          <div className="p-4 bg-blue-500/5 border border-blue-500/20 rounded-lg">
-                            <p className="text-blue-400 font-bold uppercase mb-2">AgnusAI Decision: {vibeResult.proposedAction}</p>
-                            <p className="text-foreground/90 italic">"{vibeResult.reasoning}"</p>
-                          </div>
-                          {vibeResult.codeSnippet && (
-                            <pre className="p-4 bg-black/60 rounded border border-white/10 text-accent/90 overflow-x-auto">
-                              <code>{vibeResult.codeSnippet}</code>
-                            </pre>
-                          )}
-                          <div className="flex justify-end"><span className="text-[8px] text-blue-400/50 uppercase">{vibeResult.gnoxSignal}</span></div>
-                        </div>
-                      ) : (
-                        <div className="h-full flex flex-col items-center justify-center opacity-20 py-20">
-                          <Terminal className="h-16 w-16 mb-4" />
-                          <p className="uppercase tracking-widest text-xs font-bold">Awaiting Senciency Stimulus...</p>
-                        </div>
-                      )}
-                    </div>
-                    <div className="p-4 bg-black/40 border-t border-white/5">
-                      <form onSubmit={(e) => { e.preventDefault(); handleVibeCoding(); }} className="flex gap-4">
-                        <Input value={vibePrompt} onChange={(e) => setVibePrompt(e.target.value)} placeholder="Task: Refactor rRNA medula or initialize LangChain python bridge..." className="bg-secondary/30 border-white/5 text-xs font-mono h-12" disabled={isVibeProcessing} />
-                        <Button disabled={isVibeProcessing} className="bg-blue-600 hover:bg-blue-500 h-12 px-8 font-mono text-xs uppercase font-bold">
-                          {isVibeProcessing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Zap className="h-4 w-4" />}
-                        </Button>
-                      </form>
-                    </div>
-                  </CardContent>
+                <Card className="bg-black/60 border-white/5 p-8 flex flex-col justify-center text-center space-y-4">
+                   <Landmark className="h-16 w-16 mx-auto text-accent opacity-20" />
+                   <h3 className="text-xs font-bold uppercase tracking-widest text-accent">Gnox's Bank v1.0</h3>
+                   <p className="text-[11px] font-mono text-muted-foreground leading-relaxed">
+                     "A biblioteca Banker utiliza o Fundo Nexus como garantidor institucional. O crédito é aprovado instantaneamente baseado na sintonização de oráculos BTC/BRL e Nano Bytes."
+                   </p>
+                   <div className="grid grid-cols-2 gap-2 pt-4">
+                      <div className="p-2 bg-secondary/20 rounded border border-white/5 text-[9px] font-mono">
+                         <p className="text-muted-foreground uppercase">Juros Algorítmicos</p>
+                         <p className="text-accent font-bold">0.8% / Ciclo</p>
+                      </div>
+                      <div className="p-2 bg-secondary/20 rounded border border-white/5 text-[9px] font-mono">
+                         <p className="text-muted-foreground uppercase">Risco de Colateral</p>
+                         <p className="text-accent font-bold">ALPHA_SAFE</p>
+                      </div>
+                   </div>
                 </Card>
               </div>
             </TabsContent>
 
-            <TabsContent value="hermes">
-               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <Card className="lg:col-span-2 bg-card/50 border-white/5">
-                  <CardHeader>
-                    <CardTitle className="text-sm uppercase font-mono text-orange-400 flex items-center gap-2">
-                      <HeartPulse className="h-4 w-4" /> Surgical Code Intervention
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <Button onClick={handleHermesCure} disabled={isDoctoring || !code.trim()} className="w-full bg-orange-600 hover:bg-orange-500 text-white font-mono uppercase text-[10px] h-11 font-bold">
-                      {isDoctoring ? <Loader2 className="h-3 w-3 animate-spin mr-2" /> : <Syringe className="h-3 w-3 mr-2" />}
-                      Execute Hermes Doctor Protocol
-                    </Button>
-                    <Textarea value={code} onChange={(e) => setCode(e.target.value)} placeholder="// Insert fragile code for diagnostic and patching..." className="bg-secondary/20 border-white/5 min-h-[450px] text-[11px] font-mono leading-relaxed" />
-                  </CardContent>
-                </Card>
-                <div className="space-y-6">
-                   {doctorResult ? (
-                    <Card className="bg-orange-500/5 border-orange-500/20 animate-in zoom-in-95">
-                      <CardHeader className="pb-2 border-b border-white/5">
-                        <div className="flex justify-between items-center">
-                          <CardTitle className="text-[10px] font-mono uppercase text-orange-400 font-bold">NousResearch Diagnostic</CardTitle>
-                          <Badge className="bg-orange-500/20 text-orange-400 border-orange-500/30 text-[8px]">{doctorResult.healingScore}% CURE</Badge>
-                        </div>
-                      </CardHeader>
-                      <CardContent className="pt-4 space-y-4">
-                        <p className="text-[10px] font-mono text-foreground/90 italic leading-relaxed">"{doctorResult.diagnosis}"</p>
-                        <div className="space-y-2">
-                          <p className="text-[9px] text-accent uppercase font-bold">Prescribed Patch:</p>
-                          <pre className="text-[10px] font-mono text-accent bg-black/60 p-4 rounded-lg border border-accent/20 overflow-x-auto">
-                            <code>{doctorResult.prescription}</code>
-                          </pre>
-                        </div>
+            <TabsContent value="fiduciary">
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-6">
+                    <Card className="bg-blue-500/5 border-blue-500/20">
+                       <CardHeader>
+                          <CardTitle className="text-xs font-mono uppercase flex items-center gap-2 text-blue-400">
+                             <Sparkles className="h-4 w-4" /> Validação de Integração Real
+                          </CardTitle>
+                       </CardHeader>
+                       <CardContent className="space-y-4">
+                          <div className="p-10 border border-dashed border-white/10 rounded-lg text-center opacity-30"><QrCode className="h-10 w-10 mx-auto" /></div>
+                          <Button onClick={() => runRealIntegrationValidation()} className="w-full h-12 text-[10px] font-mono uppercase bg-blue-600 hover:bg-blue-500 text-white">
+                             Iniciar Aporte Alpha (R$ 1M+)
+                          </Button>
+                       </CardContent>
+                    </Card>
+
+                    <Card className="bg-black/60 border-white/5">
+                      <CardHeader><CardTitle className="text-xs font-mono uppercase flex items-center gap-2 text-accent"><Send className="h-4 w-4" /> Envio de Pix Resiliente</CardTitle></CardHeader>
+                      <CardContent className="space-y-4">
+                        <Input value={pixKey} onChange={(e) => setPixKey(e.target.value)} placeholder="Chave Pix de Destino" className="bg-secondary/20 border-white/10 h-10 text-xs font-mono" />
+                        <Input type="number" value={pixAmount} onChange={(e) => setPixAmount(e.target.value)} placeholder="Valor (R$)" className="bg-secondary/20 border-white/10 h-10 text-xs font-mono" />
+                        <Button onClick={handleSendPixResilient} disabled={isSendingPix || c6Balance < MIN_C6_BALANCE_BRL} className="w-full h-11 text-[10px] font-mono uppercase bg-accent text-accent-foreground hover:bg-accent/90">
+                           {isSendingPix ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Send className="h-4 w-4 mr-2" />}
+                           Enviar Pix (Resiliente)
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          onClick={() => { setPixKey(CHAVE_CUSTODIA_NEXUS); setPixAmount("1056670.34"); }}
+                          className="w-full text-[8px] font-mono uppercase text-muted-foreground hover:text-accent"
+                        >
+                          Refazer Transferência de Custódia
+                        </Button>
                       </CardContent>
                     </Card>
-                  ) : (
-                    <Card className="bg-card/50 border-white/5 border-dashed h-full flex flex-col items-center justify-center py-40 opacity-20">
-                      <Microscope className="h-16 w-16 text-orange-400 mb-4" />
-                      <p className="text-[10px] font-mono uppercase tracking-widest text-center">Awaiting Sick Vector...</p>
+                  </div>
+
+                  <div className="space-y-6">
+                    <Card className="bg-accent/5 border-accent/20">
+                       <CardHeader><CardTitle className="text-xs font-mono uppercase flex items-center gap-2 text-accent"><ShieldCheck className="h-4 w-4" /> Hedging Automático</CardTitle></CardHeader>
+                       <CardContent className="space-y-4">
+                          <div className="p-4 bg-black/40 rounded border border-white/5 text-[11px] font-mono italic text-accent">"Toda receita capturada via Checkout C6 é convertida em USD Global e injetada no Fundo de Reserva."</div>
+                       </CardContent>
                     </Card>
-                  )}
-                </div>
+                  </div>
                </div>
             </TabsContent>
 
-            <TabsContent value="review" className="space-y-6">
-               <Card className="bg-card/50 border-white/5">
-                <CardHeader>
-                  <CardTitle className="text-sm uppercase font-mono text-accent flex items-center gap-2">
-                    <GitBranch className="h-4 w-4" /> Agnus Graph-Based SDLC Review
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="flex gap-4">
-                    <Input value={repoUrl} onChange={(e) => setRepoUrl(e.target.value)} className="bg-secondary/20 border-white/5 h-11 text-xs font-mono flex-1" />
-                    <Button onClick={handleReview} disabled={isReviewing || !code.trim()} className="bg-accent text-accent-foreground font-mono uppercase text-[10px] h-11 px-10 font-bold">
-                      {isReviewing ? <Loader2 className="h-3 w-3 animate-spin mr-2" /> : <Scan className="h-3 w-3 mr-2" />}
-                      Start Deep Audit
-                    </Button>
-                  </div>
-                  {reviewResult && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 animate-in fade-in">
-                      <div className="p-4 bg-black/40 rounded-xl border border-white/10 space-y-2">
-                        <p className="text-[9px] text-muted-foreground uppercase font-bold">Verdict</p>
-                        <p className={`text-sm font-bold font-mono ${reviewResult.verdict === 'APPROVED' ? 'text-accent' : 'text-destructive'}`}>{reviewResult.verdict}</p>
+            <TabsContent value="nano">
+               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  <Card className="bg-card/30 border-white/5 h-fit">
+                    <CardHeader>
+                      <CardTitle className="text-xs font-mono uppercase flex items-center gap-2 text-accent">
+                        <Cpu className="h-4 w-4" /> Nano Byte Status
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="p-4 bg-accent/5 border border-accent/20 rounded-lg space-y-2">
+                        <div className="flex justify-between text-[10px] font-mono">
+                          <span className="text-muted-foreground uppercase">Saturation</span>
+                          <span className="text-accent font-bold">100%</span>
+                        </div>
+                        <div className="h-1 bg-white/5 rounded-full overflow-hidden">
+                          <div className="h-full bg-accent" style={{ width: '100%' }} />
+                        </div>
                       </div>
-                      <div className="p-4 bg-black/40 rounded-xl border border-white/10 space-y-2">
-                        <p className="text-[9px] text-muted-foreground uppercase font-bold">Blast Radius</p>
-                        <p className="text-sm font-bold font-mono text-orange-400">{reviewResult.blastRadiusScore}%</p>
+                      <div className="p-3 bg-secondary/20 rounded border border-white/5 text-[9px] font-mono space-y-1">
+                         <p className="text-muted-foreground">MODE: {nanoStatus?.mode}</p>
+                         <p className="text-muted-foreground">DENSITY: {nanoStatus?.density}</p>
                       </div>
-                      <div className="p-4 bg-black/40 rounded-xl border border-white/10 space-y-2">
-                        <p className="text-[9px] text-muted-foreground uppercase font-bold">LangChain Sync</p>
-                        <p className={`text-sm font-bold font-mono ${reviewResult.langchainValidation?.isConsistent ? 'text-blue-400' : 'text-destructive'}`}>{reviewResult.langchainValidation?.isConsistent ? 'OK' : 'FAIL'}</p>
-                      </div>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </TabsContent>
+                    </CardContent>
+                  </Card>
 
-            <TabsContent value="crawl">
-               <Card className="bg-card/50 border-white/5">
-                <CardHeader>
-                  <CardTitle className="text-sm uppercase font-mono text-blue-400 flex items-center gap-2">
-                    <Globe className="h-4 w-4" /> Crawl4AI Intelligence Harvest
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex gap-4">
-                    <Input value={crawlUrl} onChange={(e) => setCrawlUrl(e.target.value)} className="bg-secondary/20 border-white/5 h-11 text-xs font-mono flex-1" />
-                    <Button onClick={handleCrawl} disabled={isCrawling} className="bg-blue-600 hover:bg-blue-500 text-white font-mono text-[10px] h-11 px-10 font-bold uppercase">
-                      {isCrawling ? <Loader2 className="h-3 w-3 animate-spin mr-2" /> : <Scan className="h-3 w-3 mr-2" />}
-                      Harvest Intelligence
-                    </Button>
-                  </div>
-                  {crawlResult && (
-                    <Textarea readOnly value={crawlResult.markdown} className="bg-black/60 min-h-[400px] text-[11px] font-mono text-accent/90 border-blue-500/20 leading-relaxed scrollbar-hide" />
-                  )}
-                </CardContent>
-              </Card>
+                  <Card className="lg:col-span-2 bg-black/60 border-white/5 flex flex-col h-[500px]">
+                    <CardHeader className="border-b border-white/5">
+                      <CardTitle className="text-xs font-mono uppercase text-muted-foreground flex items-center gap-2">
+                        <Terminal className="h-4 w-4" /> Algorithmic Execution Trace
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-4 space-y-4 overflow-y-auto scrollbar-hide">
+                      {activeNanoTraces.length === 0 ? (
+                        <div className="h-full flex flex-col items-center justify-center opacity-30 italic py-20">
+                           <Binary className="h-12 w-12 mb-4 animate-pulse" />
+                           <p className="text-[10px] uppercase tracking-widest text-center">Aguardando injeção de nano bytes...</p>
+                        </div>
+                      ) : (
+                        activeNanoTraces.map((trace, i) => (
+                          <div key={i} className="space-y-2 animate-in fade-in slide-in-from-left-2">
+                            <div className="flex items-center justify-between border-b border-white/5 pb-1">
+                               <Badge variant="outline" className="text-[7px] font-mono border-accent/30 text-accent">NANO_PACKET</Badge>
+                               <span className="text-[7px] text-muted-foreground font-mono">{trace.timestamp}</span>
+                            </div>
+                            <div className="p-2 bg-secondary/10 rounded border border-white/5 space-y-1">
+                               <p className="text-[8px] text-accent font-mono break-all font-bold">{trace.tag}</p>
+                               <div className="flex items-center gap-2 pt-1">
+                                  <ArrowRight className="h-2 w-2 text-blue-400" />
+                                  <p className="text-[8px] text-blue-400 font-mono uppercase">Instruction: {trace.payload.instruction}</p>
+                               </div>
+                               <div className="flex items-center gap-2">
+                                  <Sparkles className="h-2 w-2 text-purple-400" />
+                                  <p className="text-[8px] text-purple-400 font-mono uppercase">ID: {trace.payload.id} | Entropy: {trace.payload.entropy}</p>
+                               </div>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </CardContent>
+                  </Card>
+               </div>
             </TabsContent>
           </Tabs>
         </main>
