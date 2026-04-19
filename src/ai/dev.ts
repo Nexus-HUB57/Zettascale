@@ -37,4 +37,6 @@ import '@/ai/flows/autonomous-execution-decision-flow.ts';
 import '@/ai/flows/gemini-update-orchestrator.ts'; 
 import '@/ai/flows/phd-nerd-ollama-flow.ts';
 import '@/ai/flows/agnus-review-flow.ts'; 
-import '@/ai/flows/hermes-doctor-flow.ts'; // Integração NousResearch
+import '@/ai/flows/agnus-analyst-flow.ts';
+import '@/ai/flows/hermes-doctor-flow.ts';
+import '@/ai/flows/alpha-gain-flow.ts'; // Novo: Alpha Gain Evolution
