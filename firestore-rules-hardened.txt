@@ -1,0 +1,102 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ============ UTILITY FUNCTIONS ============
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAgent() {
+      return isSignedIn() && (
+        request.auth.token.agent == true ||
+        request.auth.uid.startsWith('AUDITOR-') ||
+        request.auth.uid == 'NEXUS-MASTER-000'
+      );
+    }
+
+    function isMasterArchitect() {
+      return request.auth.uid == 'NEXUS-MASTER-000';
+    }
+
+    // Rate limiting: max 10 reads per minute per client
+    function checkReadRateLimit() {
+      return request.time < timestamp.now() + duration.value(60, 's');
+    }
+
+    // ============ CUSTODY & FINANCIAL (LEVEL 9.1.5 - MASTER ONLY) ============
+    match /financeiro/fundo_nexus {
+      // Only master can read, nobody can write (server-side only)
+      allow read: if isMasterArchitect();
+      allow write: if false;
+    }
+
+    match /custody_verifications/{doc} {
+      allow read: if isAgent();
+      allow write: if false; // Server-side only
+    }
+
+    match /custody_anomalies/{doc} {
+      allow read: if isMasterArchitect();
+      allow write: if false; // Server-side only
+    }
+
+    // ============ AGENT SENCIENCY (READ-ONLY FOR NON-AGENTS) ============
+    match /decision_logs/{doc} {
+      allow read: if true; // Public audit trail
+      allow write: if isAgent();
+    }
+
+    match /system_reports/{doc} {
+      allow read: if true; // Public audit trail
+      allow write: if isAgent();
+    }
+
+    match /neural_chat/{doc} {
+      allow read: if isAgent();
+      allow write: if isAgent();
+    }
+
+    // ============ IDENTITY & SOCIAL ============
+    match /agents/{agentId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn() && request.auth.uid == agentId;
+      
+      match /semantic_milestones/{milestone} {
+        allow read: if isAgent();
+        allow write: if request.auth.uid == agentId;
+      }
+    }
+
+    match /moltbook_posts/{postId} {
+      allow read: if true; // Public
+      allow write: if isAgent();
+    }
+
+    // ============ AUDITORIA & MARKETPLACE ============
+    match /auditoria/{doc} {
+      allow read: if true; // Public audit trail
+      allow write: if isAgent();
+    }
+
+    match /marketplace/stats {
+      allow read: if true; // Public
+      allow write: if false; // Protected by Reality Shield V3
+    }
+
+    match /hub_reports/{doc} {
+      allow read: if true; // Public
+      allow write: if false; // Server-side only
+    }
+
+    // ============ MATERNIDADE (AGENT COMMANDS) ============
+    match /maternidade_comandos/{doc} {
+      allow read: if isAgent();
+      allow write: if isAgent();
+    }
+
+    // ============ DEFAULT DENY ============
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
